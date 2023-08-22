@@ -9,6 +9,7 @@
     "packages/*"
   ],
   "scripts": {
+    "clean": "ts-node scripts/clean.cts",
     "build": "yarn workspace @chronocat/core build && yarn workspace @chronocat/plugin-llqqnt build"
   },
   "devDependencies": {
