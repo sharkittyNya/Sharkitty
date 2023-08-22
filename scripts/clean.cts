@@ -1,13 +1,17 @@
 import { rm } from 'fs/promises'
 import { resolve } from 'node:path'
 
-void Promise.all([
-  rm(resolve(__dirname, '../build'), {
-    force: true,
-    recursive: true,
-  }),
-  rm(resolve(__dirname, '../packages/core/tsconfig.buildinfo'), {
-    force: true,
-    recursive: true,
-  }),
-])
+void Promise.all(
+  [
+    '../build',
+    '../packages/core/lib',
+    '../packages/core/tsconfig.buildinfo',
+    '../packages/llqqnt/lib',
+    '../packages/qqntim/lib',
+  ].map((x) =>
+    rm(resolve(__dirname, x), {
+      force: true,
+      recursive: true,
+    }),
+  ),
+)

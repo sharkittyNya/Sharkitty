@@ -14,6 +14,14 @@ void (async () => {
     format: 'cjs',
     tsconfig: join(cwd, 'tsconfig.json'),
 
+    external: [
+      'electron',
+      'qqntim/main',
+      'qqntim/renderer',
+      'qqntim-settings',
+      'qqntim-settings/components',
+    ],
+
     bundle: true,
     minify: true,
     sourcemap: true,
