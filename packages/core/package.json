@@ -1,0 +1,16 @@
+{
+  "name": "@chronocat/core",
+  "description": "小巧轻便的 Red 实现",
+  "version": "0.0.36",
+  "license": "AGPL-3.0",
+  "author": {
+    "name": "Il Harper",
+    "email": "hi@ilharper.com",
+    "url": "https://ilharper.com"
+  },
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "files": [
+    "lib"
+  ]
+}
