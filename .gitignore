@@ -134,6 +134,8 @@ yarn.lock
 
 # Artifacts
 build/
+lib/
+dist/
 
 # Temp files
 tmp/
