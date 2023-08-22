@@ -1,5 +1,6 @@
 {
   "name": "chronocat-workspace",
+  "description": "小巧轻便的 Red 实现",
   "version": "0.0.0",
   "packageManager": "yarn@1.22.19",
   "private": true,
@@ -7,6 +8,10 @@
   "workspaces": [
     "packages/*"
   ],
+  "scripts": {
+    "dev": "concurrently -n core \"yarn workspace @chronocat/core dev\"",
+    "build": "yarn workspace @chronocat/core build"
+  },
   "devDependencies": {
     "@tsconfig/strictest": "^2.0.1",
     "@types/jest": "^29.5.3",
@@ -14,6 +19,7 @@
     "@typescript-eslint/eslint-plugin": "^6.4.1",
     "@typescript-eslint/parser": "^6.4.1",
     "concurrently": "^8.2.1",
+    "esbuild": "^0.19.2",
     "eslint": "^8.47.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-import-resolver-typescript": "^3.6.0",
