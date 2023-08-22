@@ -20,7 +20,9 @@
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "project": true
+    "project": [
+      "./tsconfig.json"
+    ]
   },
   "settings": {
     "import/resolver": {
