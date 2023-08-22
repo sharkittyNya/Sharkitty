@@ -9,8 +9,7 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently -n core \"yarn workspace @chronocat/core dev\"",
-    "build": "yarn workspace @chronocat/core build"
+    "build": "yarn workspace @chronocat/core build && yarn workspace @chronocat/plugin-llqqnt build"
   },
   "devDependencies": {
     "@tsconfig/strictest": "^2.0.1",

@@ -10,7 +10,7 @@ void (async () => {
     write: true,
     outdir: 'lib',
 
-    platform: 'browser',
+    platform: 'node',
     format: 'cjs',
     tsconfig: join(cwd, 'tsconfig.json'),
 
