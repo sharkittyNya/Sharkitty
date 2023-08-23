@@ -26,14 +26,6 @@ export interface State {
   selfProfile?: Profile
   groupMap: Record<string, Group>
   friendMap: Record<string, unknown>
-  responseMap: Record<
-    Uuid,
-    {
-      resolved?: Detail
-    }
-  >
-  requestMap: Record<Uuid, unknown>
-  requestCallbackMap: Record<Uuid, (...args: unknown[]) => void>
   richMediaDownloadMap: Record<string, (path: string) => void>
 }
 

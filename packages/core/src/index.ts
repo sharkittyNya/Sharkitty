@@ -14,7 +14,6 @@ import type {
 } from '@chronocat/red'
 import { MsgType } from '@chronocat/red'
 import busboy from 'busboy'
-import { ipcMain } from 'electron'
 import { getType } from 'mime/lite'
 import { randomBytes, randomFillSync } from 'node:crypto'
 import type { PathLike } from 'node:fs'
@@ -24,23 +23,16 @@ import type { IncomingMessage, ServerResponse } from 'node:http'
 import { createServer } from 'node:http'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
-import toSource from 'tosource'
+
 import type { WebSocket } from 'ws'
 import { WebSocketServer } from 'ws'
-import type {
-  MemoryStoreItem,
-  State,
-  ListenerData,
-  IpcEvent,
-  Detail,
-} from './types'
+import type { State, ListenerData } from './types'
 import type { MuteMember } from './ipc/definitions/groupService'
 import {
   createMemberListScene,
   destroyMemberListScene,
   getNextMemberList,
   kickMember,
-  searchMember,
   setGroupShutUp,
   setMemberShutUp,
 } from './ipc/definitions/groupService'
@@ -57,68 +49,13 @@ import {
   getFileType,
   getImageSizeFromPath,
 } from './ipc/definitions/fsApi'
+import { initListener } from './ipc/intercept'
+import { initUixCache } from './uix-cache'
+import { detachPromise } from './utils/detach-promise'
 
 declare const __DEFINE_CHRONO_VERSION__: string
 declare const authData: {
   uid: string
-}
-
-class MemoryStore {
-  #data: Record<string, MemoryStoreItem> = {}
-
-  get(key: string, cb: (item: MemoryStoreItem | undefined) => void) {
-    cb(this.#data[key])
-  }
-
-  set(key: string, val: MemoryStoreItem, cb: () => void) {
-    this.#data[key] = val
-    cb()
-  }
-
-  clear(cb: () => void) {
-    this.#data = {}
-    cb()
-  }
-}
-
-function memoize(target: (...args: unknown[]) => unknown) {
-  const expire = 30000
-  const id = Math.floor(Math.random() * 100000000).toString(36)
-  const store = new MemoryStore()
-
-  function wrapper() {
-    return function (this: unknown, ...rawArgs: unknown[]) {
-      // eslint-disable-next-line @typescript-eslint/no-this-alias
-      const self = this
-      const args = rawArgs.slice()
-      const cb = args.pop() as (...args: unknown[]) => void
-      const hash = id + '=' + toSource(args)
-
-      store.get(hash, function (cached) {
-        if (cached && (!cached.expires || cached.expires >= Date.now()))
-          return cb.apply(self, cached.args)
-        args.push(function (this: unknown, ...rawArgs: unknown[]) {
-          // eslint-disable-next-line @typescript-eslint/no-this-alias
-          const self = this
-          const cbargs = rawArgs.slice()
-          store.set(
-            hash,
-            {
-              args: cbargs,
-              expires: Date.now() + expire,
-            },
-            function () {
-              cb.apply(self, cbargs)
-            },
-          )
-        })
-
-        target.apply(target, args)
-      })
-    }
-  }
-
-  return wrapper()
 }
 
 const exists = async (path: PathLike) => {
@@ -194,202 +131,6 @@ const makeFullPacket = (obj: Record<string, unknown>) => {
 
   return obj
 }
-
-const initListener = (
-  state: State,
-  listener: (data: ListenerData) => void | Promise<void>,
-) => {
-  // eslint-disable-next-line @typescript-eslint/unbound-method
-  const emit = ipcMain.emit
-
-  ipcMain.emit = function (eventName: string | symbol, ...p: unknown[]) {
-    const p0 = p[0] as {
-      sender: {
-        send: (channel: string, evt: IpcEvent, detail: Detail) => void
-        __CHRONO_HOOKED__: boolean
-      }
-    }
-    const p1 = p?.[1] as IpcEvent
-    const p2 = p?.[2] as unknown[] | undefined
-
-    const sender = p0.sender
-    if (!sender.__CHRONO_HOOKED__) {
-      const send = sender.send
-      sender.__CHRONO_HOOKED__ = true
-
-      sender.send = function (channel, evt, detail) {
-        void listener({
-          Full: [channel, evt, detail],
-          EventName: evt.eventName,
-          CmdName: detail?.[0]?.cmdName,
-          Payload: detail?.[0]?.payload,
-          Request: state.requestMap[evt.callbackId],
-        })
-
-        send.call(this, channel, evt, detail)
-
-        if (evt.callbackId) {
-          const uuid = evt.callbackId
-          if (state.requestCallbackMap[uuid])
-            state.requestCallbackMap[uuid]?.call(evt, detail)
-
-          if (state.responseMap[evt.callbackId])
-            state.responseMap[evt.callbackId]!.resolved = detail
-        }
-        delete state.requestMap[evt.callbackId]
-      }
-    }
-
-    const ipcInfo = {
-      Full: p,
-      EventName: p1?.eventName,
-      Method: p2?.[0],
-      Args: p2,
-      Channel: eventName,
-    }
-
-    emit.call(this, eventName, ...p)
-
-    if (p1?.eventName?.includes('Log')) return false
-    state.responseMap[p1?.callbackId] ??= {}
-    state.requestMap[p1?.callbackId] = ipcInfo
-
-    return false
-  }
-
-  return () => {
-    ipcMain.emit = emit
-  }
-}
-
-const initUixCache = () => {
-  const map: Record<string, string> = {}
-
-  const enumerateAll = (
-    obj: object,
-  ): [string, unknown, Record<string, unknown>][] => {
-    const entries: [string, unknown, Record<string, unknown>][] = []
-    const enumerate = (obj: Record<string, unknown>) => {
-      for (const key in obj) {
-        if (obj[key] instanceof Map) continue
-        if (obj[key] instanceof Object)
-          enumerate(obj[key] as Record<string, unknown>)
-        else entries.push([key, obj[key], obj])
-      }
-    }
-    enumerate(obj as Record<string, unknown>)
-    return entries
-  }
-
-  const genCorrespondingName = (name: string): string | undefined => {
-    const keyMap: Record<string, string> = {
-      uid: 'uin',
-      uin: 'uid',
-      Uid: 'Uin',
-      Uin: 'Uid',
-    }
-
-    for (const key in keyMap) {
-      if (name.endsWith(key)) {
-        const k = name.slice(0, -key.length)
-        return k + keyMap[key]
-      }
-    }
-    return undefined
-  }
-
-  const addToMap = (a: string, b: string) => {
-    if (parseInt(a) === 0 || parseInt(b) === 0) return
-    map[a] = b
-    map[b] = a
-  }
-
-  const performSearch = memoize(async (contextGroup) => {
-    const scene = await createMemberListScene({
-      groupCode: contextGroup as number,
-      scene: 'groupMemberList_MainWindow',
-    })
-
-    detachPromise(
-      searchMember({
-        sceneId: scene,
-        keyword: contextGroup as string,
-      }),
-    )
-
-    await destroyMemberListScene({
-      sceneId: scene,
-    })
-  })
-
-  const cacheObject = (object: Record<string, unknown>) => {
-    for (const [key, value, obj] of enumerateAll(object)) {
-      const cKey = genCorrespondingName(key)
-      if (cKey && obj[cKey]) {
-        if (
-          parseInt(obj[cKey] as string) == 0 ||
-          !obj[cKey] ||
-          (obj[cKey] as string).includes('*') ||
-          map[value as string]
-        )
-          continue
-
-        addToMap(value as string, obj[cKey] as string)
-      }
-    }
-  }
-
-  const preprocessObject = async <T extends object>(
-    origin: T,
-    { contextGroup = -1 } = {},
-  ): Promise<T> => {
-    const eAll = enumerateAll(origin)
-
-    for (const [key, value, obj] of eAll) {
-      const cKey = genCorrespondingName(key)
-      if (cKey && !obj[cKey]) {
-        if (key.toLocaleLowerCase().endsWith('uin')) {
-          if (contextGroup !== -1) performSearch(contextGroup, value)
-        }
-
-        if (key === 'atNtUid') {
-          performSearch(
-            contextGroup,
-            (
-              obj as {
-                content: string
-              }
-            ).content.slice(1),
-          )
-        }
-      }
-    }
-
-    await new Promise((resolve) => setTimeout(resolve, 80))
-
-    for (const [key, value, obj] of eAll) {
-      const cKey = genCorrespondingName(key)
-      if (key === 'peerUin' && obj['chatType'] === 2) obj['peerUid'] = value
-      if (key === 'peerUid' && !(value as string).startsWith('u_'))
-        obj['peerUin'] = value
-      if (cKey && !obj[cKey] && map[value as string])
-        obj[cKey] = map[value as string]
-    }
-    return origin
-  }
-
-  const preprocessArrayOfUix = (arr: string[]) => arr.map((v) => map[v] ?? v)
-
-  return {
-    cacheObject,
-    preprocessObject,
-    addToMap,
-    preprocessArrayOfUix,
-    map,
-  }
-}
-
-const detachPromise = (_: Promise<unknown>) => void 0
 
 type UixCache = ReturnType<typeof initUixCache>
 
@@ -689,9 +430,6 @@ export const chronocat = async () => {
   const state: State = {
     groupMap: {},
     friendMap: {},
-    responseMap: {},
-    requestMap: {},
-    requestCallbackMap: {},
     richMediaDownloadMap: {},
   }
 
@@ -906,7 +644,7 @@ export const chronocat = async () => {
     }
   }
 
-  const disposeListener = initListener(state, dispatch)
+  const disposeListener = initListener(dispatch)
 
   wsServer.on('connection', (wsClient) => {
     wsClient.once('message', (raw: Buffer) => {

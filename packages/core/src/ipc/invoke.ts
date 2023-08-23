@@ -1,5 +1,6 @@
 import { ipcMain } from 'electron'
 import type { Uuid, IpcEvent, Detail } from '../types'
+import { requestCallbackMap } from './global'
 
 const generateUUID = () => {
   let d = new Date().getTime()
@@ -12,8 +13,6 @@ const generateUUID = () => {
   })
   return uuid
 }
-
-const requestCallbackMap: Record<Uuid, unknown> = {}
 
 export const invoke = async (
   channel: string,
