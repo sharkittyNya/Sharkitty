@@ -9,6 +9,7 @@ import type {
   MessageGetHistoryPayload,
   MessageRecallPayload,
   MessageSendPayload,
+  Peer,
   Profile,
   WsPackage,
 } from '@chronocat/red'
@@ -27,52 +28,30 @@ import { join } from 'node:path'
 import toSource from 'tosource'
 import type { WebSocket } from 'ws'
 import { WebSocketServer } from 'ws'
+import type { Invoke } from './ipc/invoke'
+import { invoke } from './ipc/invoke'
+import type {
+  MemoryStoreItem,
+  State,
+  ListenerData,
+  IpcEvent,
+  Detail,
+} from './types'
+import type { MuteMember } from './ipc/definitions/groupService'
+import {
+  createMemberListScene,
+  destroyMemberListScene,
+  getNextMemberList,
+  kickMember,
+  searchMember,
+  setGroupShutUp,
+  setMemberShutUp,
+} from './ipc/definitions/groupService'
+import { recallMsg } from './ipc/definitions/msgService'
 
 declare const __DEFINE_CHRONO_VERSION__: string
 declare const authData: {
   uid: string
-}
-
-type Uuid = string | number
-
-interface IpcEvent {
-  eventName: string
-  callbackId: Uuid
-}
-
-type Detail = [
-  {
-    cmdName: string
-    payload: unknown
-  },
-]
-
-interface ListenerData {
-  Full: [unknown, IpcEvent, unknown]
-  EventName: string
-  CmdName: string
-  Payload: unknown
-  Request: unknown
-}
-
-interface State {
-  selfProfile?: Profile
-  groupMap: Record<string, Group>
-  friendMap: Record<string, unknown>
-  responseMap: Record<
-    Uuid,
-    {
-      resolved?: Detail
-    }
-  >
-  requestMap: Record<Uuid, unknown>
-  requestCallbackMap: Record<Uuid, (...args: unknown[]) => void>
-  richMediaDownloadMap: Record<string, (path: string) => void>
-}
-
-interface MemoryStoreItem {
-  args: unknown[]
-  expires: number
 }
 
 class MemoryStore {
@@ -159,18 +138,6 @@ const initToken = async (baseDir: string) => {
   return generatedToken
 }
 
-const generateUUID = () => {
-  let d = new Date().getTime()
-  d += performance.now()
-
-  const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    const r = (d + Math.random() * 16) % 16 | 0
-    d = Math.floor(d / 16)
-    return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16)
-  })
-  return uuid
-}
-
 const packetPreset = {
   atTinyUid: '',
   elementId: '',
@@ -218,37 +185,6 @@ const makeFullPacket = (obj: Record<string, unknown>) => {
 
   return obj
 }
-
-const initInvoke =
-  (state: State) =>
-    async (channel: string, evtName: unknown, ...args: unknown[]) => {
-      const uuid = generateUUID()
-      const result = await Promise.race([
-        new Promise((_, reject) => setTimeout(() => reject(), 5000)),
-        new Promise((resolve) => {
-          state.requestCallbackMap[uuid] = resolve
-          ipcMain.emit(
-            channel,
-            {
-              sender: {
-                send: (...args: [string, IpcEvent, Detail]) => {
-                  resolve(args)
-                },
-                __CHRONO_HOOKED__: true,
-              },
-            },
-            { type: 'request', callbackId: uuid, eventName: evtName },
-            args,
-          )
-        }),
-      ])
-
-      delete state.requestCallbackMap[uuid]
-
-      return result
-    }
-
-type Invoke = ReturnType<typeof initInvoke>
 
 const initListener = (
   state: State,
@@ -317,7 +253,7 @@ const initListener = (
   }
 }
 
-const initUixCache = (invoke: Invoke) => {
+const initUixCache = () => {
   const map: Record<string, string> = {}
 
   const enumerateAll = (
@@ -360,34 +296,21 @@ const initUixCache = (invoke: Invoke) => {
   }
 
   const performSearch = memoize(async (contextGroup) => {
-    const scene = await invoke(
-      'IPC_UP_2',
-      'ns-ntApi-2',
-      'nodeIKernelGroupService/createMemberListScene',
-      {
-        groupCode: contextGroup,
-        scene: 'groupMemberList_MainWindow',
-      },
+    const scene = await createMemberListScene({
+      groupCode: contextGroup as number,
+      scene: 'groupMemberList_MainWindow',
+    })
+
+    detachPromise(
+      searchMember({
+        sceneId: scene,
+        keyword: contextGroup as string,
+      }),
     )
 
-    await invoke(
-      'IPC_UP_2',
-      'ns-ntApi-2',
-      'nodeIKernelGroupService/searchMember',
-      {
-        sceneId: scene,
-        keyword: contextGroup,
-      },
-    )
-
-    await invoke(
-      'IPC_UP_2',
-      'ns-ntApi-2',
-      'nodeIKernelGroupService/destroyMemberListScene',
-      {
-        sceneId: scene,
-      },
-    )
+    await destroyMemberListScene({
+      sceneId: scene,
+    })
   })
 
   const cacheObject = (object: Record<string, unknown>) => {
@@ -481,10 +404,10 @@ const routes = {
       return manualHandled
     }
 
-    return state.selfProfile
+    return state.selfProfile ?? {}
   },
 
-  '/group/getMemberList': async ({ invoke, req, res, getBody }: Context) => {
+  '/group/getMemberList': async ({ req, res, getBody }: Context) => {
     if (req.method !== 'POST') {
       res.writeHead(400)
       res.end('bad request')
@@ -493,55 +416,25 @@ const routes = {
 
     const body = (await getBody()) as GroupGetMemeberListPayload
 
-    const scene = await invoke(
-      'IPC_UP_2',
-      'ns-ntApi-2',
-      'nodeIKernelGroupService/createMemberListScene',
-      {
-        groupCode: body.group,
-        scene: 'groupMemberList_MainWindow',
-      },
-    )
+    const scene = await createMemberListScene({
+      groupCode: body.group,
+      scene: 'groupMemberList_MainWindow',
+    })
 
-    const memList = (await invoke(
-      'IPC_UP_2',
-      'ns-ntApi-2',
-      'nodeIKernelGroupService/getNextMemberList',
-      {
-        sceneId: scene,
-        lastId: undefined,
-        num: body.size,
-      },
-    )) as {
-      result: {
-        ids: {
-          uid: string
-          index: string
-        }[]
-        infos: {
-          get: (uid: string) => unknown
-        }
-      }
-    }
+    const memList = await getNextMemberList({
+      sceneId: scene,
+      lastId: undefined,
+      num: body.size,
+    })
 
-    await invoke(
-      'IPC_UP_2',
-      'ns-ntApi-2',
-      'nodeIKernelGroupService/destroyMemberListScene',
-      {
-        sceneId: scene,
-      },
-    )
+    await destroyMemberListScene({
+      sceneId: scene,
+    })
 
     detachPromise(
-      invoke(
-        'IPC_UP_2',
-        'ns-ntApi-2',
-        'nodeIKernelGroupService/destroyMemberListScene',
-        {
-          sceneId: scene,
-        },
-      ),
+      destroyMemberListScene({
+        sceneId: scene,
+      }),
     )
 
     return memList.result?.ids?.map(({ uid, index }) => {
@@ -553,13 +446,7 @@ const routes = {
     })
   },
 
-  '/group/muteMember': async ({
-    invoke,
-    uixCache,
-    req,
-    res,
-    getBody,
-  }: Context) => {
+  '/group/muteMember': async ({ uixCache, req, res, getBody }: Context) => {
     if (req.method !== 'POST') {
       res.writeHead(400)
       res.end('bad request')
@@ -568,21 +455,15 @@ const routes = {
 
     const { group, memList } = (await getBody()) as GroupMuteMemberPayload
 
-    return await invoke(
-      'IPC_UP_2',
-      'ns-ntApi-2',
-      'nodeIKernelGroupService/setMemberShutUp',
-      {
-        groupCode: group,
-        memList: await uixCache.preprocessObject(memList, {
-          contextGroup: Number(group),
-        }),
-      },
-      null,
-    )
+    return await setMemberShutUp({
+      groupCode: group,
+      memList: (await uixCache.preprocessObject(memList, {
+        contextGroup: Number(group),
+      })) as MuteMember[],
+    })
   },
 
-  '/group/muteEveryone': async ({ invoke, req, res, getBody }: Context) => {
+  '/group/muteEveryone': async ({ req, res, getBody }: Context) => {
     if (req.method !== 'POST') {
       res.writeHead(400)
       res.end('bad request')
@@ -591,18 +472,13 @@ const routes = {
 
     const { group, enable } = (await getBody()) as GroupMuteEveryonePayload
 
-    return await invoke(
-      'IPC_UP_2',
-      'ns-ntApi-2',
-      'nodeIKernelGroupService/setGroupShutUp',
-      {
-        groupCode: group,
-        shutUp: enable,
-      },
-    )
+    return await setGroupShutUp({
+      groupCode: group,
+      shutUp: enable,
+    })
   },
 
-  '/group/kick': async ({ invoke, uixCache, req, res, getBody }: Context) => {
+  '/group/kick': async ({ uixCache, req, res, getBody }: Context) => {
     if (req.method !== 'POST') {
       res.writeHead(400)
       res.end('bad request')
@@ -612,26 +488,15 @@ const routes = {
     const { uidList, group, reason, refuseForever } =
       (await getBody()) as GroupKickPayload
 
-    return await invoke(
-      'IPC_UP_2',
-      'ns-ntApi-2',
-      'nodeIKernelGroupService/kickMember',
-      {
-        groupCode: group,
-        kickUids: uixCache.preprocessArrayOfUix(uidList),
-        refuseForever: refuseForever,
-        kickReason: reason,
-      },
-    )
+    return await kickMember({
+      groupCode: group,
+      kickUids: uixCache.preprocessArrayOfUix(uidList),
+      refuseForever: refuseForever,
+      kickReason: reason,
+    })
   },
 
-  '/message/recall': async ({
-    invoke,
-    uixCache,
-    req,
-    res,
-    getBody,
-  }: Context) => {
+  '/message/recall': async ({ uixCache, req, res, getBody }: Context) => {
     if (req.method !== 'POST') {
       res.writeHead(400)
       res.end('bad request')
@@ -640,15 +505,10 @@ const routes = {
 
     const { peer, msgIds } = (await getBody()) as MessageRecallPayload
 
-    return await invoke(
-      'IPC_UP_2',
-      'ns-ntApi-2',
-      'nodeIKernelMsgService/recallMsg',
-      {
-        peer: await uixCache.preprocessObject(peer),
-        msgIds: msgIds,
-      },
-    )
+    return recallMsg({
+      peer: (await uixCache.preprocessObject(peer)) as Peer,
+      msgIds: msgIds,
+    })
   },
 
   '/message/fetchRichMedia': async ({
@@ -774,7 +634,8 @@ const routes = {
           await mkdir(saveTo, { recursive: true })
           filePath = join(
             saveTo,
-            `${randomFillSync(Buffer.alloc(16)).toString('hex')}-${info.filename
+            `${randomFillSync(Buffer.alloc(16)).toString('hex')}-${
+              info.filename
             }`,
           )
           fileInfo = info
@@ -809,11 +670,11 @@ const routes = {
             invoke('IPC_UP_2', 'ns-fsApi-2', 'getFileMd5', filePath),
             category === 'image'
               ? invoke(
-                'IPC_UP_2',
-                'ns-fsApi-2',
-                'getImageSizeFromPath',
-                filePath,
-              )
+                  'IPC_UP_2',
+                  'ns-fsApi-2',
+                  'getImageSizeFromPath',
+                  filePath,
+                )
               : undefined,
             invoke('IPC_UP_2', 'ns-fsApi-2', 'getFileSize', filePath),
           ])
@@ -872,8 +733,8 @@ export const chronocat = async () => {
   )
 
   const token = await initToken(baseDir)
-  const invoke = initInvoke(state)
-  const uixCache = initUixCache(invoke)
+
+  const uixCache = initUixCache()
 
   const wsClientListener = (raw: Buffer) =>
     void (async () => {
