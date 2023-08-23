@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron'
-import type { Uuid, IpcEvent, Detail } from '../types'
-import { requestCallbackMap } from './global'
+import type { IpcEvent, Detail } from '../types'
+import { requestCallbackMap } from './globalVars'
 
 const generateUUID = () => {
   let d = new Date().getTime()
