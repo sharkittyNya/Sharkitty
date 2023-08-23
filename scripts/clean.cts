@@ -6,6 +6,8 @@ void Promise.all(
     '../build',
     '../packages/core/lib',
     '../packages/core/tsconfig.buildinfo',
+    '../packages/red/lib',
+    '../packages/red/tsconfig.buildinfo',
     '../packages/llqqnt/lib',
     '../packages/qqntim/lib',
   ].map((x) =>
