@@ -5,6 +5,9 @@ const [_node, _tsNode, mode] = process.argv
 const cwd = process.cwd()
 
 void (async () => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-var-requires
+  const { version } = require(join(cwd, 'package.json'))
+
   const ctx = await context({
     entryPoints: [join(cwd, 'src/index.ts')],
     write: true,
@@ -14,6 +17,9 @@ void (async () => {
     format: 'cjs',
     tsconfig: join(cwd, 'tsconfig.json'),
 
+    define: {
+      __DEFINE_CHRONO_VERSION__: `'${version}'`,
+    },
     external: [
       'electron',
       'qqntim/main',

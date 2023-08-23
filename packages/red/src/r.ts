@@ -12,14 +12,12 @@ const b = () => {
       chatType: 1,
       guildId: '',
       peerUid: '',
-
       peerUin: '',
     },
     'peer/group': {
       chatType: 2,
       guildId: '',
       peerUid: '',
-
       peerUin: '',
     },
   } as const
@@ -28,6 +26,8 @@ const b = () => {
     Object.assign({}, reg[type], data) as (typeof reg)[T] & D
 
   const h = {
+    reg,
+
     peerPrivate: (peerUin: string) =>
       r('peer/private', {
         peerUin,
