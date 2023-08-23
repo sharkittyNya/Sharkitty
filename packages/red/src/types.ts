@@ -37,7 +37,7 @@ export interface MetaConnectResponse {
   }
 }
 
-export interface GetSelfProfileResponse {
+export interface Profile {
   uid: string
   qid: string
   uin: string
@@ -67,13 +67,15 @@ export interface GetSelfProfileResponse {
   vipLevel: number
 }
 
+export interface Peer {
+  chatType: 1 | 2
+  peerUid: string
+  peerUin: string
+  guildId?: string
+}
+
 export interface MessageSendPayload {
-  peer: {
-    chatType: 1 | 2
-    peerUid: string
-    peerUin: string
-    guildId?: string
-  }
+  peer: Peer
   elements: RecursivePartial<Element>[]
 }
 
@@ -92,7 +94,7 @@ export interface UploadResponse {
   ntFilePath: string
 }
 
-export type GetGroupsResponse = {
+export interface Group {
   groupCode: string
   maxMember: number
   memberCount: number
@@ -113,7 +115,9 @@ export type GetGroupsResponse = {
   discussToGroupUin: string
   discussToGroupMaxMsgSeq: number
   discussToGroupTime: number
-}[]
+}
+
+export type GetGroupsResponse = Group[]
 
 export type GetFriendsResponse = {
   uid: string
@@ -528,4 +532,44 @@ export interface Media {
   elementId: string
   thumbSize: number
   downloadType: number
+}
+
+export interface GroupGetMemeberListPayload {
+  group: number
+  size: number
+}
+
+export interface GroupMuteMemberPayload {
+  group: string
+  memList: {
+    uin: string
+    timeStamp: number
+  }[]
+}
+
+export interface GroupMuteEveryonePayload {
+  group: string
+  enable: boolean
+}
+
+export interface GroupKickPayload {
+  uidList: string[]
+  group: string
+  refuseForever: boolean
+  reason: string
+}
+
+export interface GroupGetAnnouncementsPayload {
+  group: string
+}
+
+export interface MessageRecallPayload {
+  msgIds: string[]
+  peer: Peer
+}
+
+export interface MessageGetHistoryPayload {
+  peer: Peer
+  count: number
+  offsetMsgId?: string
 }

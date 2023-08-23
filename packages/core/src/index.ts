@@ -1,9 +1,26 @@
-import type { Message, MessageSendPayload, WsPackage } from '@chronocat/red'
+import type {
+  Group,
+  GroupGetMemeberListPayload,
+  GroupKickPayload,
+  GroupMuteEveryonePayload,
+  GroupMuteMemberPayload,
+  Media,
+  Message,
+  MessageGetHistoryPayload,
+  MessageRecallPayload,
+  MessageSendPayload,
+  Profile,
+  WsPackage,
+} from '@chronocat/red'
 import { MsgType } from '@chronocat/red'
+import busboy from 'busboy'
 import { ipcMain } from 'electron'
-import { randomBytes } from 'node:crypto'
+import { getType } from 'mime/lite'
+import { randomBytes, randomFillSync } from 'node:crypto'
 import type { PathLike } from 'node:fs'
-import { readFile, stat, writeFile } from 'node:fs/promises'
+import { createReadStream, createWriteStream } from 'node:fs'
+import { copyFile, mkdir, readFile, stat, writeFile } from 'node:fs/promises'
+import type { IncomingMessage, ServerResponse } from 'node:http'
 import { createServer } from 'node:http'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
@@ -12,7 +29,9 @@ import type { WebSocket } from 'ws'
 import { WebSocketServer } from 'ws'
 
 declare const __DEFINE_CHRONO_VERSION__: string
-declare const authData: unknown
+declare const authData: {
+  uid: string
+}
 
 type Uuid = string | number
 
@@ -36,7 +55,10 @@ interface ListenerData {
   Request: unknown
 }
 
-interface Context {
+interface State {
+  selfProfile?: Profile
+  groupMap: Record<string, Group>
+  friendMap: Record<string, unknown>
   responseMap: Record<
     Uuid,
     {
@@ -45,6 +67,7 @@ interface Context {
   >
   requestMap: Record<Uuid, unknown>
   requestCallbackMap: Record<Uuid, (...args: unknown[]) => void>
+  richMediaDownloadMap: Record<string, (path: string) => void>
 }
 
 interface MemoryStoreItem {
@@ -113,7 +136,7 @@ function memoize(target: (...args: unknown[]) => unknown) {
 const exists = async (path: PathLike) => {
   try {
     await stat(path)
-  } catch (_) {
+  } catch (e) {
     return false
   }
   return true
@@ -124,11 +147,8 @@ const filterMessage = (message: MessageSendPayload | Message) =>
     ? !message.elements.some((x) => x.walletElement || x.arkElement)
     : !(message.msgType === MsgType.Ark || message.msgType === MsgType.Wallet)
 
-const initToken = async () => {
-  const path = join(
-    process.env['APPDATA'] || homedir(),
-    'BetterUniverse/QQNT/RED_PROTOCOL_TOKEN',
-  )
+const initToken = async (baseDir: string) => {
+  const path = join(baseDir, 'RED_PROTOCOL_TOKEN')
   try {
     if (await exists(path)) return (await readFile(path, 'utf-8')).trim()
   } catch (e) {
@@ -200,13 +220,13 @@ const makeFullPacket = (obj: Record<string, unknown>) => {
 }
 
 const initInvoke =
-  (ctx: Context) =>
+  (state: State) =>
   async (channel: string, evtName: unknown, ...args: unknown[]) => {
     const uuid = generateUUID()
     const result = await Promise.race([
       new Promise((_, reject) => setTimeout(() => reject(), 5000)),
       new Promise((resolve) => {
-        ctx.requestCallbackMap[uuid] = resolve
+        state.requestCallbackMap[uuid] = resolve
         ipcMain.emit(
           channel,
           {
@@ -223,7 +243,7 @@ const initInvoke =
       }),
     ])
 
-    delete ctx.requestCallbackMap[uuid]
+    delete state.requestCallbackMap[uuid]
 
     return result
   }
@@ -231,7 +251,7 @@ const initInvoke =
 type Invoke = ReturnType<typeof initInvoke>
 
 const initListener = (
-  ctx: Context,
+  state: State,
   listener: (data: ListenerData) => void | Promise<void>,
 ) => {
   // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -258,20 +278,20 @@ const initListener = (
           EventName: evt.eventName,
           CmdName: detail?.[0]?.cmdName,
           Payload: detail?.[0]?.payload,
-          Request: ctx.requestMap[evt.callbackId],
+          Request: state.requestMap[evt.callbackId],
         })
 
         send.call(this, channel, evt, detail)
 
         if (evt.callbackId) {
           const uuid = evt.callbackId
-          if (ctx.requestCallbackMap[uuid])
-            ctx.requestCallbackMap[uuid]?.call(evt, detail)
+          if (state.requestCallbackMap[uuid])
+            state.requestCallbackMap[uuid]?.call(evt, detail)
 
-          if (ctx.responseMap[evt.callbackId])
-            ctx.responseMap[evt.callbackId]!.resolved = detail
+          if (state.responseMap[evt.callbackId])
+            state.responseMap[evt.callbackId]!.resolved = detail
         }
-        delete ctx.requestMap[evt.callbackId]
+        delete state.requestMap[evt.callbackId]
       }
     }
 
@@ -286,8 +306,8 @@ const initListener = (
     emit.call(this, eventName, ...p)
 
     if (p1?.eventName?.includes('Log')) return false
-    ctx.responseMap[p1?.callbackId] ??= {}
-    ctx.requestMap[p1?.callbackId] = ipcInfo
+    state.responseMap[p1?.callbackId] ??= {}
+    state.requestMap[p1?.callbackId] = ipcInfo
 
     return false
   }
@@ -437,15 +457,420 @@ const initUixCache = (invoke: Invoke) => {
   }
 }
 
+type UixCache = ReturnType<typeof initUixCache>
+
+interface Context {
+  baseDir: string
+  invoke: Invoke
+  uixCache: UixCache
+  state: State
+  req: IncomingMessage
+  res: ServerResponse
+  getBody: () => Promise<unknown>
+}
+
+const manualHandled = Symbol('manualHandled')
+
+const routes = {
+  '/getSelfProfile': async ({ state, req, res }: Context) => {
+    if (req.method !== 'GET') {
+      res.writeHead(400)
+      res.end('bad request')
+      return manualHandled
+    }
+
+    return state.selfProfile
+  },
+
+  '/group/getMemberList': async ({ invoke, req, res, getBody }: Context) => {
+    if (req.method !== 'POST') {
+      res.writeHead(400)
+      res.end('bad request')
+      return manualHandled
+    }
+
+    const body = (await getBody()) as GroupGetMemeberListPayload
+
+    const scene = await invoke(
+      'IPC_UP_2',
+      'ns-ntApi-2',
+      'nodeIKernelGroupService/createMemberListScene',
+      {
+        groupCode: body.group,
+        scene: 'groupMemberList_MainWindow',
+      },
+    )
+
+    const memList = (await invoke(
+      'IPC_UP_2',
+      'ns-ntApi-2',
+      'nodeIKernelGroupService/getNextMemberList',
+      {
+        sceneId: scene,
+        lastId: undefined,
+        num: body.size,
+      },
+    )) as {
+      result: {
+        ids: {
+          uid: string
+          index: string
+        }[]
+        infos: {
+          get: (uid: string) => unknown
+        }
+      }
+    }
+
+    await invoke(
+      'IPC_UP_2',
+      'ns-ntApi-2',
+      'nodeIKernelGroupService/destroyMemberListScene',
+      {
+        sceneId: scene,
+      },
+    )
+
+    // TODO: ???
+    void invoke(
+      'IPC_UP_2',
+      'ns-ntApi-2',
+      'nodeIKernelGroupService/destroyMemberListScene',
+      {
+        sceneId: scene,
+      },
+    )
+
+    return memList.result?.ids?.map(({ uid, index }) => {
+      return {
+        uid,
+        index,
+        detail: memList.result.infos.get(uid),
+      }
+    })
+  },
+
+  '/group/muteMember': async ({
+    invoke,
+    uixCache,
+    req,
+    res,
+    getBody,
+  }: Context) => {
+    if (req.method !== 'POST') {
+      res.writeHead(400)
+      res.end('bad request')
+      return manualHandled
+    }
+
+    const { group, memList } = (await getBody()) as GroupMuteMemberPayload
+
+    return await invoke(
+      'IPC_UP_2',
+      'ns-ntApi-2',
+      'nodeIKernelGroupService/setMemberShutUp',
+      {
+        groupCode: group,
+        memList: await uixCache.preprocessObject(memList, {
+          contextGroup: Number(group),
+        }),
+      },
+      null,
+    )
+  },
+
+  '/group/muteEveryone': async ({ invoke, req, res, getBody }: Context) => {
+    if (req.method !== 'POST') {
+      res.writeHead(400)
+      res.end('bad request')
+      return manualHandled
+    }
+
+    const { group, enable } = (await getBody()) as GroupMuteEveryonePayload
+
+    return await invoke(
+      'IPC_UP_2',
+      'ns-ntApi-2',
+      'nodeIKernelGroupService/setGroupShutUp',
+      {
+        groupCode: group,
+        shutUp: enable,
+      },
+    )
+  },
+
+  '/group/kick': async ({ invoke, uixCache, req, res, getBody }: Context) => {
+    if (req.method !== 'POST') {
+      res.writeHead(400)
+      res.end('bad request')
+      return manualHandled
+    }
+
+    const { uidList, group, reason, refuseForever } =
+      (await getBody()) as GroupKickPayload
+
+    return await invoke(
+      'IPC_UP_2',
+      'ns-ntApi-2',
+      'nodeIKernelGroupService/kickMember',
+      {
+        groupCode: group,
+        kickUids: uixCache.preprocessArrayOfUix(uidList),
+        refuseForever: refuseForever,
+        kickReason: reason,
+      },
+    )
+  },
+
+  '/message/recall': async ({
+    invoke,
+    uixCache,
+    req,
+    res,
+    getBody,
+  }: Context) => {
+    if (req.method !== 'POST') {
+      res.writeHead(400)
+      res.end('bad request')
+      return manualHandled
+    }
+
+    const { peer, msgIds } = (await getBody()) as MessageRecallPayload
+
+    return await invoke(
+      'IPC_UP_2',
+      'ns-ntApi-2',
+      'nodeIKernelMsgService/recallMsg',
+      {
+        peer: await uixCache.preprocessObject(peer),
+        msgIds: msgIds,
+      },
+    )
+  },
+
+  '/message/fetchRichMedia': async ({
+    state,
+    uixCache,
+    invoke,
+    req,
+    res,
+    getBody,
+  }: Context) => {
+    if (req.method !== 'POST') {
+      res.writeHead(400)
+      res.end('bad request')
+      return manualHandled
+    }
+
+    const body = (await getBody()) as Media
+
+    const downloadId = body.msgId + '::' + body.elementId
+    console.log('DownloadId:', downloadId)
+    const downloadCompletePromise = new Promise<string>((rs) => {
+      state.richMediaDownloadMap[downloadId] = rs
+    })
+
+    if (body.chatType === 1 && !body.peerUid.startsWith('u_'))
+      body.peerUid = uixCache.map[body.peerUid]!
+
+    await invoke(
+      'IPC_UP_2',
+      'ns-ntApi-2',
+      'nodeIKernelMsgService/downloadRichMedia',
+      {
+        getReq: {
+          msgId: body.msgId,
+          chatType: body.chatType,
+          peerUid: body.peerUid,
+          elementId: body.elementId,
+          thumbSize: 0,
+          downloadType: 2,
+        },
+      },
+    )
+
+    const path = await downloadCompletePromise
+
+    res.statusCode = 200
+    res.setHeader('Content-Type', getType(path)!)
+
+    const readStream = createReadStream(path)
+    readStream.pipe(res)
+
+    return manualHandled
+  },
+
+  '/message/getHistory': async ({
+    invoke,
+    uixCache,
+    req,
+    res,
+    getBody,
+  }: Context) => {
+    if (req.method !== 'POST') {
+      res.writeHead(400)
+      res.end('bad request')
+      return manualHandled
+    }
+
+    const { peer, offsetMsgId, count } =
+      (await getBody()) as MessageGetHistoryPayload
+
+    return await invoke(
+      'IPC_UP_2',
+      'ns-ntApi-2',
+      'nodeIKernelMsgService/getMsgsIncludeSelf',
+      [
+        {
+          peer: await uixCache.preprocessObject(peer),
+          msgId: offsetMsgId,
+          cnt: count,
+          queryOrder: true,
+        },
+        undefined,
+      ],
+    )
+  },
+
+  '/bot/friends': async ({ state, req, res }: Context) => {
+    if (req.method !== 'GET') {
+      res.writeHead(400)
+      res.end('bad request')
+      return manualHandled
+    }
+
+    return Object.values(state.friendMap)
+  },
+
+  '/bot/groups': async ({ state, req, res }: Context) => {
+    if (req.method !== 'GET') {
+      res.writeHead(400)
+      res.end('bad request')
+      return manualHandled
+    }
+
+    return Object.values(state.groupMap)
+  },
+
+  '/upload': async ({ baseDir, invoke, req, res }: Context) => {
+    if (req.method !== 'POST') {
+      res.writeHead(400)
+      res.end('bad request')
+      return manualHandled
+    }
+
+    const bb = busboy({ headers: req.headers })
+    let filePath: PathLike
+    let fileInfo: busboy.FileInfo
+
+    bb.on(
+      'file',
+      (_name, file, info) =>
+        void (async () => {
+          const saveTo = join(baseDir, `redprotocol-upload`)
+          await mkdir(saveTo, { recursive: true })
+          filePath = join(
+            saveTo,
+            `${randomFillSync(Buffer.alloc(16)).toString('hex')}-${
+              info.filename
+            }`,
+          )
+          fileInfo = info
+          file.pipe(createWriteStream(filePath))
+        })(),
+    )
+
+    bb.on(
+      'close',
+      () =>
+        void (async () => {
+          if (!filePath) {
+            res.writeHead(400)
+            res.end(`400 bad request`)
+            return
+          }
+
+          const fileType: {
+            mime: string
+          } = (await invoke(
+            'IPC_UP_2',
+            'ns-fsApi-2',
+            'getFileType',
+            filePath,
+          )) as {
+            mime: string
+          }
+
+          const category = fileType.mime.split('/')[0]
+
+          const [md5, imageInfo, fileSize] = await Promise.all([
+            invoke('IPC_UP_2', 'ns-fsApi-2', 'getFileMd5', filePath),
+            category === 'image'
+              ? invoke(
+                  'IPC_UP_2',
+                  'ns-fsApi-2',
+                  'getImageSizeFromPath',
+                  filePath,
+                )
+              : undefined,
+            invoke('IPC_UP_2', 'ns-fsApi-2', 'getFileSize', filePath),
+          ])
+
+          const richMediaPath = await invoke(
+            'IPC_UP_2',
+            'ns-ntApi-2',
+            'nodeIKernelMsgService/getRichMediaFilePath',
+            {
+              md5HexStr: md5,
+              fileName: fileInfo.filename,
+              elementType: 2,
+              elementSubType: 0,
+              thumbSize: 0,
+              needCreate: true,
+              fileType: 1,
+            },
+            undefined,
+          )
+
+          await copyFile(filePath, richMediaPath as string)
+
+          res.writeHead(200)
+
+          res.end(
+            JSON.stringify({
+              md5,
+              imageInfo,
+              fileSize,
+              filePath,
+              ntFilePath: richMediaPath,
+            }),
+          )
+        })(),
+    )
+
+    req.pipe(bb)
+
+    return manualHandled
+  },
+} as const
+
 export const chronocat = async () => {
-  const ctx: Context = {
+  const state: State = {
+    groupMap: {},
+    friendMap: {},
     responseMap: {},
     requestMap: {},
     requestCallbackMap: {},
+    richMediaDownloadMap: {},
   }
 
-  const token = await initToken()
-  const invoke = initInvoke(ctx)
+  const baseDir = join(
+    process.env['APPDATA'] || homedir(),
+    'BetterUniverse/QQNT',
+  )
+
+  const token = await initToken(baseDir)
+  const invoke = initInvoke(state)
   const uixCache = initUixCache(invoke)
 
   const wsClientListener = (raw: Buffer) =>
@@ -482,9 +907,63 @@ export const chronocat = async () => {
       }
     })()
 
-  const httpServer = createServer((_req, res) => {
-    res.writeHead(404)
-    res.end('404 not found')
+  const httpServer = createServer((req, res) => {
+    if (!req.url) return
+    const url = new URL(req.url, `http://${req.headers.host}`)
+
+    if (
+      req.headers.authorization?.slice(0, 7) !== 'Bearer ' ||
+      req.headers.authorization.slice(7) !== token
+    ) {
+      res.writeHead(401)
+      res.end('401 unauthorized')
+    }
+
+    const getBody = () =>
+      new Promise((resolve, reject) => {
+        let body = ''
+        req.on('data', (chunk: { toString: () => string }) => {
+          body += chunk.toString()
+        })
+        req.on('end', () => {
+          try {
+            resolve(JSON.parse(body))
+          } catch (error) {
+            reject(error)
+          }
+        })
+        req.on('error', (error: unknown) => {
+          reject(error)
+        })
+      })
+
+    const ctx = {
+      baseDir,
+      invoke,
+      uixCache,
+      state,
+      req,
+      res,
+      getBody,
+    }
+
+    const route =
+      routes[url.pathname.replace('/api', '') as keyof typeof routes]
+    if (route)
+      void route(ctx)
+        .then((result) => {
+          if (result === manualHandled) return
+          res.writeHead(200)
+          res.end(result)
+        })
+        .catch((_error) => {
+          res.writeHead(500)
+          res.end()
+        })
+    else {
+      res.writeHead(404)
+      res.end('404 not found')
+    }
   })
 
   const wsServer = new WebSocketServer({
@@ -505,30 +984,105 @@ export const chronocat = async () => {
   const dispatch = async ({ CmdName, Payload }: ListenerData) => {
     try {
       uixCache.cacheObject(Payload as Record<string, unknown>)
-    } catch (e: unknown) {
+    } catch (e) {
       // Ignore
     }
 
     switch (CmdName) {
       case 'nodeIKernelMsgListener/onRecvMsg': {
+        const payload = Payload as {
+          msgList: Message[]
+        }
+
         send(
           'message::recv',
           await Promise.all(
-            (
-              Payload as {
-                msgList: Message[]
-              }
-            ).msgList
+            payload.msgList
               .filter(filterMessage)
               .map(async (msg) => await uixCache.preprocessObject(msg)),
           ),
         )
         return
       }
+
+      case 'nodeIKernelProfileListener/onProfileSimpleChanged':
+      case 'nodeIKernelGroupListener/onSearchMemberChange':
+      case 'nodeIKernelGroupService/getNextMemberList': {
+        const payload = Payload as {
+          profiles: [
+            string,
+            {
+              uin: string
+            },
+          ][] & {
+            get: (uid: string) => Profile
+          }
+          infos: [
+            string,
+            {
+              uin: string
+            },
+          ][]
+        }
+
+        if (payload.profiles.get(authData.uid))
+          state.selfProfile = payload.profiles.get(authData.uid)
+
+        const profile = payload.profiles ?? payload.infos
+        for (const [uid, { uin }] of profile) uixCache.addToMap(uid, uin)
+        return
+      }
+
+      case 'nodeIKernelMsgListener/onRichMediaDownloadComplete': {
+        const payload = Payload as {
+          notifyInfo: {
+            msgId: string
+            msgElementId: string
+            filePath: string
+          }
+        }
+
+        const downloadId = `${payload.notifyInfo.msgId}::${payload.notifyInfo.msgElementId}`
+        if (state.richMediaDownloadMap[downloadId]) {
+          state.richMediaDownloadMap[downloadId]!(payload.notifyInfo.filePath)
+          delete state.richMediaDownloadMap[downloadId]
+        }
+        return
+      }
+
+      case 'nodeIKernelGroupListener/onGroupListUpdate': {
+        const payload = Payload as {
+          groupList: Group[]
+        }
+
+        for (const group of payload.groupList)
+          state.groupMap[group.groupCode] = group
+        return
+      }
+
+      case 'nodeIKernelBuddyListener/onBuddyListChange': {
+        const payload = Payload as {
+          data: {
+            categoryName: string
+            buddyList: {
+              category: string
+              uin: string
+            }[]
+          }[]
+        }
+
+        for (const category of payload.data) {
+          for (const buddy of category.buddyList) {
+            buddy.category = category.categoryName
+            state.friendMap[buddy.uin] = buddy
+          }
+        }
+        return
+      }
     }
   }
 
-  const disposeListener = initListener(ctx, dispatch)
+  const disposeListener = initListener(state, dispatch)
 
   wsServer.on('connection', (wsClient) => {
     wsClient.once('message', (raw: Buffer) => {
@@ -558,7 +1112,7 @@ export const chronocat = async () => {
         wsClient.on('disconnect', () =>
           wsClients.splice(wsClients.indexOf(wsClient), 1),
         )
-      } catch (e: unknown) {
+      } catch (e) {
         wsClient.close()
       }
     })
