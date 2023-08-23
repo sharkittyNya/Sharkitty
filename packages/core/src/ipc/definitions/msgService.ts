@@ -1,7 +1,7 @@
 import type { Peer, RecursivePartial, Element } from '@chronocat/red'
-import { defineApi } from '../define'
+import { defineIpcApi } from '../define'
 
-export const recallMsg = defineApi<
+export const recallMsg = defineIpcApi<
   unknown,
   [
     {
@@ -11,7 +11,7 @@ export const recallMsg = defineApi<
   ]
 >('IPC_UP_2', 'ns-ntApi-2', 'nodeIKernelMsgService/recallMsg')
 
-export const downloadRichMedia = defineApi<
+export const downloadRichMedia = defineIpcApi<
   unknown,
   [
     {
@@ -27,7 +27,7 @@ export const downloadRichMedia = defineApi<
   ]
 >('IPC_UP_2', 'ns-ntApi-2', 'nodeIKernelMsgService/downloadRichMedia')
 
-export const getMsgsIncludeSelf = defineApi<
+export const getMsgsIncludeSelf = defineIpcApi<
   unknown,
   [
     {
@@ -39,7 +39,7 @@ export const getMsgsIncludeSelf = defineApi<
   ]
 >('IPC_UP_2', 'ns-ntApi-2', 'nodeIKernelMsgService/getMsgsIncludeSelf')
 
-export const getRichMediaFilePath = defineApi<
+export const getRichMediaFilePath = defineIpcApi<
   unknown,
   [
     {
@@ -54,7 +54,7 @@ export const getRichMediaFilePath = defineApi<
   ]
 >('IPC_UP_2', 'ns-ntApi-2', 'nodeIKernelMsgService/getRichMediaFilePath')
 
-export const sendMsg = defineApi<
+export const sendMsg = defineIpcApi<
   unknown,
   [
     {

@@ -1,8 +1,8 @@
-import { defineApi } from '../define'
+import { defineIpcApi } from '../define'
 
 export type SceneId = unknown
 
-export const createMemberListScene = defineApi<
+export const createMemberListScene = defineIpcApi<
   SceneId,
   [
     {
@@ -12,7 +12,7 @@ export const createMemberListScene = defineApi<
   ]
 >('IPC_UP_2', 'ns-ntApi-2', 'nodeIKernelGroupService/createMemberListScene')
 
-export const searchMember = defineApi<
+export const searchMember = defineIpcApi<
   undefined,
   [
     {
@@ -22,7 +22,7 @@ export const searchMember = defineApi<
   ]
 >('IPC_UP_2', 'ns-ntApi-2', 'nodeIKernelGroupService/searchMember')
 
-export const destroyMemberListScene = defineApi<
+export const destroyMemberListScene = defineIpcApi<
   undefined,
   [
     {
@@ -43,7 +43,7 @@ export interface MemberListResult {
   }
 }
 
-export const getNextMemberList = defineApi<
+export const getNextMemberList = defineIpcApi<
   MemberListResult,
   [
     {
@@ -59,7 +59,7 @@ export interface MuteMember {
   timeStamp: number
 }
 
-export const setMemberShutUp = defineApi<
+export const setMemberShutUp = defineIpcApi<
   unknown,
   [
     {
@@ -69,7 +69,7 @@ export const setMemberShutUp = defineApi<
   ]
 >('IPC_UP_2', 'ns-ntApi-2', 'nodeIKernelGroupService/setMemberShutUp')
 
-export const setGroupShutUp = defineApi<
+export const setGroupShutUp = defineIpcApi<
   unknown,
   [
     {
@@ -79,7 +79,7 @@ export const setGroupShutUp = defineApi<
   ]
 >('IPC_UP_2', 'ns-ntApi-2', 'nodeIKernelGroupService/setGroupShutUp')
 
-export const kickMember = defineApi<
+export const kickMember = defineIpcApi<
   unknown,
   [
     {
