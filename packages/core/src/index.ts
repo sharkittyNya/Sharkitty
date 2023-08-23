@@ -221,32 +221,32 @@ const makeFullPacket = (obj: Record<string, unknown>) => {
 
 const initInvoke =
   (state: State) =>
-  async (channel: string, evtName: unknown, ...args: unknown[]) => {
-    const uuid = generateUUID()
-    const result = await Promise.race([
-      new Promise((_, reject) => setTimeout(() => reject(), 5000)),
-      new Promise((resolve) => {
-        state.requestCallbackMap[uuid] = resolve
-        ipcMain.emit(
-          channel,
-          {
-            sender: {
-              send: (...args: [string, IpcEvent, Detail]) => {
-                resolve(args)
+    async (channel: string, evtName: unknown, ...args: unknown[]) => {
+      const uuid = generateUUID()
+      const result = await Promise.race([
+        new Promise((_, reject) => setTimeout(() => reject(), 5000)),
+        new Promise((resolve) => {
+          state.requestCallbackMap[uuid] = resolve
+          ipcMain.emit(
+            channel,
+            {
+              sender: {
+                send: (...args: [string, IpcEvent, Detail]) => {
+                  resolve(args)
+                },
+                __CHRONO_HOOKED__: true,
               },
-              __CHRONO_HOOKED__: true,
             },
-          },
-          { type: 'request', callbackId: uuid, eventName: evtName },
-          args,
-        )
-      }),
-    ])
+            { type: 'request', callbackId: uuid, eventName: evtName },
+            args,
+          )
+        }),
+      ])
 
-    delete state.requestCallbackMap[uuid]
+      delete state.requestCallbackMap[uuid]
 
-    return result
-  }
+      return result
+    }
 
 type Invoke = ReturnType<typeof initInvoke>
 
@@ -457,6 +457,8 @@ const initUixCache = (invoke: Invoke) => {
   }
 }
 
+const detachPromise = (_: Promise<unknown>) => void 0
+
 type UixCache = ReturnType<typeof initUixCache>
 
 interface Context {
@@ -531,14 +533,15 @@ const routes = {
       },
     )
 
-    // TODO: ???
-    void invoke(
-      'IPC_UP_2',
-      'ns-ntApi-2',
-      'nodeIKernelGroupService/destroyMemberListScene',
-      {
-        sceneId: scene,
-      },
+    detachPromise(
+      invoke(
+        'IPC_UP_2',
+        'ns-ntApi-2',
+        'nodeIKernelGroupService/destroyMemberListScene',
+        {
+          sceneId: scene,
+        },
+      ),
     )
 
     return memList.result?.ids?.map(({ uid, index }) => {
@@ -771,8 +774,7 @@ const routes = {
           await mkdir(saveTo, { recursive: true })
           filePath = join(
             saveTo,
-            `${randomFillSync(Buffer.alloc(16)).toString('hex')}-${
-              info.filename
+            `${randomFillSync(Buffer.alloc(16)).toString('hex')}-${info.filename
             }`,
           )
           fileInfo = info
@@ -807,11 +809,11 @@ const routes = {
             invoke('IPC_UP_2', 'ns-fsApi-2', 'getFileMd5', filePath),
             category === 'image'
               ? invoke(
-                  'IPC_UP_2',
-                  'ns-fsApi-2',
-                  'getImageSizeFromPath',
-                  filePath,
-                )
+                'IPC_UP_2',
+                'ns-fsApi-2',
+                'getImageSizeFromPath',
+                filePath,
+              )
               : undefined,
             invoke('IPC_UP_2', 'ns-fsApi-2', 'getFileSize', filePath),
           ])
