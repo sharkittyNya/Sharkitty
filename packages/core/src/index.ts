@@ -9,7 +9,6 @@ import type {
   MessageGetHistoryPayload,
   MessageRecallPayload,
   MessageSendPayload,
-  Peer,
   Profile,
   WsPackage,
 } from '@chronocat/red'
@@ -28,8 +27,6 @@ import { join } from 'node:path'
 import toSource from 'tosource'
 import type { WebSocket } from 'ws'
 import { WebSocketServer } from 'ws'
-import type { Invoke } from './ipc/invoke'
-import { invoke } from './ipc/invoke'
 import type {
   MemoryStoreItem,
   State,
@@ -47,7 +44,19 @@ import {
   setGroupShutUp,
   setMemberShutUp,
 } from './ipc/definitions/groupService'
-import { recallMsg } from './ipc/definitions/msgService'
+import {
+  downloadRichMedia,
+  getMsgsIncludeSelf,
+  getRichMediaFilePath,
+  recallMsg,
+  sendMsg,
+} from './ipc/definitions/msgService'
+import {
+  getFileMd5,
+  getFileSize,
+  getFileType,
+  getImageSizeFromPath,
+} from './ipc/definitions/fsApi'
 
 declare const __DEFINE_CHRONO_VERSION__: string
 declare const authData: {
@@ -330,10 +339,10 @@ const initUixCache = () => {
     }
   }
 
-  const preprocessObject = async (
-    origin: object,
+  const preprocessObject = async <T extends object>(
+    origin: T,
     { contextGroup = -1 } = {},
-  ): Promise<object> => {
+  ): Promise<T> => {
     const eAll = enumerateAll(origin)
 
     for (const [key, value, obj] of eAll) {
@@ -386,7 +395,6 @@ type UixCache = ReturnType<typeof initUixCache>
 
 interface Context {
   baseDir: string
-  invoke: Invoke
   uixCache: UixCache
   state: State
   req: IncomingMessage
@@ -506,7 +514,7 @@ const routes = {
     const { peer, msgIds } = (await getBody()) as MessageRecallPayload
 
     return recallMsg({
-      peer: (await uixCache.preprocessObject(peer)) as Peer,
+      peer: await uixCache.preprocessObject(peer),
       msgIds: msgIds,
     })
   },
@@ -514,7 +522,6 @@ const routes = {
   '/message/fetchRichMedia': async ({
     state,
     uixCache,
-    invoke,
     req,
     res,
     getBody,
@@ -536,21 +543,16 @@ const routes = {
     if (body.chatType === 1 && !body.peerUid.startsWith('u_'))
       body.peerUid = uixCache.map[body.peerUid]!
 
-    await invoke(
-      'IPC_UP_2',
-      'ns-ntApi-2',
-      'nodeIKernelMsgService/downloadRichMedia',
-      {
-        getReq: {
-          msgId: body.msgId,
-          chatType: body.chatType,
-          peerUid: body.peerUid,
-          elementId: body.elementId,
-          thumbSize: 0,
-          downloadType: 2,
-        },
+    await downloadRichMedia({
+      getReq: {
+        msgId: body.msgId,
+        chatType: body.chatType,
+        peerUid: body.peerUid,
+        elementId: body.elementId,
+        thumbSize: 0,
+        downloadType: 2,
       },
-    )
+    })
 
     const path = await downloadCompletePromise
 
@@ -563,13 +565,7 @@ const routes = {
     return manualHandled
   },
 
-  '/message/getHistory': async ({
-    invoke,
-    uixCache,
-    req,
-    res,
-    getBody,
-  }: Context) => {
+  '/message/getHistory': async ({ uixCache, req, res, getBody }: Context) => {
     if (req.method !== 'POST') {
       res.writeHead(400)
       res.end('bad request')
@@ -579,20 +575,12 @@ const routes = {
     const { peer, offsetMsgId, count } =
       (await getBody()) as MessageGetHistoryPayload
 
-    return await invoke(
-      'IPC_UP_2',
-      'ns-ntApi-2',
-      'nodeIKernelMsgService/getMsgsIncludeSelf',
-      [
-        {
-          peer: await uixCache.preprocessObject(peer),
-          msgId: offsetMsgId,
-          cnt: count,
-          queryOrder: true,
-        },
-        undefined,
-      ],
-    )
+    return await getMsgsIncludeSelf({
+      peer: await uixCache.preprocessObject(peer),
+      msgId: offsetMsgId!,
+      cnt: count,
+      queryOrder: true,
+    })
   },
 
   '/bot/friends': async ({ state, req, res }: Context) => {
@@ -615,7 +603,7 @@ const routes = {
     return Object.values(state.groupMap)
   },
 
-  '/upload': async ({ baseDir, invoke, req, res }: Context) => {
+  '/upload': async ({ baseDir, req, res }: Context) => {
     if (req.method !== 'POST') {
       res.writeHead(400)
       res.end('bad request')
@@ -655,45 +643,25 @@ const routes = {
 
           const fileType: {
             mime: string
-          } = (await invoke(
-            'IPC_UP_2',
-            'ns-fsApi-2',
-            'getFileType',
-            filePath,
-          )) as {
-            mime: string
-          }
+          } = await getFileType(filePath)
 
           const category = fileType.mime.split('/')[0]
 
           const [md5, imageInfo, fileSize] = await Promise.all([
-            invoke('IPC_UP_2', 'ns-fsApi-2', 'getFileMd5', filePath),
-            category === 'image'
-              ? invoke(
-                  'IPC_UP_2',
-                  'ns-fsApi-2',
-                  'getImageSizeFromPath',
-                  filePath,
-                )
-              : undefined,
-            invoke('IPC_UP_2', 'ns-fsApi-2', 'getFileSize', filePath),
+            getFileMd5(filePath),
+            category === 'image' ? getImageSizeFromPath(filePath) : undefined,
+            getFileSize(filePath),
           ])
 
-          const richMediaPath = await invoke(
-            'IPC_UP_2',
-            'ns-ntApi-2',
-            'nodeIKernelMsgService/getRichMediaFilePath',
-            {
-              md5HexStr: md5,
-              fileName: fileInfo.filename,
-              elementType: 2,
-              elementSubType: 0,
-              thumbSize: 0,
-              needCreate: true,
-              fileType: 1,
-            },
-            undefined,
-          )
+          const richMediaPath = await getRichMediaFilePath({
+            md5HexStr: md5,
+            fileName: fileInfo.filename,
+            elementType: 2,
+            elementSubType: 0,
+            thumbSize: 0,
+            needCreate: true,
+            fileType: 1,
+          })
 
           await copyFile(filePath, richMediaPath as string)
 
@@ -748,22 +716,16 @@ export const chronocat = async () => {
 
           makeFullPacket(payload as unknown as Record<string, unknown>)
 
-          void invoke(
-            'IPC_UP_2',
-            'ns-ntApi-2',
-            'nodeIKernelMsgService/sendMsg',
-            {
-              msgId: '0',
-              peer: await uixCache.preprocessObject(payload.peer),
-              msgElements: await uixCache.preprocessObject(payload.elements, {
-                contextGroup:
-                  payload.peer.chatType === 2
-                    ? Number(payload.peer.peerUin)
-                    : undefined,
-              }),
-            },
-            null,
-          )
+          await sendMsg({
+            msgId: '0',
+            peer: await uixCache.preprocessObject(payload.peer),
+            msgElements: await uixCache.preprocessObject(payload.elements, {
+              contextGroup:
+                payload.peer.chatType === 2
+                  ? Number(payload.peer.peerUin)
+                  : undefined,
+            }),
+          })
 
           return
         }
@@ -802,7 +764,6 @@ export const chronocat = async () => {
 
     const ctx = {
       baseDir,
-      invoke,
       uixCache,
       state,
       req,
