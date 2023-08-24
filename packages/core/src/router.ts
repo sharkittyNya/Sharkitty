@@ -44,18 +44,16 @@ type Keys = {
 }
 type RouterOptionsDeclarators<RouterOption extends RouterOptions> =
   RouterOptionsToDeclarator<RouterOption>
-type RouterProxy<RouterOption extends RouterOptions> = NonNullable<
-  {
-    <T extends Partial<RouterOptions>>(
-      handler: RouterHandler<Merge<RouterOption, T>, unknown>,
-      options?: T,
-    ): undefined
-  } & {
-    [K in keyof Omit<never, keyof Keys>]: RouterProxy<RouterOption>
-  } & {
-    [K in keyof RouterOptionsDeclarators<RouterOption>]: RouterOptionsDeclarators<RouterOption>[K]
-  }
->
+type RouterProxy<RouterOption extends RouterOptions> = {
+  [K: string]: RouterProxy<RouterOption>
+} & {
+  <T extends Partial<RouterOptions>>(
+    handler: RouterHandler<Merge<RouterOption, T>, unknown>,
+    options?: T,
+  ): undefined
+} & {
+  [K in keyof Keys]: RouterOptionsDeclarators<RouterOption>[K]
+}
 
 export interface Route {
   path: string[]
@@ -113,13 +111,8 @@ export const router: RouterProxy<typeof defaultRouterOption> = makeRouterProxy(
   },
 ) as unknown as RouterProxy<typeof defaultRouterOption>
 
-router.a?.b?.c?.$body('none')(
-  (ctx) => {
-    ctx.body
-  },
-  {
-    body: 'binary',
-  },
-)
+router.a.b.d((ctx) => {
+  ctx.body
+})
 
 console.log(routes)

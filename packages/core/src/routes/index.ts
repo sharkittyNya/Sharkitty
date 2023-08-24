@@ -6,8 +6,8 @@ import { groupKick } from './group/kick'
 import { groupMuteEveryone } from './group/muteEveryone'
 import { groupMuteMember } from './group/muteMember'
 import { messageFetchRichMedia } from './message/fetchRichMedia'
-import { messageGetHistory } from './message/getHistory'
-import { messageRecall } from './message/recall'
+import {} from './message/getHistory'
+import {} from './message/recall'
 import { upload } from './upload'
 
 export const routes = {
@@ -16,9 +16,7 @@ export const routes = {
   'group/muteMember': groupMuteMember,
   'group/muteEveryone': groupMuteEveryone,
   'group/kick': groupKick,
-  'message/recall': messageRecall,
   'message/fetchRichMedia': messageFetchRichMedia,
-  'message/getHistory': messageGetHistory,
   'bot/friends': botFriends,
   'bot/groups': botGroups,
   upload,
