@@ -1,5 +1,3 @@
-import type { Profile, Group } from '@chronocat/red'
-
 export type Uuid = string | number
 
 export interface IpcEvent {
@@ -20,13 +18,6 @@ export interface ListenerData {
   CmdName: string
   Payload: unknown
   Request: unknown
-}
-
-export interface State {
-  selfProfile?: Profile
-  groupMap: Record<string, Group>
-  friendMap: Record<string, unknown>
-  richMediaDownloadMap: Record<string, (path: string) => void>
 }
 
 export interface MemoryStoreItem {

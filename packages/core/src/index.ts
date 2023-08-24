@@ -47,8 +47,14 @@ import {
   recallMsg,
   sendMsg,
 } from './ipc/definitions/msgService'
+import {
+  friendMap,
+  groupMap,
+  richMediaDownloadMap,
+  selfProfile,
+} from './ipc/globalVars'
 import { initListener } from './ipc/intercept'
-import type { ListenerData, State } from './types'
+import type { ListenerData } from './types'
 import type { UixCache } from './uix-cache'
 import { initUixCache } from './uix-cache'
 import { detachPromise } from './utils/detach-promise'
@@ -135,7 +141,6 @@ const makeFullPacket = (obj: Record<string, unknown>) => {
 interface Context {
   baseDir: string
   uixCache: UixCache
-  state: State
   req: IncomingMessage
   res: ServerResponse
   getBody: () => Promise<unknown>
@@ -144,14 +149,14 @@ interface Context {
 const manualHandled = Symbol('manualHandled')
 
 const routes = {
-  '/getSelfProfile': async ({ state, req, res }: Context) => {
+  '/getSelfProfile': async ({ req, res }: Context) => {
     if (req.method !== 'GET') {
       res.writeHead(400)
       res.end('bad request')
       return manualHandled
     }
 
-    return state.selfProfile ?? {}
+    return selfProfile.value ?? {}
   },
 
   '/group/getMemberList': async ({ req, res, getBody }: Context) => {
@@ -259,7 +264,6 @@ const routes = {
   },
 
   '/message/fetchRichMedia': async ({
-    state,
     uixCache,
     req,
     res,
@@ -276,7 +280,7 @@ const routes = {
     const downloadId = body.msgId + '::' + body.elementId
     console.log('DownloadId:', downloadId)
     const downloadCompletePromise = new Promise<string>((rs) => {
-      state.richMediaDownloadMap[downloadId] = rs
+      richMediaDownloadMap[downloadId] = rs
     })
 
     if (body.chatType === 1 && !body.peerUid.startsWith('u_'))
@@ -322,24 +326,24 @@ const routes = {
     })
   },
 
-  '/bot/friends': async ({ state, req, res }: Context) => {
+  '/bot/friends': async ({ req, res }: Context) => {
     if (req.method !== 'GET') {
       res.writeHead(400)
       res.end('bad request')
       return manualHandled
     }
 
-    return Object.values(state.friendMap)
+    return Object.values(friendMap)
   },
 
-  '/bot/groups': async ({ state, req, res }: Context) => {
+  '/bot/groups': async ({ req, res }: Context) => {
     if (req.method !== 'GET') {
       res.writeHead(400)
       res.end('bad request')
       return manualHandled
     }
 
-    return Object.values(state.groupMap)
+    return Object.values(groupMap)
   },
 
   '/upload': async ({ baseDir, req, res }: Context) => {
@@ -425,12 +429,6 @@ const routes = {
 } as const
 
 export const chronocat = async () => {
-  const state: State = {
-    groupMap: {},
-    friendMap: {},
-    richMediaDownloadMap: {},
-  }
-
   const baseDir = join(
     process.env['APPDATA'] || homedir(),
     'BetterUniverse/QQNT',
@@ -501,7 +499,6 @@ export const chronocat = async () => {
     const ctx = {
       baseDir,
       uixCache,
-      state,
       req,
       res,
       getBody,
@@ -586,7 +583,7 @@ export const chronocat = async () => {
         }
 
         if (payload.profiles.get(authData.uid))
-          state.selfProfile = payload.profiles.get(authData.uid)
+          selfProfile.value = payload.profiles.get(authData.uid)
 
         const profile = payload.profiles ?? payload.infos
         for (const [uid, { uin }] of profile) uixCache.addToMap(uid, uin)
@@ -603,9 +600,9 @@ export const chronocat = async () => {
         }
 
         const downloadId = `${payload.notifyInfo.msgId}::${payload.notifyInfo.msgElementId}`
-        if (state.richMediaDownloadMap[downloadId]) {
-          state.richMediaDownloadMap[downloadId]!(payload.notifyInfo.filePath)
-          delete state.richMediaDownloadMap[downloadId]
+        if (richMediaDownloadMap[downloadId]) {
+          richMediaDownloadMap[downloadId]!(payload.notifyInfo.filePath)
+          delete richMediaDownloadMap[downloadId]
         }
         return
       }
@@ -615,8 +612,7 @@ export const chronocat = async () => {
           groupList: Group[]
         }
 
-        for (const group of payload.groupList)
-          state.groupMap[group.groupCode] = group
+        for (const group of payload.groupList) groupMap[group.groupCode] = group
         return
       }
 
@@ -634,7 +630,7 @@ export const chronocat = async () => {
         for (const category of payload.data) {
           for (const buddy of category.buddyList) {
             buddy.category = category.categoryName
-            state.friendMap[buddy.uin] = buddy
+            friendMap[buddy.uin] = buddy
           }
         }
         return
