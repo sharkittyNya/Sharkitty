@@ -1,5 +1,4 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
-import type { UixCache } from './uixCache'
 
 export type Uuid = string | number
 
@@ -30,8 +29,7 @@ export interface MemoryStoreItem {
 
 export interface Context {
   baseDir: string
-  uixCache: UixCache
-  req: IncomingMessage
-  res: ServerResponse
+  req?: IncomingMessage
+  res?: ServerResponse
   getBody: () => Promise<unknown>
 }
