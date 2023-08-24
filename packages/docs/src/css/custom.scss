@@ -1,0 +1,74 @@
+:root {
+  --ifm-color-primary: #0077b3;
+  --ifm-color-primary-dark: #006ba1;
+  --ifm-color-primary-darker: #006598;
+  --ifm-color-primary-darkest: #00537d;
+  --ifm-color-primary-light: #0083c5;
+  --ifm-color-primary-lighter: #0089ce;
+  --ifm-color-primary-lightest: #009be9;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+
+  --ifm-color-primary-develop: #2e8555;
+  --ifm-color-primary-dark-develop: #29784c;
+  --ifm-color-primary-darker-develop: #277148;
+  --ifm-color-primary-darkest-develop: #205d3b;
+  --ifm-color-primary-light-develop: #33925d;
+  --ifm-color-primary-lighter-develop: #359962;
+  --ifm-color-primary-lightest-develop: #3cad6e;
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #47b4eb;
+  --ifm-color-primary-dark: #2ba9e8;
+  --ifm-color-primary-darker: #1ea3e6;
+  --ifm-color-primary-darkest: #1587c1;
+  --ifm-color-primary-light: #63bfee;
+  --ifm-color-primary-lighter: #70c5ef;
+  --ifm-color-primary-lightest: #9ad6f4;
+
+  --ifm-color-primary-develop: #25c2a0;
+  --ifm-color-primary-dark-develop: #21af90;
+  --ifm-color-primary-darker-develop: #1fa588;
+  --ifm-color-primary-darkest-develop: #1a8870;
+  --ifm-color-primary-light-develop: #29d5b0;
+  --ifm-color-primary-lighter-develop: #32d8b4;
+  --ifm-color-primary-lightest-develop: #4fddbf;
+}
+
+[data-area='develop'] {
+  --ifm-color-primary: var(--ifm-color-primary-develop);
+  --ifm-color-primary-dark: var(--ifm-color-primary-dark-develop);
+  --ifm-color-primary-darker: var(--ifm-color-primary-darker-develop);
+  --ifm-color-primary-darkest: var(--ifm-color-primary-darkest-develop);
+  --ifm-color-primary-light: var(--ifm-color-primary-light-develop);
+  --ifm-color-primary-lighter: var(--ifm-color-primary-lighter-develop);
+  --ifm-color-primary-lightest: var(--ifm-color-primary-lightest-develop);
+}
+
+[data-theme='dark'][data-area='develop'] {
+  --ifm-color-primary: var(--ifm-color-primary-develop);
+  --ifm-color-primary-dark: var(--ifm-color-primary-dark-develop);
+  --ifm-color-primary-darker: var(--ifm-color-primary-darker-develop);
+  --ifm-color-primary-darkest: var(--ifm-color-primary-darkest-develop);
+  --ifm-color-primary-light: var(--ifm-color-primary-light-develop);
+  --ifm-color-primary-lighter: var(--ifm-color-primary-lighter-develop);
+  --ifm-color-primary-lightest: var(--ifm-color-primary-lightest-develop);
+}
+
+.button--common {
+  --ifm-button-color: var(--ifm-color-content-inverse);
+  color: var(--ifm-button-color);
+}
+
+.button.button--normal {
+  @extend .button--common;
+  --ifm-button-background-color: var(--ifm-color-primary);
+  --ifm-button-border-color: var(--ifm-color-primary);
+}
+
+.button.button--develop {
+  @extend .button--common;
+  --ifm-button-background-color: var(--ifm-color-primary-develop);
+  --ifm-button-border-color: var(--ifm-color-primary-develop);
+}
