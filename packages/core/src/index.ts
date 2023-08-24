@@ -19,7 +19,6 @@ import { randomBytes, randomFillSync } from 'node:crypto'
 import type { PathLike } from 'node:fs'
 import { createReadStream, createWriteStream } from 'node:fs'
 import { copyFile, mkdir, readFile, stat, writeFile } from 'node:fs/promises'
-import type { IncomingMessage, ServerResponse } from 'node:http'
 import { createServer } from 'node:http'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
@@ -54,8 +53,7 @@ import {
   selfProfile,
 } from './ipc/globalVars'
 import { initListener } from './ipc/intercept'
-import type { ListenerData } from './types'
-import type { UixCache } from './uix-cache'
+import type { Context, ListenerData } from './types'
 import { initUixCache } from './uix-cache'
 import { detachPromise } from './utils/detach-promise'
 
@@ -136,14 +134,6 @@ const makeFullPacket = (obj: Record<string, unknown>) => {
   traverse(obj)
 
   return obj
-}
-
-interface Context {
-  baseDir: string
-  uixCache: UixCache
-  req: IncomingMessage
-  res: ServerResponse
-  getBody: () => Promise<unknown>
 }
 
 const manualHandled = Symbol('manualHandled')

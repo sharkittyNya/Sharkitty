@@ -13,6 +13,6 @@ export const requestMap: Record<Uuid, unknown> = {}
 export const groupMap: Record<string, Group> = {}
 export const friendMap: Record<string, unknown> = {}
 export const richMediaDownloadMap: Record<string, (path: string) => void> = {}
-export let selfProfile: {
+export const selfProfile: {
   value?: Profile
 } = {}

@@ -1,3 +1,6 @@
+import type { IncomingMessage, ServerResponse } from 'node:http'
+import type { UixCache } from './uix-cache'
+
 export type Uuid = string | number
 
 export interface IpcEvent {
@@ -23,4 +26,12 @@ export interface ListenerData {
 export interface MemoryStoreItem {
   args: unknown[]
   expires: number
+}
+
+export interface Context {
+  baseDir: string
+  uixCache: UixCache
+  req: IncomingMessage
+  res: ServerResponse
+  getBody: () => Promise<unknown>
 }
