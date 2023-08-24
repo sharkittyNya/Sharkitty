@@ -1,11 +1,10 @@
 import type { MessageGetHistoryPayload } from '@chronocat/red'
 import { getMsgsIncludeSelf } from '../../ipc/definitions/msgService'
-import type { Context } from '../../types'
 import { uixCache } from '../../uixCache'
+import { router } from '../router'
 
-export const messageGetHistory = async ({ getBody }: Context) => {
-  const { peer, offsetMsgId, count } =
-    (await getBody()) as MessageGetHistoryPayload
+router.message?.getHistory?.$body('json')(async ({ body }) => {
+  const { peer, offsetMsgId, count } = body as MessageGetHistoryPayload
 
   return await getMsgsIncludeSelf({
     peer: await uixCache.preprocessObject(peer),
@@ -13,4 +12,4 @@ export const messageGetHistory = async ({ getBody }: Context) => {
     cnt: count,
     queryOrder: true,
   })
-}
+})

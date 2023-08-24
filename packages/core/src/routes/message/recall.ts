@@ -1,13 +1,13 @@
 import type { MessageRecallPayload } from '@chronocat/red'
 import { recallMsg } from '../../ipc/definitions/msgService'
-import type { Context } from '../../types'
 import { uixCache } from '../../uixCache'
+import { router } from '../router'
 
-export const messageRecall = async ({ getBody }: Context) => {
-  const { peer, msgIds } = (await getBody()) as MessageRecallPayload
+router.message?.recall?.$body('json')(async ({ body }) => {
+  const { peer, msgIds } = body as MessageRecallPayload
 
   return recallMsg({
     peer: await uixCache.preprocessObject(peer),
     msgIds: msgIds,
   })
-}
+})
