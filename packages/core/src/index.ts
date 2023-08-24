@@ -1,51 +1,20 @@
 import type {
   Group,
-  GroupGetMemeberListPayload,
-  GroupKickPayload,
-  GroupMuteEveryonePayload,
-  GroupMuteMemberPayload,
-  Media,
   Message,
-  MessageGetHistoryPayload,
-  MessageRecallPayload,
   MessageSendPayload,
   Profile,
   WsPackage,
 } from '@chronocat/red'
 import { MsgType } from '@chronocat/red'
-import busboy from 'busboy'
-import { getType } from 'mime/lite'
-import { randomBytes, randomFillSync } from 'node:crypto'
+import { randomBytes } from 'node:crypto'
 import type { PathLike } from 'node:fs'
-import { createReadStream, createWriteStream } from 'node:fs'
-import { copyFile, mkdir, readFile, stat, writeFile } from 'node:fs/promises'
+import { readFile, stat, writeFile } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 import type { WebSocket } from 'ws'
 import { WebSocketServer } from 'ws'
-import {
-  getFileMd5,
-  getFileSize,
-  getFileType,
-  getImageSizeFromPath,
-} from './ipc/definitions/fsApi'
-import type { MuteMember } from './ipc/definitions/groupService'
-import {
-  createMemberListScene,
-  destroyMemberListScene,
-  getNextMemberList,
-  kickMember,
-  setGroupShutUp,
-  setMemberShutUp,
-} from './ipc/definitions/groupService'
-import {
-  downloadRichMedia,
-  getMsgsIncludeSelf,
-  getRichMediaFilePath,
-  recallMsg,
-  sendMsg,
-} from './ipc/definitions/msgService'
+import { sendMsg } from './ipc/definitions/msgService'
 import {
   friendMap,
   groupMap,
@@ -53,9 +22,9 @@ import {
   selfProfile,
 } from './ipc/globalVars'
 import { initListener } from './ipc/intercept'
-import type { Context, ListenerData } from './types'
-import { initUixCache } from './uixCache'
-import { detachPromise } from './utils/detach-promise'
+import { routes } from './routes'
+import type { ListenerData } from './types'
+import { uixCache } from './uixCache'
 
 declare const __DEFINE_CHRONO_VERSION__: string
 declare const authData: {
@@ -136,288 +105,6 @@ const makeFullPacket = (obj: Record<string, unknown>) => {
   return obj
 }
 
-const manualHandled = Symbol('manualHandled')
-
-const routes = {
-  '/getSelfProfile': async ({ req, res }: Context) => {
-    if (req.method !== 'GET') {
-      res.writeHead(400)
-      res.end('bad request')
-      return manualHandled
-    }
-
-    return selfProfile.value ?? {}
-  },
-
-  '/group/getMemberList': async ({ req, res, getBody }: Context) => {
-    if (req.method !== 'POST') {
-      res.writeHead(400)
-      res.end('bad request')
-      return manualHandled
-    }
-
-    const body = (await getBody()) as GroupGetMemeberListPayload
-
-    const scene = await createMemberListScene({
-      groupCode: body.group,
-      scene: 'groupMemberList_MainWindow',
-    })
-
-    const memList = await getNextMemberList({
-      sceneId: scene,
-      lastId: undefined,
-      num: body.size,
-    })
-
-    await destroyMemberListScene({
-      sceneId: scene,
-    })
-
-    detachPromise(
-      destroyMemberListScene({
-        sceneId: scene,
-      }),
-    )
-
-    return memList.result?.ids?.map(({ uid, index }) => {
-      return {
-        uid,
-        index,
-        detail: memList.result.infos.get(uid),
-      }
-    })
-  },
-
-  '/group/muteMember': async ({ uixCache, req, res, getBody }: Context) => {
-    if (req.method !== 'POST') {
-      res.writeHead(400)
-      res.end('bad request')
-      return manualHandled
-    }
-
-    const { group, memList } = (await getBody()) as GroupMuteMemberPayload
-
-    return await setMemberShutUp({
-      groupCode: group,
-      memList: (await uixCache.preprocessObject(memList, {
-        contextGroup: Number(group),
-      })) as MuteMember[],
-    })
-  },
-
-  '/group/muteEveryone': async ({ req, res, getBody }: Context) => {
-    if (req.method !== 'POST') {
-      res.writeHead(400)
-      res.end('bad request')
-      return manualHandled
-    }
-
-    const { group, enable } = (await getBody()) as GroupMuteEveryonePayload
-
-    return await setGroupShutUp({
-      groupCode: group,
-      shutUp: enable,
-    })
-  },
-
-  '/group/kick': async ({ uixCache, req, res, getBody }: Context) => {
-    if (req.method !== 'POST') {
-      res.writeHead(400)
-      res.end('bad request')
-      return manualHandled
-    }
-
-    const { uidList, group, reason, refuseForever } =
-      (await getBody()) as GroupKickPayload
-
-    return await kickMember({
-      groupCode: group,
-      kickUids: uixCache.preprocessArrayOfUix(uidList),
-      refuseForever: refuseForever,
-      kickReason: reason,
-    })
-  },
-
-  '/message/recall': async ({ uixCache, req, res, getBody }: Context) => {
-    if (req.method !== 'POST') {
-      res.writeHead(400)
-      res.end('bad request')
-      return manualHandled
-    }
-
-    const { peer, msgIds } = (await getBody()) as MessageRecallPayload
-
-    return recallMsg({
-      peer: await uixCache.preprocessObject(peer),
-      msgIds: msgIds,
-    })
-  },
-
-  '/message/fetchRichMedia': async ({
-    uixCache,
-    req,
-    res,
-    getBody,
-  }: Context) => {
-    if (req.method !== 'POST') {
-      res.writeHead(400)
-      res.end('bad request')
-      return manualHandled
-    }
-
-    const body = (await getBody()) as Media
-
-    const downloadId = body.msgId + '::' + body.elementId
-    console.log('DownloadId:', downloadId)
-    const downloadCompletePromise = new Promise<string>((rs) => {
-      richMediaDownloadMap[downloadId] = rs
-    })
-
-    if (body.chatType === 1 && !body.peerUid.startsWith('u_'))
-      body.peerUid = uixCache.map[body.peerUid]!
-
-    await downloadRichMedia({
-      getReq: {
-        msgId: body.msgId,
-        chatType: body.chatType,
-        peerUid: body.peerUid,
-        elementId: body.elementId,
-        thumbSize: 0,
-        downloadType: 2,
-      },
-    })
-
-    const path = await downloadCompletePromise
-
-    res.statusCode = 200
-    res.setHeader('Content-Type', getType(path)!)
-
-    const readStream = createReadStream(path)
-    readStream.pipe(res)
-
-    return manualHandled
-  },
-
-  '/message/getHistory': async ({ uixCache, req, res, getBody }: Context) => {
-    if (req.method !== 'POST') {
-      res.writeHead(400)
-      res.end('bad request')
-      return manualHandled
-    }
-
-    const { peer, offsetMsgId, count } =
-      (await getBody()) as MessageGetHistoryPayload
-
-    return await getMsgsIncludeSelf({
-      peer: await uixCache.preprocessObject(peer),
-      msgId: offsetMsgId!,
-      cnt: count,
-      queryOrder: true,
-    })
-  },
-
-  '/bot/friends': async ({ req, res }: Context) => {
-    if (req.method !== 'GET') {
-      res.writeHead(400)
-      res.end('bad request')
-      return manualHandled
-    }
-
-    return Object.values(friendMap)
-  },
-
-  '/bot/groups': async ({ req, res }: Context) => {
-    if (req.method !== 'GET') {
-      res.writeHead(400)
-      res.end('bad request')
-      return manualHandled
-    }
-
-    return Object.values(groupMap)
-  },
-
-  '/upload': async ({ baseDir, req, res }: Context) => {
-    if (req.method !== 'POST') {
-      res.writeHead(400)
-      res.end('bad request')
-      return manualHandled
-    }
-
-    const bb = busboy({ headers: req.headers })
-    let filePath: PathLike
-    let fileInfo: busboy.FileInfo
-
-    bb.on(
-      'file',
-      (_name, file, info) =>
-        void (async () => {
-          const saveTo = join(baseDir, `redprotocol-upload`)
-          await mkdir(saveTo, { recursive: true })
-          filePath = join(
-            saveTo,
-            `${randomFillSync(Buffer.alloc(16)).toString('hex')}-${
-              info.filename
-            }`,
-          )
-          fileInfo = info
-          file.pipe(createWriteStream(filePath))
-        })(),
-    )
-
-    bb.on(
-      'close',
-      () =>
-        void (async () => {
-          if (!filePath) {
-            res.writeHead(400)
-            res.end(`400 bad request`)
-            return
-          }
-
-          const fileType: {
-            mime: string
-          } = await getFileType(filePath)
-
-          const category = fileType.mime.split('/')[0]
-
-          const [md5, imageInfo, fileSize] = await Promise.all([
-            getFileMd5(filePath),
-            category === 'image' ? getImageSizeFromPath(filePath) : undefined,
-            getFileSize(filePath),
-          ])
-
-          const richMediaPath = await getRichMediaFilePath({
-            md5HexStr: md5,
-            fileName: fileInfo.filename,
-            elementType: 2,
-            elementSubType: 0,
-            thumbSize: 0,
-            needCreate: true,
-            fileType: 1,
-          })
-
-          await copyFile(filePath, richMediaPath as string)
-
-          res.writeHead(200)
-
-          res.end(
-            JSON.stringify({
-              md5,
-              imageInfo,
-              fileSize,
-              filePath,
-              ntFilePath: richMediaPath,
-            }),
-          )
-        })(),
-    )
-
-    req.pipe(bb)
-
-    return manualHandled
-  },
-} as const
-
 export const chronocat = async () => {
   const baseDir = join(
     process.env['APPDATA'] || homedir(),
@@ -425,8 +112,6 @@ export const chronocat = async () => {
   )
 
   const token = await initToken(baseDir)
-
-  const uixCache = initUixCache()
 
   const wsClientListener = (raw: Buffer) =>
     void (async () => {
@@ -495,11 +180,10 @@ export const chronocat = async () => {
     }
 
     const route =
-      routes[url.pathname.replace('/api', '') as keyof typeof routes]
+      routes[url.pathname.replace('/api/', '') as keyof typeof routes]
     if (route)
       void route(ctx)
         .then((result) => {
-          if (result === manualHandled) return
           res.writeHead(200)
           res.end(result)
         })
