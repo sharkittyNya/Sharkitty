@@ -25,7 +25,7 @@ import { initListener } from './ipc/intercept'
 import { routes } from './routes'
 import type { ListenerData } from './types'
 import { uixCache } from './uixCache'
-import { makeFullPacket } from './utils/packet-helper'
+import { makeFullPacket } from './utils/packetHelper'
 
 declare const __DEFINE_CHRONO_VERSION__: string
 declare const authData: {
