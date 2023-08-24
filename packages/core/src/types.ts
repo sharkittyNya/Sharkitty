@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
-import type { UixCache } from './uix-cache'
+import type { UixCache } from './uixCache'
 
 export type Uuid = string | number
 

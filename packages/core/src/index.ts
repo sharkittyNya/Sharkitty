@@ -54,7 +54,7 @@ import {
 } from './ipc/globalVars'
 import { initListener } from './ipc/intercept'
 import type { Context, ListenerData } from './types'
-import { initUixCache } from './uix-cache'
+import { initUixCache } from './uixCache'
 import { detachPromise } from './utils/detach-promise'
 
 declare const __DEFINE_CHRONO_VERSION__: string
