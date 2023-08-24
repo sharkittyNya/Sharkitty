@@ -1,6 +1,6 @@
 import { invoke } from './invoke'
 
-type QQNTApi<ReturnType, Args extends unknown[]> = (
+export type QQNTApi<ReturnType, Args extends unknown[]> = (
   ...args: Args
 ) => Promise<ReturnType>
 

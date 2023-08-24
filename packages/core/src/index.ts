@@ -23,10 +23,14 @@ import type { IncomingMessage, ServerResponse } from 'node:http'
 import { createServer } from 'node:http'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
-
 import type { WebSocket } from 'ws'
 import { WebSocketServer } from 'ws'
-import type { State, ListenerData } from './types'
+import {
+  getFileMd5,
+  getFileSize,
+  getFileType,
+  getImageSizeFromPath,
+} from './ipc/definitions/fsApi'
 import type { MuteMember } from './ipc/definitions/groupService'
 import {
   createMemberListScene,
@@ -43,13 +47,9 @@ import {
   recallMsg,
   sendMsg,
 } from './ipc/definitions/msgService'
-import {
-  getFileMd5,
-  getFileSize,
-  getFileType,
-  getImageSizeFromPath,
-} from './ipc/definitions/fsApi'
 import { initListener } from './ipc/intercept'
+import type { ListenerData, State } from './types'
+import type { UixCache } from './uix-cache'
 import { initUixCache } from './uix-cache'
 import { detachPromise } from './utils/detach-promise'
 
@@ -131,8 +131,6 @@ const makeFullPacket = (obj: Record<string, unknown>) => {
 
   return obj
 }
-
-type UixCache = ReturnType<typeof initUixCache>
 
 interface Context {
   baseDir: string

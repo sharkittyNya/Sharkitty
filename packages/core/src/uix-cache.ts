@@ -1,7 +1,7 @@
 import {
   createMemberListScene,
-  searchMember,
   destroyMemberListScene,
+  searchMember,
 } from './ipc/definitions/groupService'
 import { detachPromise } from './utils/detach-promise'
 import { memoize } from './utils/memoize'
@@ -132,3 +132,5 @@ export const initUixCache = () => {
     map,
   }
 }
+
+export type UixCache = ReturnType<typeof initUixCache>
