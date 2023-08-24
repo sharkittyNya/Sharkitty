@@ -5,7 +5,7 @@ import {
   getNextMemberList,
   destroyMemberListScene,
 } from '../../ipc/definitions/groupService'
-import { detachPromise } from '../../utils/detach-promise'
+import { detachPromise } from '../../utils/detachPromise'
 
 export const groupGetMemberList = async ({ getBody }: Context) => {
   const body = (await getBody()) as GroupGetMemeberListPayload

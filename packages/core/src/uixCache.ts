@@ -3,7 +3,7 @@ import {
   destroyMemberListScene,
   searchMember,
 } from './ipc/definitions/groupService'
-import { detachPromise } from './utils/detach-promise'
+import { detachPromise } from './utils/detachPromise'
 import { memoize } from './utils/memoize'
 
 const map: Record<string, string> = {}
