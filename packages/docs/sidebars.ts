@@ -9,7 +9,13 @@ const sidebars: SidebarsConfig = {
         type: 'doc',
         id: 'install/index',
       },
-      items: ['install/llqqnt'],
+      items: [
+        'install/llqqnt',
+        'install/llqqnt-airgap',
+        'install/qqntim',
+        'install/qqntim-airgap',
+        'install/launcher',
+      ],
     },
     {
       type: 'category',
