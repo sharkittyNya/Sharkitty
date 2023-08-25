@@ -21,4 +21,4 @@
 
 ## 许可
 
-[MIT](https://github.com/chrononeko/chronocat/blob/master/LICENSE)
+[AGPL-3.0](https://github.com/chrononeko/chronocat/blob/master/LICENSE)
