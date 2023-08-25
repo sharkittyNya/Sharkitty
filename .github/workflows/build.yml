@@ -38,6 +38,12 @@ jobs:
           cd ../../..
         shell: bash
 
+      - name: Upload Packages
+        uses: actions/upload-artifact@v3
+        with:
+          name: chronocat-pkgs-${{ github.sha }}
+          path: build/dist/*.tgz
+
       - name: Upload LiteLoaderQQNT-Plugin-Chronocat
         uses: actions/upload-artifact@v3
         with:
