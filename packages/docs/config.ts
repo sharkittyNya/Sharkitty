@@ -101,7 +101,18 @@ const buildConfig = (): Config => {
           {
             label: '开发',
             position: 'left',
+            type: 'dropdown',
             to: 'develop',
+            items: [
+              {
+                label: '协议',
+                to: 'develop/protocol',
+              },
+              {
+                label: 'JavaScript',
+                to: 'develop/js',
+              },
+            ],
           },
           {
             href: 'https://github.com/chrononeko/chronocat',
@@ -123,7 +134,7 @@ const buildConfig = (): Config => {
 
         links: [
           {
-            title: '主题',
+            title: '使用',
             items: [
               {
                 label: '安装',
@@ -136,6 +147,19 @@ const buildConfig = (): Config => {
               {
                 label: '开发',
                 to: '/develop',
+              },
+            ],
+          },
+          {
+            title: '开发',
+            items: [
+              {
+                label: '协议',
+                to: '/develop/protocol',
+              },
+              {
+                label: 'JavaScript SDK',
+                to: '/develop/js',
               },
             ],
           },
