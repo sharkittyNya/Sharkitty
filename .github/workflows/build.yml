@@ -23,6 +23,12 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Build Packages
+        run: |
+          yarn
+          yarn build
+        shell: bash
+
       - name: Zip QQNTim Plugin
         run: |
           cd build/dist/qqntim/qqntim-plugin-chronocat
