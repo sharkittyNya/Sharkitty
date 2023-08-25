@@ -9,7 +9,7 @@
     "packages/*"
   ],
   "scripts": {
-    "clean": "ts-node scripts/clean.cts",
+    "clean": "ts-node -T scripts/clean.cts",
     "build": "yarn workspace @chronocat/red build && yarn workspace @chronocat/core build && yarn workspace @chronocat/plugin-llqqnt build && yarn workspace @chronocat/plugin-qqntim build",
     "lint": "eslint --ignore-path .gitignore .",
     "lint:fix": "yarn lint --fix",

@@ -14,6 +14,6 @@
     "lib"
   ],
   "scripts": {
-    "build": "ts-node ../../scripts/build.cts build && ts-node pack.cts"
+    "build": "ts-node -T ../../scripts/build.cts build && ts-node -T pack.cts"
   }
 }
