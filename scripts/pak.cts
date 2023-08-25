@@ -43,7 +43,7 @@ void (async () => {
           '-f',
           join(
             pathDist,
-            `${pkgJson.name.replace('@chronocat/', '')}-v${
+            `${pkgJson.name.replace('@chronocat/', 'chronocat-')}-v${
               pkgJson.version
             }.tgz`,
           ),
