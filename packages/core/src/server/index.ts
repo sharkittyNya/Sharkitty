@@ -18,12 +18,9 @@ export const createNormalServers = (
   const wsServer = wsRouterServer.createServer(resolveRoute, {
     authorizer: PayloadAuthorizer(token),
     rootPath: '/',
-    port: 16530,
     mountHTTPServer: (httpServer as HttpRouterServerInstance).server,
     connectPayload,
   })
-
-  ;(httpServer as HttpRouterServerInstance).listen()
 
   return {
     binaryServer: httpServer,

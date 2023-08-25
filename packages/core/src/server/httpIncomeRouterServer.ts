@@ -11,6 +11,7 @@ import type {
 interface HttpIncomeRouterServerConfig
   extends RouterServerCommonConfig<IncomingMessage> {
   rootPath: string
+  port: number
 }
 
 export class HttpRouterServerInstance implements RouterServerInstance {
@@ -22,8 +23,6 @@ export class HttpRouterServerInstance implements RouterServerInstance {
       port,
     }: ConfigOf<HttpIncomeRouterServerConfig>,
   ) {
-    this.#port = port
-
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     this.server = createServer(async (req, res) => {
       if (!req.url) {
@@ -92,14 +91,11 @@ export class HttpRouterServerInstance implements RouterServerInstance {
         res.end('404 not found')
       }
     })
+
+    this.server.listen(port)
   }
 
   public readonly server: Server
-  #port: number
-
-  listen(): void {
-    this.server.listen(this.#port)
-  }
 
   stop(): void {
     this.server.close()

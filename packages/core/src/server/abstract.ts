@@ -2,7 +2,6 @@ import type { RouteResolver } from '../router'
 
 export type RouterServerCommonConfig<AuthorizerInput> = {
   authorizer: (input: AuthorizerInput) => boolean | Promise<boolean>
-  port: number
 }
 
 export type ConfigOf<ConfigType> = Partial<ConfigType> &

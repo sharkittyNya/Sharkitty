@@ -11,12 +11,21 @@ import type {
 
 type JSONPayloadPacket = unknown
 
-interface WebSocketIncomeRouterServerConfig
-  extends RouterServerCommonConfig<JSONPayloadPacket> {
+type WebSocketInitiator =
+  | {
+      mountHTTPServer: Server
+      port?: undefined
+    }
+  | {
+      mountHTTPServer?: undefined
+      port: number
+    }
+
+type WebSocketIncomeRouterServerConfig = {
   rootPath: string
-  mountHTTPServer: Server
   connectPayload: () => unknown
-}
+} & RouterServerCommonConfig<JSONPayloadPacket> &
+  WebSocketInitiator
 
 export class WebsocketRouterServerInstance implements RouterServerInstance {
   constructor(
