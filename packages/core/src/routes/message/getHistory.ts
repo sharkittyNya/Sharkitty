@@ -3,7 +3,7 @@ import { getMsgsIncludeSelf } from '../../ipc/definitions/msgService'
 import { uixCache } from '../../uixCache'
 import { router } from '../router'
 
-router.message?.getHistory?.$body('json')(async ({ body }) => {
+router.message.getHistory.$body('json')(async ({ body }) => {
   const { peer, offsetMsgId, count } = body as MessageGetHistoryPayload
 
   return await getMsgsIncludeSelf({

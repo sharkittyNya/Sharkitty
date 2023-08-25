@@ -1,9 +1,11 @@
 type RouterOptions = {
   body: BodyType
+  testType: 'a' | 'b'
 }
 
 const defaultRouterOption = {
   body: 'none',
+  testType: 'a',
 } as const
 
 type BodyType = 'binary' | 'json' | 'text' | 'none'
@@ -17,42 +19,50 @@ type RouterHandlerContext<RouterOption extends RouterOptions> = {
     : RouterOption['body'] extends 'none'
     ? undefined
     : unknown
+  testType: RouterOption['testType']
 }
 type RouterHandler<RouterOption extends RouterOptions, T> = (
   ctx: RouterHandlerContext<RouterOption>,
 ) => T | Promise<T>
 
-type AssignValueToKey<T, V, K extends keyof T> = {
-  [P in keyof T]: P extends K ? V : T[P]
-}
-
 type RouterOptionsToDeclarator<RouterOption extends RouterOptions> = {
   [key in keyof RouterOptions as `$${string & key}`]: <
-    Value extends RouterOptions[key],
+    RouterOptionValue extends RouterOptions[key],
   >(
-    optionValue: Value,
-  ) => RouterProxy<AssignValueToKey<RouterOption, Value, key>>
+    optionValue: RouterOptionValue,
+  ) => RouterProxy<{
+    [keyOpt in keyof RouterOptions]: keyOpt extends key
+      ? RouterOptionValue & RouterOptions[keyOpt]
+      : RouterOption[keyOpt]
+  }>
 }
 
-type Merge<T extends object, U extends { [key: string]: string }> = {
-  [key in keyof T]: U[key & string] extends undefined
-    ? T[key]
-    : NonNullable<U[key & string]>
-}
-type Keys = {
+type RouterOptionDeclaratorKeys = {
   [key in keyof RouterOptions as `$${string & key}`]: unknown
 }
+
 type RouterOptionsDeclarators<RouterOption extends RouterOptions> =
   RouterOptionsToDeclarator<RouterOption>
 type RouterProxy<RouterOption extends RouterOptions> = {
-  [K: string]: RouterProxy<RouterOption>
+  [K in keyof Omit<
+    never,
+    keyof RouterOptionDeclaratorKeys
+  >]: RouterProxy<RouterOption>
 } & {
+  (handler: RouterHandler<RouterOption, unknown>): undefined
   <T extends Partial<RouterOptions>>(
-    handler: RouterHandler<Merge<RouterOption, T>, unknown>,
-    options?: T,
+    handler: RouterHandler<
+      {
+        [key in keyof RouterOptions]: [T[key]] extends [undefined]
+          ? RouterOptions[key]
+          : NonNullable<T[key]>
+      },
+      unknown
+    >,
+    options: T,
   ): undefined
 } & {
-  [K in keyof Keys]: RouterOptionsDeclarators<RouterOption>[K]
+  [K in keyof RouterOptionDeclaratorKeys]: RouterOptionsDeclarators<RouterOption>[K]
 }
 
 export interface Route {
@@ -106,13 +116,5 @@ const makeRouterProxy: MakeRouterProxyFn = ((
 
 export const router: RouterProxy<typeof defaultRouterOption> = makeRouterProxy(
   [],
-  {
-    body: 'none',
-  },
+  defaultRouterOption,
 ) as unknown as RouterProxy<typeof defaultRouterOption>
-
-router.a.b.d((ctx) => {
-  ctx.body
-})
-
-console.log(routes)

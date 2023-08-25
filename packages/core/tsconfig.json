@@ -4,7 +4,8 @@
     "rootDir": "src",
     "outDir": "lib",
     "noPropertyAccessFromIndexSignature": false,
-    "target": "ES2022"
+    "target": "ES2022",
+    "strict": false
   },
   "include": [
     "src",
