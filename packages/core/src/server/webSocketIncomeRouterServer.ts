@@ -1,13 +1,13 @@
-import type { Server } from 'http'
-import type {
-  RouterServer,
-  RouterServerInstance,
-  RouteResolver,
-  RouterServerCommonConfig,
-  ConfigOf,
-} from './abstract'
-import { WebSocketServer } from 'ws'
+import type { Server } from 'node:http'
 import type { WebSocket } from 'ws'
+import { WebSocketServer } from 'ws'
+import type {
+  ConfigOf,
+  RouteResolver,
+  RouterServer,
+  RouterServerCommonConfig,
+  RouterServerInstance,
+} from './abstract'
 
 type JSONPayloadPacket = unknown
 

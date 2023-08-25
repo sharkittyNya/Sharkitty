@@ -1,11 +1,11 @@
-import { createServer } from 'http'
-import type { IncomingMessage, Server } from 'http'
+import type { IncomingMessage, Server } from 'node:http'
+import { createServer } from 'node:http'
 import type {
-  RouterServer,
-  RouterServerInstance,
-  RouteResolver,
-  RouterServerCommonConfig,
   ConfigOf,
+  RouteResolver,
+  RouterServer,
+  RouterServerCommonConfig,
+  RouterServerInstance,
 } from './abstract'
 
 interface HttpIncomeRouterServerConfig
@@ -22,17 +22,22 @@ export class HttpRouterServerInstance implements RouterServerInstance {
       port,
     }: ConfigOf<HttpIncomeRouterServerConfig>,
   ) {
+    this.#port = port
+
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     this.server = createServer(async (req, res) => {
-      if (!req.url) return
+      if (!req.url) {
+        res.writeHead(400)
+        res.end('404 bad request')
+        return
+      }
       const url = new URL(req.url, `http://${req.headers.host}`)
 
-      if (!(await authorizer(req))) {
-        res.writeHead(401)
-        res.end('401 unauthorized')
+      if (!url.pathname.startsWith(rootPath)) {
+        res.writeHead(404)
+        res.end('404 not found')
+        return
       }
-
-      if (!url.pathname.startsWith(rootPath)) return
 
       const path = url.pathname
         .slice(rootPath.length)
@@ -41,6 +46,11 @@ export class HttpRouterServerInstance implements RouterServerInstance {
 
       const route = resolveRoute(path)
       if (route) {
+        if (!(await authorizer(req))) {
+          res.writeHead(401)
+          res.end('401 unauthorized')
+        }
+
         const readBodyToBuffer = (req: IncomingMessage) => {
           const chunks: Buffer[] = []
           return new Promise<Buffer>((resolve, reject) => {
@@ -82,11 +92,14 @@ export class HttpRouterServerInstance implements RouterServerInstance {
         res.end('404 not found')
       }
     })
-
-    this.server.listen(port)
   }
 
   public readonly server: Server
+  #port: number
+
+  listen(): void {
+    this.server.listen(this.#port)
+  }
 
   stop(): void {
     this.server.close()

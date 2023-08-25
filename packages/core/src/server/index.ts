@@ -1,5 +1,5 @@
 import { resolveRoute } from '../router'
-import { HeaderAuthorizer } from './authorizer'
+import { HeaderAuthorizer, PayloadAuthorizer } from './authorizer'
 import type { HttpRouterServerInstance } from './httpIncomeRouterServer'
 import { httpRouterServer } from './httpIncomeRouterServer'
 import type { WebsocketRouterServerInstance } from './webSocketIncomeRouterServer'
@@ -16,12 +16,14 @@ export const createNormalServers = (
   })
 
   const wsServer = wsRouterServer.createServer(resolveRoute, {
-    authorizer: HeaderAuthorizer(token),
+    authorizer: PayloadAuthorizer(token),
     rootPath: '/',
     port: 16530,
-    mountHTTPServer: (httpServer as unknown as HttpRouterServerInstance).server,
+    mountHTTPServer: (httpServer as HttpRouterServerInstance).server,
     connectPayload,
   })
+
+  ;(httpServer as HttpRouterServerInstance).listen()
 
   return {
     binaryServer: httpServer,
