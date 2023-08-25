@@ -1,6 +1,6 @@
 import type { Server } from 'node:http'
-import type { WebSocket } from 'ws'
 import { WebSocketServer } from 'ws'
+import type { WebSocket } from 'ws'
 import type {
   ConfigOf,
   RouteResolver,
@@ -8,7 +8,13 @@ import type {
   RouterServerCommonConfig,
   RouterServerInstance,
 } from './abstract'
+import type { Route } from '../router'
 
+type JSONPacket = {
+  type: string
+  payload: JSONPayloadPacket
+  echo: unknown
+}
 type JSONPayloadPacket = unknown
 
 type WebSocketInitiator =
@@ -50,12 +56,10 @@ export class WebsocketRouterServerInstance implements RouterServerInstance {
       client.once('message', async (message) => {
         try {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-base-to-string
-          const { type, payload } = JSON.parse(message.toString())
+          const packet = JSON.parse(message.toString()) as JSONPacket
+          const { type, payload } = packet
 
-          if (type !== 'meta::connect')
-            throw new Error('Invalid connect message')
-
-          if (type === 'auth') {
+          if (type === 'meta::connect') {
             if (!(await authorizer(payload))) {
               client.close(401)
               return
@@ -64,73 +68,12 @@ export class WebsocketRouterServerInstance implements RouterServerInstance {
 
             // eslint-disable-next-line @typescript-eslint/no-misused-promises
             client.on('message', async (message) => {
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-              const {
-                type,
-                payload,
-                echo,
-              }: {
-                type: string
-                payload: unknown
-                echo: unknown
-                // eslint-disable-next-line @typescript-eslint/no-base-to-string
-              } = JSON.parse(message.toString())
+              // eslint-disable-next-line @typescript-eslint/no-base-to-string, @typescript-eslint/no-unsafe-assignment
+              const packet = JSON.parse(message.toString()) as JSONPacket
               if (typeof type !== 'string') return
-              const path = type.split('::')
+              const path = packet.type.split('::')
               const route = resolveRoute(path)
-              const reply = (payload: unknown) =>
-                client.send(
-                  JSON.stringify({
-                    type: `${path.join('::')}::reply`,
-                    payload,
-                    echo,
-                  }),
-                )
-              if (route) {
-                if (route.options.httpOnly)
-                  return reply({
-                    error: 'route not supported',
-                    reason: 'This route is http only',
-                  })
-
-                if (route.options.body === 'binary')
-                  return reply({
-                    error: 'route not supported',
-                    reason: 'Binary body is not supported for websocket',
-                  })
-
-                if (route.options.body === 'json') {
-                  if (typeof payload !== 'object')
-                    return reply({
-                      error: 'invalid payload',
-                      reason: 'Payload must be an object for this route',
-                    })
-                }
-
-                if (route.options.body === 'text') {
-                  if (typeof payload !== 'string')
-                    return reply({
-                      error: 'invalid payload',
-                      reason: 'Payload must be a string for this route',
-                    })
-                }
-
-                const ctx = {
-                  body: payload,
-                  http: undefined,
-                }
-
-                try {
-                  const result = await route.handler(ctx)
-                  reply(result)
-                } catch (e) {
-                  console.error(e)
-                  reply({
-                    error: 'internal error',
-                    reason: 'Internal error occurred',
-                  })
-                }
-              }
+              await this.handleRoute(route, client, packet)
             })
 
             client.on('disconnect', () =>
@@ -146,7 +89,14 @@ export class WebsocketRouterServerInstance implements RouterServerInstance {
                 payload: connectPayload(),
               }),
             )
-          }
+          } else if (typeof type === 'string') {
+            const path = type.split('::')
+            const route = resolveRoute(path)
+            if (route.options.requireAuthorize) throw Error('Authorize needed')
+            else {
+              await this.handleRoute(route, client, packet)
+            }
+          } else throw new Error('Invalid API type')
         } catch (e) {
           client.close(401)
         }
@@ -156,6 +106,68 @@ export class WebsocketRouterServerInstance implements RouterServerInstance {
 
   public readonly server: WebSocketServer
   public readonly wsAuthedClients: WebSocket[] = []
+
+  async handleRoute(route: Route, client: WebSocket, packet: JSONPacket) {
+    const reply = (payload: unknown) =>
+      client.send(
+        JSON.stringify({
+          type: `${route.path.join('::')}::reply`,
+          payload,
+          echo: packet.echo,
+        }),
+      )
+    if (route) {
+      const { payload } = packet
+      if (route.options.httpOnly)
+        return reply({
+          error: 'route not supported',
+          reason: 'This route is http only',
+        })
+
+      if (route.options.body === 'binary')
+        return reply({
+          error: 'route not supported',
+          reason: 'Binary body is not supported for websocket',
+        })
+
+      if (route.options.body === 'json') {
+        if (typeof payload !== 'object')
+          return reply({
+            error: 'invalid payload',
+            reason: 'Payload must be an object for this route',
+          })
+      }
+
+      if (route.options.body === 'text') {
+        if (typeof payload !== 'string')
+          return reply({
+            error: 'invalid payload',
+            reason: 'Payload must be a string for this route',
+          })
+      }
+
+      const ctx = {
+        body: payload,
+        http: undefined,
+      }
+
+      try {
+        const result = await route.handler(ctx)
+        reply(result)
+      } catch (e) {
+        console.error(e)
+        reply({
+          error: 'internal error',
+          reason: 'Internal error occurred',
+        })
+      }
+    } else {
+      reply({
+        error: 'route error',
+        reason: 'Route not found',
+      })
+    }
+  }
 
   broadcast(type: string, payload: unknown): void {
     this.wsAuthedClients.forEach((c) =>

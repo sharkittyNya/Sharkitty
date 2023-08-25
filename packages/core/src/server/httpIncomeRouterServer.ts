@@ -45,7 +45,7 @@ export class HttpRouterServerInstance implements RouterServerInstance {
 
       const route = resolveRoute(path)
       if (route) {
-        if (!(await authorizer(req))) {
+        if (route.options.requireAuthorize && !(await authorizer(req))) {
           res.writeHead(401)
           res.end('401 unauthorized')
         }

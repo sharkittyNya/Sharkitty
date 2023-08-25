@@ -3,6 +3,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http'
 type RouterOptions = {
   body: BodyType
   httpOnly: boolean | 'POST' | 'GET'
+  requireAuthorize: boolean
 }
 
 const defaultRouterOption = {
