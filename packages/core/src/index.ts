@@ -10,7 +10,6 @@ import { randomBytes } from 'node:crypto'
 import type { PathLike } from 'node:fs'
 import { readFile, stat, writeFile } from 'node:fs/promises'
 import { createServer } from 'node:http'
-import { homedir } from 'node:os'
 import { join } from 'node:path'
 import type { WebSocket } from 'ws'
 import { WebSocketServer } from 'ws'
@@ -22,9 +21,11 @@ import {
   selfProfile,
 } from './ipc/globalVars'
 import { initListener } from './ipc/intercept'
-import { routes } from './routes'
+import { router } from './router'
+import './routes'
 import type { ListenerData } from './types'
 import { uixCache } from './uixCache'
+import { baseDir } from './utils/baseDir'
 import { makeFullPacket } from './utils/packetHelper'
 
 declare const __DEFINE_CHRONO_VERSION__: string
@@ -59,11 +60,6 @@ const initToken = async (baseDir: string) => {
 }
 
 export const chronocat = async () => {
-  const baseDir = join(
-    process.env['APPDATA'] || homedir(),
-    'BetterUniverse/QQNT',
-  )
-
   const token = await initToken(baseDir)
 
   const wsClientListener = (raw: Buffer) =>
@@ -106,36 +102,10 @@ export const chronocat = async () => {
       res.end('401 unauthorized')
     }
 
-    const getBody = () =>
-      new Promise((resolve, reject) => {
-        let body = ''
-        req.on('data', (chunk: { toString: () => string }) => {
-          body += chunk.toString()
-        })
-        req.on('end', () => {
-          try {
-            resolve(JSON.parse(body))
-          } catch (error) {
-            reject(error)
-          }
-        })
-        req.on('error', (error: unknown) => {
-          reject(error)
-        })
-      })
-
-    const ctx = {
-      baseDir,
-      uixCache,
-      req,
-      res,
-      getBody,
-    }
-
-    const route =
-      routes[url.pathname.replace('/api/', '') as keyof typeof routes]
+    // TODO
+    const route = routes[url.pathname.replace('/api/', '')]
     if (route)
-      void route(ctx)
+      void route()
         .then((result) => {
           res.writeHead(200)
           res.end(result)

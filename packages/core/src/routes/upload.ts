@@ -11,11 +11,11 @@ import {
   getImageSizeFromPath,
 } from '../ipc/definitions/fsApi'
 import { getRichMediaFilePath } from '../ipc/definitions/msgService'
-import type { Context } from '../types'
+import { router } from '../router'
+import { baseDir } from '../utils/baseDir'
 
-export const upload = async ({ baseDir, req, res }: Context) => {
-  if (!req || !res) throw new Error()
-
+router.upload.$body('binary')(async ({ body }) => {
+  // TODO
   const bb = busboy({ headers: req.headers })
   let filePath: PathLike
   let fileInfo: busboy.FileInfo
@@ -86,4 +86,4 @@ export const upload = async ({ baseDir, req, res }: Context) => {
   )
 
   req.pipe(bb)
-}
+})

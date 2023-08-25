@@ -1,12 +1,12 @@
 import type { GroupMuteEveryonePayload } from '@chronocat/red'
 import { setGroupShutUp } from '../../ipc/definitions/groupService'
-import type { Context } from '../../types'
+import { router } from '../../router'
 
-export const groupMuteEveryone = async ({ getBody }: Context) => {
-  const { group, enable } = (await getBody()) as GroupMuteEveryonePayload
+router.group.muteEveryone.$body('json')(async ({ body }) => {
+  const { group: groupCode, enable: shutUp } = body as GroupMuteEveryonePayload
 
   return await setGroupShutUp({
-    groupCode: group,
-    shutUp: enable,
+    groupCode,
+    shutUp,
   })
-}
+})

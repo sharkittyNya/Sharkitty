@@ -1,24 +1,24 @@
 import type { GroupGetMemeberListPayload } from '@chronocat/red'
-import type { Context } from '../../types'
 import {
   createMemberListScene,
-  getNextMemberList,
   destroyMemberListScene,
+  getNextMemberList,
 } from '../../ipc/definitions/groupService'
+import { router } from '../../router'
 import { detachPromise } from '../../utils/detachPromise'
 
-export const groupGetMemberList = async ({ getBody }: Context) => {
-  const body = (await getBody()) as GroupGetMemeberListPayload
+router.group.getMemberList.$body('json')(async ({ body }) => {
+  const { group: groupCode, size: num } = body as GroupGetMemeberListPayload
 
   const scene = await createMemberListScene({
-    groupCode: body.group,
+    groupCode,
     scene: 'groupMemberList_MainWindow',
   })
 
   const memList = await getNextMemberList({
     sceneId: scene,
     lastId: undefined,
-    num: body.size,
+    num,
   })
 
   await destroyMemberListScene({
@@ -38,4 +38,4 @@ export const groupGetMemberList = async ({ getBody }: Context) => {
       detail: memList.result.infos.get(uid),
     }
   })
-}
+})

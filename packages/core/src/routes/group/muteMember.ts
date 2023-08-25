@@ -1,16 +1,16 @@
 import type { GroupMuteMemberPayload } from '@chronocat/red'
 import type { MuteMember } from '../../ipc/definitions/groupService'
 import { setMemberShutUp } from '../../ipc/definitions/groupService'
-import type { Context } from '../../types'
+import { router } from '../../router'
 import { uixCache } from '../../uixCache'
 
-export const groupMuteMember = async ({ getBody }: Context) => {
-  const { group, memList } = (await getBody()) as GroupMuteMemberPayload
+router.group.muteMember.$body('json')(async ({ body }) => {
+  const { group: groupCode, memList } = body as GroupMuteMemberPayload
 
   return await setMemberShutUp({
-    groupCode: group,
+    groupCode,
     memList: (await uixCache.preprocessObject(memList, {
-      contextGroup: Number(group),
+      contextGroup: Number(groupCode),
     })) as MuteMember[],
   })
-}
+})

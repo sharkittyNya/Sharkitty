@@ -1,4 +1,4 @@
 import { friendMap } from '../../ipc/globalVars'
-import type { Context } from '../../types'
+import { router } from '../../router'
 
-export const botFriends = async (_ctx: Context) => Object.values(friendMap)
+router.bot.friends(async () => Object.values(friendMap))

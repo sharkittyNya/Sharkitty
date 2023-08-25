@@ -1,4 +1,4 @@
 import { selfProfile } from '../ipc/globalVars'
-import type { Context } from '../types'
+import { router } from '../router'
 
-export const getSelfProfile = async (_ctx: Context) => selfProfile.value ?? {}
+router.getSelfProfile(async () => selfProfile.value ?? {})

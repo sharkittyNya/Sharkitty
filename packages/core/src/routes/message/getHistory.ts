@@ -1,7 +1,7 @@
 import type { MessageGetHistoryPayload } from '@chronocat/red'
 import { getMsgsIncludeSelf } from '../../ipc/definitions/msgService'
+import { router } from '../../router'
 import { uixCache } from '../../uixCache'
-import { router } from '../router'
 
 router.message.getHistory.$body('json')(async ({ body }) => {
   const { peer, offsetMsgId, count } = body as MessageGetHistoryPayload

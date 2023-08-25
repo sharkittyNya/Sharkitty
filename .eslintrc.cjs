@@ -37,6 +37,12 @@ module.exports = {
       },
     ],
     'no-unused-vars': 'off',
+    'prefer-const': [
+      'error',
+      {
+        destructuring: 'all',
+      },
+    ],
     'import/no-default-export': 'error',
     'import/consistent-type-specifier-style': 'error',
     '@typescript-eslint/no-non-null-assertion': 'off',

@@ -1,4 +1,4 @@
 import { groupMap } from '../../ipc/globalVars'
-import type { Context } from '../../types'
+import { router } from '../../router'
 
-export const botGroups = async (_ctx: Context) => Object.values(groupMap)
+router.bot.groups(async () => Object.values(groupMap))
