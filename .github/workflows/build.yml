@@ -1,0 +1,64 @@
+name: build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: build
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Zip QQNTim Plugin
+        run: |
+          cd build/dist/qqntim/qqntim-plugin-chronocat
+          zip -r ../qqntim-plugin-chronocat.zip *
+          cd ..
+          rm -r qqntim-plugin-chronocat
+          cd ../../..
+        shell: bash
+
+      - name: Upload LiteLoaderQQNT-Plugin-Chronocat
+        uses: actions/upload-artifact@v3
+        with:
+          name: chronocat-llqqnt-${{ github.sha }}
+          path: build/dist/llqqnt
+
+      - name: Upload qqntim-plugin-chronocat
+        uses: actions/upload-artifact@v3
+        with:
+          name: chronocat-qqntim-${{ github.sha }}
+          path: build/dist/qqntim
+
+      - name: Upload IIFE
+        uses: actions/upload-artifact@v3
+        with:
+          name: chronocat-iife-${{ github.sha }}
+          path: build/dist/iife
+
+      - name: Publish LiteLoaderQQNT-Plugin-Chronocat
+        if: github.ref == 'refs/heads/master'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          personal_token: ${{ secrets.DEPLOY_TOKEN }}
+          user_name: 'Il Harper'
+          user_email: 'hi@ilharper.com'
+          external_repository: chrononeko/LiteLoaderQQNT-Plugin-Chronocat
+          publish_branch: master
+          publish_dir: build/dist/llqqnt/LiteLoaderQQNT-Plugin-Chronocat
+          enable_jekyll: true # Not to create .nojekyll since this is not a gh page
+          commit_message: 'chore: publish ${{ github.sha }}'
