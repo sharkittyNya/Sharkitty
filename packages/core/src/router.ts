@@ -1,11 +1,14 @@
+import type { IncomingMessage, ServerResponse } from 'node:http'
+
 type RouterOptions = {
   body: BodyType
-  testType: 'a' | 'b'
+  httpOnly: boolean | 'POST' | 'GET'
 }
 
 const defaultRouterOption = {
   body: 'none',
-  testType: 'a',
+  httpOnly: false,
+  requireAuthorize: true,
 } as const
 
 type BodyType = 'binary' | 'json' | 'text' | 'none'
@@ -15,11 +18,16 @@ type RouterHandlerContext<RouterOption extends RouterOptions> = {
     : RouterOption['body'] extends 'json'
     ? unknown
     : RouterOption['body'] extends 'binary'
-    ? ArrayBuffer
+    ? Buffer
     : RouterOption['body'] extends 'none'
     ? undefined
     : unknown
-  testType: RouterOption['testType']
+  http: RouterOption['httpOnly'] extends false
+    ? undefined
+    : {
+        req: IncomingMessage
+        res: ServerResponse
+      }
 }
 type RouterHandler<RouterOption extends RouterOptions, T> = (
   ctx: RouterHandlerContext<RouterOption>,
@@ -68,7 +76,7 @@ type RouterProxy<RouterOption extends RouterOptions> = {
 export interface Route {
   path: string[]
   options: RouterOptions
-  handler: <T>(ctx: RouterHandler<RouterOptions, T>) => T
+  handler: RouterHandler<RouterOptions, unknown>
 }
 const routes: Route[] = []
 
@@ -118,3 +126,8 @@ export const router: RouterProxy<typeof defaultRouterOption> = makeRouterProxy(
   [],
   defaultRouterOption,
 ) as unknown as RouterProxy<typeof defaultRouterOption>
+
+export type RouteResolver = (path: string[]) => Route | undefined
+
+export const resolveRoute: RouteResolver = (path) =>
+  routes.find((route) => !route.path.some((p, i) => p !== path[i]))

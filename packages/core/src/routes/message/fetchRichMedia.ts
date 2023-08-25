@@ -6,35 +6,36 @@ import { richMediaDownloadMap } from '../../ipc/globalVars'
 import { router } from '../../router'
 import { uixCache } from '../../uixCache'
 
-router.message.fetchRichMedia.$body('json')(async ({ body }) => {
-  let { msgId, elementId, chatType, peerUid } = body as Media
+router.message.fetchRichMedia.$body('json').$httpOnly(true)(
+  async ({ body, http }) => {
+    let { msgId, elementId, chatType, peerUid } = body as Media
 
-  const downloadId = msgId + '::' + elementId
-  console.log('DownloadId:', downloadId)
-  const downloadCompletePromise = new Promise<string>((rs) => {
-    richMediaDownloadMap[downloadId] = rs
-  })
+    const downloadId = msgId + '::' + elementId
+    console.log('DownloadId:', downloadId)
+    const downloadCompletePromise = new Promise<string>((rs) => {
+      richMediaDownloadMap[downloadId] = rs
+    })
 
-  if (chatType === 1 && !peerUid.startsWith('u_'))
-    peerUid = uixCache.map[peerUid]!
+    if (chatType === 1 && !peerUid.startsWith('u_'))
+      peerUid = uixCache.map[peerUid]!
 
-  await downloadRichMedia({
-    getReq: {
-      msgId,
-      chatType,
-      peerUid,
-      elementId,
-      thumbSize: 0,
-      downloadType: 2,
-    },
-  })
+    await downloadRichMedia({
+      getReq: {
+        msgId,
+        chatType,
+        peerUid,
+        elementId,
+        thumbSize: 0,
+        downloadType: 2,
+      },
+    })
 
-  const path = await downloadCompletePromise
+    const path = await downloadCompletePromise
 
-  // TODO
-  res!.statusCode = 200
-  res!.setHeader('Content-Type', getType(path)!)
+    http.res.statusCode = 200
+    http.res.setHeader('Content-Type', getType(path)!)
 
-  const readStream = createReadStream(path)
-  readStream.pipe(res!)
-})
+    const readStream = createReadStream(path)
+    readStream.pipe(http.res)
+  },
+)

@@ -1,19 +1,8 @@
-import type {
-  Group,
-  Message,
-  MessageSendPayload,
-  Profile,
-  WsPackage,
-} from '@chronocat/red'
-import { MsgType } from '@chronocat/red'
+import type { Group, Message, Profile } from '@chronocat/red'
 import { randomBytes } from 'node:crypto'
 import type { PathLike } from 'node:fs'
 import { readFile, stat, writeFile } from 'node:fs/promises'
-import { createServer } from 'node:http'
 import { join } from 'node:path'
-import type { WebSocket } from 'ws'
-import { WebSocketServer } from 'ws'
-import { sendMsg } from './ipc/definitions/msgService'
 import {
   friendMap,
   groupMap,
@@ -21,12 +10,12 @@ import {
   selfProfile,
 } from './ipc/globalVars'
 import { initListener } from './ipc/intercept'
-import { router } from './router'
 import './routes'
 import type { ListenerData } from './types'
 import { uixCache } from './uixCache'
 import { baseDir } from './utils/baseDir'
-import { makeFullPacket } from './utils/packetHelper'
+import { createNormalServers } from './server'
+import { filterMessage } from './utils/filterMessage'
 
 declare const __DEFINE_CHRONO_VERSION__: string
 declare const authData: {
@@ -41,11 +30,6 @@ const exists = async (path: PathLike) => {
   }
   return true
 }
-
-const filterMessage = (message: MessageSendPayload | Message) =>
-  'peer' in message
-    ? !message.elements.some((x) => x.walletElement || x.arkElement)
-    : !(message.msgType === MsgType.Ark || message.msgType === MsgType.Wallet)
 
 const initToken = async (baseDir: string) => {
   const path = join(baseDir, 'RED_PROTOCOL_TOKEN')
@@ -62,78 +46,17 @@ const initToken = async (baseDir: string) => {
 export const chronocat = async () => {
   const token = await initToken(baseDir)
 
-  const wsClientListener = (raw: Buffer) =>
-    void (async () => {
-      const { type, payload } = JSON.parse(
-        raw.toString(),
-      ) as WsPackage<MessageSendPayload>
+  const { broadcastAbleServer, binaryServer } = createNormalServers(
+    token,
+    () => ({
+      version: __DEFINE_CHRONO_VERSION__,
+      name: 'chronocat',
+      authData,
+    }),
+  )
 
-      switch (type) {
-        case 'message::send': {
-          if (!filterMessage(payload)) return
-
-          makeFullPacket(payload as unknown as Record<string, unknown>)
-
-          await sendMsg({
-            msgId: '0',
-            peer: await uixCache.preprocessObject(payload.peer),
-            msgElements: await uixCache.preprocessObject(payload.elements, {
-              contextGroup:
-                payload.peer.chatType === 2
-                  ? Number(payload.peer.peerUin)
-                  : undefined,
-            }),
-          })
-
-          return
-        }
-      }
-    })()
-
-  const httpServer = createServer((req, res) => {
-    if (!req.url) return
-    const url = new URL(req.url, `http://${req.headers.host}`)
-
-    if (
-      req.headers.authorization?.slice(0, 7) !== 'Bearer ' ||
-      req.headers.authorization.slice(7) !== token
-    ) {
-      res.writeHead(401)
-      res.end('401 unauthorized')
-    }
-
-    // TODO
-    const route = routes[url.pathname.replace('/api/', '')]
-    if (route)
-      void route()
-        .then((result) => {
-          res.writeHead(200)
-          res.end(result)
-        })
-        .catch((_error) => {
-          res.writeHead(500)
-          res.end()
-        })
-    else {
-      res.writeHead(404)
-      res.end('404 not found')
-    }
-  })
-
-  const wsServer = new WebSocketServer({
-    server: httpServer,
-  })
-
-  const wsClients: WebSocket[] = []
   const send = (type: string, payload: unknown) =>
-    wsClients.forEach((c) =>
-      c.send(
-        JSON.stringify({
-          type,
-          payload,
-        }),
-      ),
-    )
+    broadcastAbleServer.broadcast(type, payload)
 
   const dispatch = async ({ CmdName, Payload }: ListenerData) => {
     try {
@@ -237,44 +160,9 @@ export const chronocat = async () => {
 
   const disposeListener = initListener(dispatch)
 
-  wsServer.on('connection', (wsClient) => {
-    wsClient.once('message', (raw: Buffer) => {
-      try {
-        const { type, payload } = JSON.parse(raw.toString()) as {
-          type: string
-          payload: {
-            token: string
-          }
-        }
-        if (type !== 'meta::connect') throw undefined
-        if (payload.token !== token) throw undefined
-
-        wsClient.send(
-          JSON.stringify({
-            type: 'meta::connect',
-            payload: {
-              version: __DEFINE_CHRONO_VERSION__,
-              name: 'chronocat',
-              authData,
-            },
-          }),
-        )
-
-        wsClients.push(wsClient)
-        wsClient.on('message', wsClientListener)
-        wsClient.on('disconnect', () =>
-          wsClients.splice(wsClients.indexOf(wsClient), 1),
-        )
-      } catch (e) {
-        wsClient.close()
-      }
-    })
-  })
-
-  httpServer.listen(16530)
-
   return () => {
-    httpServer.close()
     disposeListener()
+    binaryServer.stop()
+    broadcastAbleServer.stop()
   }
 }
