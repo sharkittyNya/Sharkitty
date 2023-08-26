@@ -86,6 +86,7 @@ export class HttpRouterServerInstance implements RouterServerInstance {
         }
 
         if (!res.writableEnded) {
+          res.setHeader('Content-Type', 'application/json')
           res.writeHead(200)
           res.end(JSON.stringify(await route.handler(ctx)))
         }
