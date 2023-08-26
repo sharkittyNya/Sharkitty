@@ -85,8 +85,10 @@ export class HttpRouterServerInstance implements RouterServerInstance {
           body,
         }
 
-        res.writeHead(200)
-        res.end(await route.handler(ctx))
+        if (!res.writableEnded) {
+          res.writeHead(200)
+          res.end(JSON.stringify(await route.handler(ctx)))
+        }
       } else {
         res.writeHead(404)
         res.end('404 not found')
