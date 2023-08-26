@@ -1,8 +1,4 @@
 import type { Group, Message, Profile } from '@chronocat/red'
-import { randomBytes } from 'node:crypto'
-import type { PathLike } from 'node:fs'
-import { readFile, stat, writeFile } from 'node:fs/promises'
-import { join } from 'node:path'
 import {
   friendMap,
   groupMap,
@@ -11,40 +7,19 @@ import {
 } from './ipc/globalVars'
 import { initListener } from './ipc/intercept'
 import './routes'
+import { createNormalServers } from './server'
 import type { ListenerData } from './types'
 import { uixCache } from './uixCache'
-import { baseDir } from './utils/baseDir'
-import { createNormalServers } from './server'
 import { filterMessage } from './utils/filterMessage'
+import { initToken } from './utils/token'
 
 declare const __DEFINE_CHRONO_VERSION__: string
 declare const authData: {
   uid: string
 }
 
-const exists = async (path: PathLike) => {
-  try {
-    await stat(path)
-  } catch (e) {
-    return false
-  }
-  return true
-}
-
-const initToken = async (baseDir: string) => {
-  const path = join(baseDir, 'RED_PROTOCOL_TOKEN')
-  try {
-    if (await exists(path)) return (await readFile(path, 'utf-8')).trim()
-  } catch (e) {
-    // Ignore
-  }
-  const generatedToken = randomBytes(32).toString('hex')
-  await writeFile(path, generatedToken)
-  return generatedToken
-}
-
 export const chronocat = async () => {
-  const token = await initToken(baseDir)
+  const token = await initToken()
 
   const { broadcastAbleServer, binaryServer } = createNormalServers(
     token,
