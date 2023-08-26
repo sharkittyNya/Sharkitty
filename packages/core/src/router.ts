@@ -50,6 +50,14 @@ type RouterOptionDeclaratorKeys = {
   [key in keyof RouterOptions as `$${string & key}`]: unknown
 }
 
+type Merge<A, B> = {
+  [K in keyof A | keyof B]: K extends keyof B
+    ? B[K]
+    : K extends keyof A
+    ? A[K]
+    : never
+}
+
 type RouterOptionsDeclarators<RouterOption extends RouterOptions> =
   RouterOptionsToDeclarator<RouterOption>
 type RouterProxy<RouterOption extends RouterOptions> = {
@@ -60,14 +68,7 @@ type RouterProxy<RouterOption extends RouterOptions> = {
 } & {
   (handler: RouterHandler<RouterOption, unknown>): undefined
   <T extends Partial<RouterOptions>>(
-    handler: RouterHandler<
-      {
-        [key in keyof RouterOptions]: [T[key]] extends [undefined]
-          ? RouterOptions[key]
-          : NonNullable<T[key]>
-      },
-      unknown
-    >,
+    handler: RouterHandler<Merge<RouterOption, T>, unknown>,
     options: T,
   ): undefined
 } & {
