@@ -12,7 +12,7 @@ router.message.send.$body('json')(async ({ body }) => {
 
   makeFullPacket(payload as unknown as Record<string, unknown>)
 
-  await sendMsg({
+  return sendMsg({
     msgId: '0',
     peer: await uixCache.preprocessObject(payload.peer),
     msgElements: await uixCache.preprocessObject(payload.elements, {
@@ -20,6 +20,4 @@ router.message.send.$body('json')(async ({ body }) => {
         payload.peer.chatType === 2 ? Number(payload.peer.peerUin) : undefined,
     }),
   })
-
-  return {}
 })
