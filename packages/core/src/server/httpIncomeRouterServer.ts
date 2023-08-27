@@ -45,50 +45,58 @@ export class HttpRouterServerInstance implements RouterServerInstance {
 
       const route = resolveRoute(path)
       if (route) {
-        if (route.options.requireAuthorize && !(await authorizer(req))) {
-          res.writeHead(401)
-          res.end('401 unauthorized')
-        }
+        try {
+          if (route.options.requireAuthorize && !(await authorizer(req))) {
+            res.writeHead(401)
+            res.end('401 unauthorized')
+          }
 
-        const readBodyToBuffer = (req: IncomingMessage) => {
-          const chunks: Buffer[] = []
-          return new Promise<Buffer>((resolve, reject) => {
-            req.on('data', (chunk) => {
-              chunks.push(chunk as Buffer)
+          const readBodyToBuffer = (req: IncomingMessage) => {
+            const chunks: Buffer[] = []
+            return new Promise<Buffer>((resolve, reject) => {
+              req.on('data', (chunk) => {
+                chunks.push(chunk as Buffer)
+              })
+              req.on('end', () => {
+                resolve(Buffer.concat(chunks))
+              })
+              req.on('error', () => {
+                reject()
+              })
             })
-            req.on('end', () => {
-              resolve(Buffer.concat(chunks))
-            })
-            req.on('error', () => {
-              reject()
-            })
-          })
-        }
+          }
 
-        const readBodyToString = async (req: IncomingMessage) =>
-          (await readBodyToBuffer(req)).toString('utf-8')
+          const readBodyToString = async (req: IncomingMessage) =>
+            (await readBodyToBuffer(req)).toString('utf-8')
 
-        let body: unknown
-        if (route.options.body === 'binary') {
-          body = await readBodyToBuffer(req)
-        } else if (route.options.body === 'json') {
-          body = JSON.parse(await readBodyToString(req))
-        } else if (route.options.body === 'text') {
-          body = await readBodyToString(req)
-        }
+          let body: unknown
+          if (route.options.body === 'binary') {
+            body = await readBodyToBuffer(req)
+          } else if (route.options.body === 'json') {
+            body = JSON.parse(await readBodyToString(req))
+          } else if (route.options.body === 'text') {
+            body = await readBodyToString(req)
+          }
 
-        const ctx = {
-          http: route.options.httpOnly && {
-            req,
-            res,
-          },
-          body,
-        }
+          const ctx = {
+            http: route.options.httpOnly && {
+              req,
+              res,
+            },
+            body,
+          }
 
-        if (!res.writableEnded) {
-          res.setHeader('Content-Type', 'application/json')
-          res.writeHead(200)
-          res.end(JSON.stringify(await route.handler(ctx)))
+          const result = await route.handler(ctx)
+
+          if (!res.writableEnded) {
+            res.setHeader('Content-Type', 'application/json')
+            res.writeHead(200)
+            res.end(JSON.stringify(result))
+          }
+        } catch (e) {
+          console.log(e)
+          res.writeHead(500)
+          res.end('500 internal server error')
         }
       } else {
         res.writeHead(404)
