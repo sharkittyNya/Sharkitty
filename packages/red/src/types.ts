@@ -67,6 +67,20 @@ export interface Profile {
   vipLevel: number
 }
 
+export interface Member {
+  uid: string
+  qid: string
+  uin: string
+  nick: string
+  remark: string
+  cardType: number
+  cardName: string
+  role: number
+  avatarPath: string
+  shutUpTime: number
+  isDelete: boolean
+}
+
 export interface Peer {
   chatType: 1 | 2
   peerUid: string

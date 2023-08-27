@@ -1,10 +1,13 @@
-import type { Group, Message, Profile } from '@chronocat/red'
+import type { Group, Message, Profile, Member } from '@chronocat/red'
+import { ChatType } from '@chronocat/red'
 import {
   friendMap,
   groupMap,
   richMediaDownloadMap,
+  roleMap,
   selfProfile,
 } from './ipc/globalVars'
+import { getMemberInfo } from './ipc/definitions/groupService'
 import { initListener } from './ipc/intercept'
 import './routes'
 import { createNormalServers } from './server'
@@ -46,12 +49,31 @@ export const chronocat = async () => {
           msgList: Message[]
         }
 
+        const prepareRole = async (msg: Message) => {
+          if (msg.chatType === ChatType.Group) {
+            await getMemberInfo({
+              forceUpdate: false,
+              groupCode: +msg.peerUid,
+              uids: [msg.senderUid],
+            })
+          }
+        }
+
+        const fillRole = (msg: Message) => {
+          if (msg.chatType === ChatType.Group) {
+            msg.roleType = roleMap[msg.peerUid]?.[msg.senderUid]
+          }
+        }
+
         send(
           'message::recv',
           await Promise.all(
-            payload.msgList
-              .filter(filterMessage)
-              .map(async (msg) => await uixCache.preprocessObject(msg)),
+            payload.msgList.filter(filterMessage).map(async (msg) => {
+              await prepareRole(msg)
+              msg = await uixCache.preprocessObject(msg)
+              fillRole(msg)
+              return msg
+            }),
           ),
         )
         return
@@ -83,6 +105,58 @@ export const chronocat = async () => {
         const profile = payload.profiles ?? payload.infos
         for (const [uid, { uin }] of profile) uixCache.addToMap(uid, uin)
         return
+      }
+
+      case 'nodeIKernelGroupListener/onMemberInfoChange': {
+        const { groupCode, members } = Payload as {
+          groupCode: string
+          dataSource: number
+          members: [
+            string,
+            {
+              uin: string
+              role: number
+            },
+          ][] & {
+            get: (uid: string) => Member
+          }
+        }
+
+        for (const [uid, { uin, role }] of members) {
+          uixCache.addToMap(uid, uin)
+          if (!(groupCode in roleMap)) roleMap[groupCode] = {}
+          roleMap[groupCode][uid] = role
+        }
+        break
+      }
+
+      case 'nodeIKernelGroupListener/onMemberListChange': {
+        const payload = Payload as {
+          info: {
+            sceneId: string
+            ids: unknown[]
+            infos: [
+              string,
+              {
+                uin: string
+                role: number
+              },
+            ][] & {
+              get: (uid: string) => Member
+            }
+          }
+        }
+
+        const groupCode = payload.info.sceneId.split('_')[0]
+        if (!groupCode) break
+
+        for (const [uid, { uin, role }] of payload.info.infos) {
+          uixCache.addToMap(uid, uin)
+          if (!(groupCode in roleMap)) roleMap[groupCode] = {}
+          roleMap[groupCode][uid] = role
+        }
+
+        break
       }
 
       case 'nodeIKernelMsgListener/onRichMediaDownloadComplete': {

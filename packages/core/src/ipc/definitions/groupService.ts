@@ -2,6 +2,17 @@ import { defineIpcApi } from '../define'
 
 export type SceneId = unknown
 
+export const getMemberInfo = defineIpcApi<
+  unknown,
+  [
+    {
+      forceUpdate: boolean
+      groupCode: number
+      uids: string[]
+    },
+  ]
+>('IPC_UP_2', 'ns-ntApi-2', 'nodeIKernelGroupService/getMemberInfo')
+
 export const createMemberListScene = defineIpcApi<
   SceneId,
   [

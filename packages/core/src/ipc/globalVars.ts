@@ -11,6 +11,7 @@ export const responseMap: Record<
 export const requestMap: Record<Uuid, unknown> = {}
 
 export const groupMap: Record<string, Group> = {}
+export const roleMap: Record<string, Record<string, number>> = {}
 export const friendMap: Record<string, unknown> = {}
 export const richMediaDownloadMap: Record<string, (path: string) => void> = {}
 export const selfProfile: {
