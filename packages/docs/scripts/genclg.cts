@@ -18,10 +18,13 @@ const componentMap = {
     'https://github.com/chrononeko/chronocat-js/tree/master/packages/adapter',
   'koishi-plugin-assets-memory':
     'https://github.com/chrononeko/chronocat-js/tree/master/packages/assets-memory',
-}
+} as const
 
 const processComponent = (s: string) =>
-  `### [${s.slice(4)}](${componentMap[s.slice(4)]})`
+  `### [${s.slice(4)}](${
+    componentMap[s.slice(4) as keyof typeof componentMap] ||
+    'https://github.com/chrononeko/chronocat'
+  })`
 
 const processCommit = (s: string) =>
   s.replace(
