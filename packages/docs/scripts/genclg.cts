@@ -32,6 +32,12 @@ const processCommit = (s: string) =>
     '([$1](https://github.com/chrononeko/chronocat/commit/$1$2))',
   )
 
+const processIssue = (s: string) =>
+  s.replace(
+    /\(#(\d+)\)/,
+    '([#$1](https://github.com/chrononeko/bugtracker/issues/$1))',
+  )
+
 const processUser = (s: string) =>
   s.replace(/@([\w\-.]*)/, '[$&](https://github.com/$1)')
 
@@ -48,7 +54,7 @@ void (async () => {
 
     if (line.startsWith('## ')) line = processRelease(line)
     else if (line.startsWith('### ')) line = processComponent(line)
-    else line = processUser(processCommit(line))
+    else line = processUser(processIssue(processCommit(line)))
 
     result.push(line)
   }
