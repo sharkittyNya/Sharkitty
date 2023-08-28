@@ -1,7 +1,7 @@
 {
   "name": "@chronocat/core",
   "description": "小巧轻便的 Red 实现",
-  "version": "0.0.37",
+  "version": "0.0.38",
   "license": "AGPL-3.0",
   "author": {
     "name": "Il Harper",
@@ -19,7 +19,7 @@
     "build:dts": "tsc -b tsconfig.json"
   },
   "devDependencies": {
-    "@chronocat/red": "0.0.37",
+    "@chronocat/red": "0.0.38",
     "@types/busboy": "^1.5.0",
     "@types/mime": "^3.0.1",
     "@types/ws": "^8.5.5",
