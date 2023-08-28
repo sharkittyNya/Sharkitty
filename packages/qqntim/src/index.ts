@@ -7,6 +7,6 @@ import { chronocat } from '@chronocat/core'
 
 export default class Entry implements QQNTim.Entry.Main {
   constructor() {
-    chronocat()
+    void chronocat()
   }
 }

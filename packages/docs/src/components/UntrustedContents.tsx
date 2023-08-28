@@ -1,4 +1,7 @@
+// https://github.com/import-js/eslint-plugin-import/issues/2802
+// eslint-disable-next-line import/no-unresolved
 import Link from '@docusaurus/Link'
+// eslint-disable-next-line import/no-unresolved
 import Admonition from '@theme/Admonition'
 
 export const UntrustedContents = () => (

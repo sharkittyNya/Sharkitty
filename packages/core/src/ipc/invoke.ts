@@ -1,3 +1,5 @@
+// https://github.com/import-js/eslint-plugin-import/issues/2802
+// eslint-disable-next-line import/no-unresolved
 import { ipcMain } from 'electron'
 import type { IpcEvent, Detail } from '../types'
 import { requestCallbackMap } from './globalVars'

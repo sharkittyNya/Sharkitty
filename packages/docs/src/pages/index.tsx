@@ -1,8 +1,13 @@
+// https://github.com/import-js/eslint-plugin-import/issues/2802
+// eslint-disable-next-line import/no-unresolved
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
+// eslint-disable-next-line import/no-unresolved
 import { HomepageFeatures } from '@site/src/components/HomepageFeatures'
+// eslint-disable-next-line import/no-unresolved
 import Heading from '@theme/Heading'
+// eslint-disable-next-line import/no-unresolved
 import Layout from '@theme/Layout'
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import styles from './index.module.css'
 
 const HomepageHeader = () => {
@@ -19,6 +24,7 @@ const HomepageHeader = () => {
   )
 }
 
+// eslint-disable-next-line import/no-default-export
 export default () => (
   <Layout>
     <HomepageHeader />
