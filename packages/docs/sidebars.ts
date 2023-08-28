@@ -24,7 +24,12 @@ const sidebars: SidebarsConfig = {
         type: 'doc',
         id: 'connect/index',
       },
-      items: ['connect/koishi'],
+      items: [
+        'connect/koishi',
+        'connect/nonebot',
+        'connect/avilla',
+        'connect/kiramibot',
+      ],
     },
   ],
   developJavaScript: [

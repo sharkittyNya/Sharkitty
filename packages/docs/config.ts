@@ -78,7 +78,7 @@ const buildConfig = (): Config => {
         {
           name: 'keywords',
           content:
-            'Chronocat, Red, Chrononeko, RedProtocol, BetterQQNT, LiteLoaderQQNT, QQNTim, Nonebot, Nonebot2, Koishi, Koishi.js, Bot, Chatbot, 机器人, OneBot, QQ',
+            'Chronocat, Red, Chrononeko, RedProtocol, BetterQQNT, LiteLoaderQQNT, QQNTim, NoneBot, NoneBot2, Koishi, Koishi.js, Bot, Chatbot, 机器人, OneBot, QQ',
         },
       ],
 
