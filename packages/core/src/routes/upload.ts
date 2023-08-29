@@ -37,11 +37,18 @@ router.upload.$httpOnly('POST')(
               info.filename
             }`,
           )
-          file.pipe(createWriteStream(filePath))
-          return {
-            filePath,
-            fileInfo: info,
-          }
+
+          return await new Promise((resolve2, reject2) =>
+            file
+              .pipe(createWriteStream(filePath))
+              .on('finish', () =>
+                resolve2({
+                  filePath,
+                  fileInfo: info,
+                }),
+              )
+              .on('error', reject2),
+          )
         })()
       })
 

@@ -36,6 +36,9 @@ router.message.fetchRichMedia.$body('json').$httpOnly(true)(
     http.res.setHeader('Content-Type', getType(path)!)
 
     const readStream = createReadStream(path)
-    readStream.pipe(http.res)
+    await new Promise((resolve, reject) =>
+      readStream.pipe(http.res).on('finish', resolve).on('error', reject),
+    )
+    http.res.end()
   },
 )
