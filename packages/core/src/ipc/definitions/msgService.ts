@@ -1,5 +1,5 @@
 import type { Element, Peer } from '@chronocat/red'
-import { Object } from 'ts-toolbelt'
+import type { Object } from 'ts-toolbelt'
 import { defineIpcApi } from '../define'
 
 export const recallMsg = defineIpcApi<
