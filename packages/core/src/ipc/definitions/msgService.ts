@@ -1,4 +1,5 @@
-import type { Peer, RecursivePartial, Element } from '@chronocat/red'
+import type { Element, Peer } from '@chronocat/red'
+import { Object } from 'ts-toolbelt'
 import { defineIpcApi } from '../define'
 
 export const recallMsg = defineIpcApi<
@@ -60,7 +61,7 @@ export const sendMsg = defineIpcApi<
     {
       msgId: '0'
       peer: Peer
-      msgElements: RecursivePartial<Element>[]
+      msgElements: Object.Partial<Element, 'deep'>[]
     },
   ]
 >('IPC_UP_2', 'ns-ntApi-2', 'nodeIKernelMsgService/sendMsg')

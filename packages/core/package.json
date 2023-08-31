@@ -26,6 +26,7 @@
     "busboy": "^1.6.0",
     "mime": "^3.0.0",
     "tosource": "^2.0.0-alpha.3",
+    "ts-toolbelt": "^9.6.0",
     "typescript-strict-plugin": "^2.1.0",
     "utility-types": "^3.10.0",
     "ws": "^8.13.0"

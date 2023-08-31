@@ -1,6 +1,4 @@
-export type RecursivePartial<T> = {
-  [P in keyof T]?: RecursivePartial<T[P]>
-}
+import type { Object } from 'ts-toolbelt'
 
 /**
  * Websocket 消息包。
@@ -90,7 +88,7 @@ export interface Peer {
 
 export interface MessageSendPayload {
   peer: Peer
-  elements: RecursivePartial<Element>[]
+  elements: Object.Partial<Element, 'deep'>[]
 }
 
 export interface UploadResponse {
