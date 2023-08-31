@@ -14,6 +14,10 @@
 - 修复了 HTTP API 无法使用的问题
 - 修复了文件上传的问题
 
+### koishi-plugin-assets-memory
+
+- 修复了资源获取失败的问题 (a45ac5934b6053c783c8122e3466b43ce0c24eb8)
+
 ## v0.0.37 (2023-08-26)
 
 ### core
