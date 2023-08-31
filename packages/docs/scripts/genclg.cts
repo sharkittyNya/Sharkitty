@@ -20,16 +20,19 @@ const componentMap = {
     'https://github.com/chrononeko/chronocat-js/tree/master/packages/assets-memory',
 } as const
 
-const processComponent = (s: string) =>
-  `### [${s.slice(4)}](${
-    componentMap[s.slice(4) as keyof typeof componentMap] ||
-    'https://github.com/chrononeko/chronocat'
-  })`
+type Component = keyof typeof componentMap
 
-const processCommit = (s: string) =>
+const processComponent = (c: Component) =>
+  `### [${c}](${componentMap[c] || 'https://github.com/chrononeko/chronocat'})`
+
+const processCommit = (c: Component, s: string) =>
   s.replace(
     /\(([a-z\d]{8})([a-z\d]{32})\)/g,
-    '([$1](https://github.com/chrononeko/chronocat/commit/$1$2))',
+    `([$1](${
+      /(https:\/\/github\.com\/chrononeko\/[\w-]*).*/.exec(
+        componentMap[c],
+      )?.[1] || 'https://github.com/chrononeko/chronocat'
+    }/commit/$1$2))`,
   )
 
 const processIssue = (s: string) =>
@@ -48,13 +51,20 @@ void (async () => {
 
   const result = ['---', 'title: 更新日志', 'sidebar_position: 10000', '---']
 
+  let component: Component = 'core'
+
   for (let line of lines) {
     // # CHANGELOG
     if (line.startsWith('# ')) continue
 
-    if (line.startsWith('## ')) line = processRelease(line)
-    else if (line.startsWith('### ')) line = processComponent(line)
-    else line = processUser(processIssue(processCommit(line)))
+    if (line.startsWith('## ')) {
+      line = processRelease(line)
+    } else if (line.startsWith('### ')) {
+      component = line.slice(4) as Component
+      line = processComponent(component)
+    } else {
+      line = processUser(processIssue(processCommit(component, line)))
+    }
 
     result.push(line)
   }
