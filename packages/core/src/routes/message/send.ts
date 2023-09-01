@@ -1,9 +1,11 @@
 import type { MessageSendPayload } from '@chronocat/red'
 import { sendMsg } from '../../ipc/definitions/msgService'
+import { sendQueue } from '../../ipc/globalVars'
 import { router } from '../../router'
 import { uixCache } from '../../uixCache'
 import { filterMessage } from '../../utils/filterMessage'
 import { makeFullPacket } from '../../utils/packetHelper'
+import { detachPromise } from '../../utils/detachPromise'
 
 router.message.send.$body('json')(async ({ body }) => {
   const payload = body as MessageSendPayload
@@ -12,12 +14,24 @@ router.message.send.$body('json')(async ({ body }) => {
 
   makeFullPacket(payload as unknown as Record<string, unknown>)
 
-  return sendMsg({
+  const param = {
     msgId: '0',
     peer: await uixCache.preprocessObject(payload.peer),
     msgElements: await uixCache.preprocessObject(payload.elements, {
       contextGroup:
         payload.peer.chatType === 2 ? Number(payload.peer.peerUin) : undefined,
     }),
+  } as const
+
+  return await new Promise((resolve, reject) => {
+    sendQueue.push(resolve)
+    detachPromise(sendMsg(param))
+    setTimeout(() => {
+      const index = sendQueue.indexOf(resolve)
+      if (index >= 0) {
+        sendQueue.splice(index, 1)
+        reject()
+      }
+    }, 5000)
   })
 })

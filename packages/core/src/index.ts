@@ -6,6 +6,8 @@ import {
   richMediaDownloadMap,
   roleMap,
   selfProfile,
+  sendCallbackMap,
+  sendQueue,
 } from './ipc/globalVars'
 import { getMemberInfo } from './ipc/definitions/groupService'
 import { initListener } from './ipc/intercept'
@@ -200,6 +202,27 @@ export const chronocat = async () => {
           for (const buddy of category.buddyList) {
             buddy.category = category.categoryName
             friendMap[buddy.uin] = buddy
+          }
+        }
+        return
+      }
+
+      case 'nodeIKernelMsgListener/onAddSendMsg': {
+        const { msgRecord } = Payload as {
+          msgRecord: Message
+        }
+        sendCallbackMap[msgRecord.msgId] = sendQueue.shift()
+        return
+      }
+
+      case 'nodeIKernelMsgListener/onMsgInfoListUpdate': {
+        const { msgList } = Payload as {
+          msgList: Message[]
+        }
+        for (const msg of msgList) {
+          if (msg.sendStatus > 1) {
+            sendCallbackMap[msg.msgId]?.(msg)
+            delete sendCallbackMap[msg.msgId]
           }
         }
         return

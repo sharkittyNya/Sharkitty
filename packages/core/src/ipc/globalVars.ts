@@ -1,4 +1,4 @@
-import type { Group, Profile } from '@chronocat/red'
+import type { Group, Message, Profile } from '@chronocat/red'
 import type { Detail, Uuid } from '../types'
 
 export const requestCallbackMap: Record<Uuid, unknown> = {}
@@ -9,6 +9,9 @@ export const responseMap: Record<
   }
 > = {}
 export const requestMap: Record<Uuid, unknown> = {}
+
+export const sendQueue: ((msg: Message) => void)[] = []
+export const sendCallbackMap: Record<string, (msg: Message) => void> = {}
 
 export const groupMap: Record<string, Group> = {}
 export const roleMap: Record<string, Record<string, number>> = {}
