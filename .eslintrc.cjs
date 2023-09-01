@@ -10,7 +10,7 @@ module.exports = {
     'eslint:recommended',
     'plugin:import/recommended',
     'plugin:import/typescript',
-    'plugin:@typescript-eslint/recommended',
+    'plugin:@typescript-eslint/strict',
     'plugin:@typescript-eslint/recommended-requiring-type-checking',
     'prettier',
     'plugin:prettier/recommended',
@@ -57,5 +57,7 @@ module.exports = {
     '@typescript-eslint/no-namespace': 'off',
     '@typescript-eslint/consistent-type-exports': 'error',
     '@typescript-eslint/consistent-type-imports': 'error',
+    '@typescript-eslint/no-dynamic-delete': 'off',
+    '@typescript-eslint/no-extraneous-class': 'off',
   },
 }

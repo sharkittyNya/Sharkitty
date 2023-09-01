@@ -3,9 +3,9 @@ import { sendMsg } from '../../ipc/definitions/msgService'
 import { sendQueue } from '../../ipc/globalVars'
 import { router } from '../../router'
 import { uixCache } from '../../uixCache'
+import { detachPromise } from '../../utils/detachPromise'
 import { filterMessage } from '../../utils/filterMessage'
 import { makeFullPacket } from '../../utils/packetHelper'
-import { detachPromise } from '../../utils/detachPromise'
 
 router.message.send.$body('json')(async ({ body }) => {
   const payload = body as MessageSendPayload

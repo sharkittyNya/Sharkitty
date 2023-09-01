@@ -1,5 +1,6 @@
-import type { Group, Message, Profile, Member } from '@chronocat/red'
+import type { Group, Member, Message, Profile } from '@chronocat/red'
 import { ChatType } from '@chronocat/red'
+import { getMemberInfo } from './ipc/definitions/groupService'
 import {
   friendMap,
   groupMap,
@@ -9,7 +10,6 @@ import {
   sendCallbackMap,
   sendQueue,
 } from './ipc/globalVars'
-import { getMemberInfo } from './ipc/definitions/groupService'
 import { initListener } from './ipc/intercept'
 import './routes'
 import { createNormalServers } from './server'

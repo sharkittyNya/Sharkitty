@@ -1,7 +1,10 @@
 import type { Group, Message, Profile } from '@chronocat/red'
-import type { Detail, Uuid } from '../types'
+import type { Detail, IpcEvent, Uuid } from '../types'
 
-export const requestCallbackMap: Record<Uuid, unknown> = {}
+export const requestCallbackMap: Record<
+  Uuid,
+  (this: IpcEvent, detail: Detail) => void
+> = {}
 export const responseMap: Record<
   Uuid,
   {
