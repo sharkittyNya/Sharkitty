@@ -1,7 +1,8 @@
 // https://github.com/import-js/eslint-plugin-import/issues/2802
 // eslint-disable-next-line import/no-unresolved
 import { ipcMain } from 'electron'
-import type { IpcEvent, Detail } from '../types'
+import type { Detail, IpcEvent } from '../types'
+import { timeout } from '../utils/time'
 import { requestCallbackMap } from './globalVars'
 
 const generateUUID = () => {
@@ -23,7 +24,7 @@ export const invoke = async (
 ) => {
   const uuid = generateUUID()
   const result = await Promise.race([
-    new Promise((_, reject) => setTimeout(() => reject(), 5000)),
+    new Promise((_, reject) => setTimeout(() => reject(), timeout)),
     new Promise((resolve) => {
       requestCallbackMap[uuid] = resolve
       ipcMain.emit(

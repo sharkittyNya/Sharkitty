@@ -5,6 +5,7 @@ import {
 } from './ipc/definitions/groupService'
 import { detachPromise } from './utils/detachPromise'
 import { memoize } from './utils/memoize'
+import { sleep } from './utils/time'
 
 const map: Record<string, string> = {}
 
@@ -108,7 +109,7 @@ const preprocessObject = async <T extends object>(
     }
   }
 
-  await new Promise((resolve) => setTimeout(resolve, 80))
+  await sleep(80)
 
   for (const [key, value, obj] of eAll) {
     const cKey = genCorrespondingName(key)
