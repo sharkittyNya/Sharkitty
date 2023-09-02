@@ -109,6 +109,10 @@ const buildConfig = (): Config => {
                 to: 'develop/protocol',
               },
               {
+                label: '原生',
+                to: 'develop/native',
+              },
+              {
                 label: 'JavaScript',
                 to: 'develop/js',
               },
@@ -157,6 +161,10 @@ const buildConfig = (): Config => {
               {
                 label: '协议',
                 to: '/develop/protocol',
+              },
+              {
+                label: '原生',
+                to: '/develop/native',
               },
               {
                 label: 'JavaScript SDK',
