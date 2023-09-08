@@ -18,6 +18,8 @@ const componentMap = {
     'https://github.com/chrononeko/chronocat-js/tree/master/packages/adapter',
   'koishi-plugin-assets-memory':
     'https://github.com/chrononeko/chronocat-js/tree/master/packages/assets-memory',
+  'module-native': 'https://github.com/chrononeko/module-native/tree/master',
+  miraigo: 'https://github.com/chrononeko/miraigo/tree/master',
 } as const
 
 type Component = keyof typeof componentMap
