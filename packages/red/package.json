@@ -19,6 +19,8 @@
     "build:dts": "tsc -b tsconfig.json"
   },
   "devDependencies": {
+    "miraigo": "0.0.39",
+    "protobufjs": "^7.2.5",
     "ts-toolbelt": "^9.6.0"
   }
 }

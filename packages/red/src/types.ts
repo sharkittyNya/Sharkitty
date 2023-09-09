@@ -1,3 +1,4 @@
+import type { msg } from 'miraigo'
 import type { Object } from 'ts-toolbelt'
 
 /**
@@ -89,6 +90,17 @@ export interface Peer {
 export interface MessageSendPayload {
   peer: Peer
   elements: Object.Partial<Element, 'deep'>[]
+}
+
+export interface MessageSendForwardPayload {
+  msgInfos?: {
+    msgId: string
+    senderShowName: string
+  }[]
+  msgElements?: msg.IMessage[]
+  coverElements?: msg.IMessage[]
+  srcContact: Peer
+  dstContact: Peer
 }
 
 export interface UploadResponse {

@@ -65,3 +65,18 @@ export const sendMsg = defineIpcApi<
     },
   ]
 >('IPC_UP_2', 'ns-ntApi-2', 'nodeIKernelMsgService/sendMsg')
+
+export const multiForwardMsgWithComment = defineIpcApi<
+  unknown,
+  [
+    {
+      msgInfos: {
+        msgId: string
+        senderShowName: string
+      }[]
+      srcContact: Peer
+      dstContact: Peer
+      commentElements: []
+    },
+  ]
+>('IPC_UP_2', 'ns-ntApi-2', 'nodeIKernelMsgService/multiForwardMsgWithComment')

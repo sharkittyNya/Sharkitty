@@ -11,7 +11,10 @@ import {
   sendQueue,
 } from './ipc/globalVars'
 import { initListener } from './ipc/intercept'
+import { getModules } from './modules'
+import { setMsgCache } from './msgCache'
 import './routes'
+import { sendForwardMsgBuffer } from './routes/message/sendForward'
 import { createNormalServers } from './server'
 import type { ListenerData } from './types'
 import { uixCache } from './uixCache'
@@ -23,7 +26,19 @@ declare const authData: {
   uid: string
 }
 
+const initHooks = async () => {
+  try {
+    const modules = await getModules()
+    modules.native.performHooks()
+    modules.native.setPBPreprocessorForGzHook(() => sendForwardMsgBuffer)
+  } catch (e) {
+    console.log('Failed to inject hooks', e)
+  }
+}
+
 export const chronocat = async () => {
+  void initHooks()
+
   const token = await initToken()
 
   const { broadcastAbleServer, binaryServer } = createNormalServers(
@@ -73,6 +88,7 @@ export const chronocat = async () => {
             payload.msgList.filter(filterMessage).map(async (msg) => {
               await prepareRole(msg)
               msg = await uixCache.preprocessObject(msg)
+              setMsgCache(msg)
               fillRole(msg)
               return msg
             }),
