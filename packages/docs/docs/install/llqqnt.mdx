@@ -21,8 +21,8 @@ LiteLoaderQQNT 提供了详细的安装教程，可以直接前往 LiteLoaderQQN
 
 简单来说，从 [这里](https://github.com/LiteLoaderQQNT/LiteLoaderQQNT/releases) 下载最新版本的
 LiteLoaderQQNT，解压得到 LiteLoader 文件夹后扔进
-`C:\Program Files\Tencent\QQNT\resources\app` 目录，最后打开该目录下的 `package.json`
-文件将 `main` 值修改为 `./LiteLoader` 即可，就像这样：
+`C:\Program Files\Tencent\QQNT\resources\app` 目录，最后打开该目录（`resources\app`）下的
+`package.json` 文件，将 `main` 值修改为 `./LiteLoader` 即可，就像这样：
 
 ```diff
   {
@@ -34,6 +34,27 @@ LiteLoaderQQNT，解压得到 LiteLoader 文件夹后扔进
    ...
   }
 ```
+
+:::tip[注意 QQ 的安装位置]
+
+上面我们将 LiteLoader 文件夹扔进了 `C:\Program Files\Tencent\QQNT\resources\app`
+目录，但如果你在安装 QQ 时修改了安装位置，或者你是从老版本的 QQ
+升级的，那么你需要将 `C:\Program Files\Tencent\QQNT` 这一部分替换为你实际的安装位置哦！
+
+:::
+
+:::tip[注意要编辑的 `package.json` 文件]
+
+LiteLoader 文件夹下也有一个 `package.json`，因此不要搞混：
+**要编辑的 `package.json` 文件在 `resources\app` 目录下，和 LiteLoader 文件夹同级哦！**
+
+:::
+
+:::tip[注意保存文件]
+
+编辑完 `package.json` 文件后，记得保存哦！
+
+:::
 
 结论：你已安装 LiteLoaderQQNT。
 
