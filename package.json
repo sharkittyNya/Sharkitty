@@ -16,6 +16,9 @@
     "lint:fix": "yarn lint --fix",
     "test": "jest"
   },
+  "resolutions": {
+    "@swc/core": "1.3.82"
+  },
   "devDependencies": {
     "@tsconfig/strictest": "^2.0.1",
     "@types/jest": "^29.5.4",
