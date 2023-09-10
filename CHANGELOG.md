@@ -1,6 +1,24 @@
 # CHANGELOG
 
-## v0.0.39 (2023-08-31)
+## v0.0.40 (2023-09-10)
+
+### core
+
+- 修复了 native 模块导致 QQ 无法启动的问题 (#7)
+
+版本 0.0.40 紧急修复了 Chronocat 导致 QQ
+无法启动的问题。特别地，如果你已经安装了版本 0.0.39
+并已经无法启动 QQ，可以按照如下步骤进行修复：
+
+1. 打开 `文档/LiteLoaderQQNT/plugins` 文件夹，删除下面带有 `LiteLoader-Plugin-Chronocat` 字样的文件夹
+1. 使用任务管理器结束所有 QQ 进程
+1. 重新打开 QQ，QQ 应当能够正常启动。接下来可以前往 LiteLoaderQQNT 插件市场下载 0.0.40 版本。
+
+### module-native
+
+- 修复了 native 模块导致 QQ 无法启动的问题 (#7)
+
+## v0.0.39 (2023-09-09)
 
 ### core
 
