@@ -63,7 +63,7 @@ jobs:
           path: build/dist/iife
 
       - name: Publish LiteLoaderQQNT-Plugin-Chronocat
-        if: github.ref == 'refs/heads/master'
+        if: startsWith(github.ref, 'refs/tags/v')
         uses: peaceiris/actions-gh-pages@v3
         with:
           personal_token: ${{ secrets.DEPLOY_TOKEN }}
