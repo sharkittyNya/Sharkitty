@@ -34,6 +34,10 @@
 
 - 支持伪造合并转发 (#5)
 
+### koishi-plugin-adapter
+
+- 适配了 Koishi v4.14.5 和 Satori v3 (e124693ef6c27cfbbab0a4e0d135b29b0adb19ff)
+
 ## v0.0.38 (2023-08-30)
 
 ### core
