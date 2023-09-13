@@ -48,6 +48,8 @@ router.message.unsafeSendForward.$body('json')(async ({ body }) => {
       },
     ]
 
+    processElements(payload.msgElements!)
+
     msgBuffer = Buffer.from(
       PbMultiMsgTransmit.encode(
         PbMultiMsgTransmit.create({
@@ -65,6 +67,8 @@ router.message.unsafeSendForward.$body('json')(async ({ body }) => {
 
     if (payload.coverElements) {
       msgInfos[0]!.senderShowName += '_WITHCOVER'
+
+      processElements(payload.coverElements)
 
       coverBuffer = Buffer.from(
         PbMultiMsgTransmit.encode(
@@ -105,3 +109,10 @@ router.message.unsafeSendForward.$body('json')(async ({ body }) => {
 
   return await task
 })
+
+function processElements(elements: msg.IMessage[]) {
+  for (const element of elements)
+    if (Number(element.head!.field2))
+      element.head!.field2 = (uixCache.map[element.head!.field2!] ||
+        element.head!.field2) as string
+}
