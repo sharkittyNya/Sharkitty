@@ -84,6 +84,31 @@ const b = () => {
         // thumbPath: undefined,
       },
     }),
+
+    remoteAudio: (
+      uploadResponse: UploadResponse,
+      waveAmplitudes?: number[],
+    ) => ({
+      elementId: '',
+      elementType: 4,
+      pttElement: {
+        canConvert2Text: true,
+        fileName: path.basename(uploadResponse.ntFilePath),
+        filePath: uploadResponse.ntFilePath,
+        md5HexStr: uploadResponse.md5,
+        fileId: 0,
+        fileSubId: '',
+        fileSize: String(uploadResponse.fileSize),
+        duration: 1,
+        formatType: 1,
+        voiceType: 1,
+        voiceChangeType: 0,
+        playState: 1,
+        waveAmplitudes: waveAmplitudes || [
+          99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99,
+        ],
+      },
+    }),
   }
 
   return Object.defineProperties(
