@@ -83,7 +83,7 @@ router.upload.$httpOnly('POST')(
           const richMediaPath = await getRichMediaFilePath({
             md5HexStr: md5,
             fileName: fileInfo.filename,
-            elementType: 2,
+            elementType: 2, // TODO: 根据 mime 决定，使文件能放入对应文件夹
             elementSubType: 0,
             thumbSize: 0,
             needCreate: true,
