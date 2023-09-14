@@ -2,6 +2,14 @@ import type { IncomingMessage, ServerResponse } from 'node:http'
 
 export type Uuid = string | number
 
+export interface IpcInfo {
+  Full: unknown[]
+  EventName: string
+  Method: string
+  Args: unknown[]
+  Channel: string
+}
+
 export interface IpcEvent {
   eventName: string
   callbackId: Uuid

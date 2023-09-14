@@ -1,8 +1,8 @@
 // https://github.com/import-js/eslint-plugin-import/issues/2802
 // eslint-disable-next-line import/no-unresolved
 import { ipcMain } from 'electron'
-import type { Detail, IpcEvent, ListenerData } from '../types'
-import { requestMap, responseMap, requestCallbackMap } from './globalVars'
+import type { Detail, IpcEvent, IpcInfo, ListenerData } from '../types'
+import { requestCallbackMap, requestMap, responseMap } from './globalVars'
 
 export const initListener = (
   listener: (data: ListenerData) => void | Promise<void>,
@@ -45,6 +45,25 @@ export const initListener = (
 
           if (responseMap[evt.callbackId])
             responseMap[evt.callbackId]!.resolved = detail
+
+          // console.log(
+          //   `%cChronocat%cResponse%c${requestMap[evt.callbackId]!.EventName}/${
+          //     requestMap[evt.callbackId]!.Method
+          //   }`,
+          //   'background:#111;color:white;padding: 2px 8px;',
+          //   'background:#292;color:white;padding: 2px 8px;',
+          //   'background:#555;color:white;padding: 2px 8px;',
+          //   requestMap[evt.callbackId]!.Args?.[1],
+          //   detail,
+          // )
+        } else {
+          // console.log(
+          //   `%cChronocat%cEvent%c${evt.eventName}/${detail[0]!.cmdName}`,
+          //   'background:#111;color:white;padding: 2px 8px;',
+          //   'background:#229;color:white;padding: 2px 8px;',
+          //   'background:#555;color:white;padding: 2px 8px;',
+          //   detail[0]?.payload,
+          // )
         }
         delete requestMap[evt.callbackId]
       }
@@ -56,13 +75,21 @@ export const initListener = (
       Method: p2?.[0],
       Args: p2,
       Channel: eventName,
-    }
+    } as IpcInfo
 
     emit.call(this, eventName, ...p)
 
     if (p1?.eventName?.includes('Log')) return false
     responseMap[p1?.callbackId] ??= {}
     requestMap[p1?.callbackId] = ipcInfo
+
+    // console.debug(
+    //   `%cChronocat%cRequest%c${ipcInfo.EventName}/${ipcInfo.Method}`,
+    //   'background:#111;color:white;padding: 2px 8px;',
+    //   'background:#922;color:white;padding: 2px 8px;',
+    //   'background:#555;color:white;padding: 2px 8px;',
+    //   ipcInfo.Args?.[1],
+    // )
 
     return false
   }

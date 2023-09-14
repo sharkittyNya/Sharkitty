@@ -1,5 +1,5 @@
 import type { Group, Message, Profile } from '@chronocat/red'
-import type { Detail, IpcEvent, Uuid } from '../types'
+import type { Detail, IpcEvent, IpcInfo, Uuid } from '../types'
 
 export const requestCallbackMap: Record<
   Uuid,
@@ -11,7 +11,7 @@ export const responseMap: Record<
     resolved?: Detail
   }
 > = {}
-export const requestMap: Record<Uuid, unknown> = {}
+export const requestMap: Record<Uuid, IpcInfo> = {}
 
 export const sendQueue: ((msg: Message) => void)[] = []
 export const sendCallbackMap: Record<string, (msg: Message) => void> = {}
