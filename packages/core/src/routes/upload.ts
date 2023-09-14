@@ -63,9 +63,14 @@ router.upload.$httpOnly('POST')(
         try {
           const { filePath, fileInfo } = await f
 
-          const fileType: {
+          let fileType: {
             mime: string
           } = await getFileType(filePath)
+
+          if (!fileType?.mime)
+            fileType = {
+              mime: 'application/octet-stream',
+            }
 
           const category = fileType.mime.split('/')[0]
 
