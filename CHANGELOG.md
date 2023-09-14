@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## v0.0.42
+
+### core
+
+- 修复了 API `upload` 可能会无限等待响应的问题 (38ea51dd0a48ac3a42b6d1e7f4fde891b7611cb7)
+- 修复了 API `upload` 上传未知格式文件会失败的问题 (bfd0ba13013a5fd91025a4d1e4cc8c08b449163c)
+
+### red
+
+- r 助手支持 `remoteAudio()` (5e401924a773a3767606a6b138f7702aae1484d8)
+- 合并转发载荷类型由 `MessageSendForwardPayload` 修改为 `UnsafeMessageSendForwardPayload` (363db56fa707045f0c99a92456680b34e68bd231)
+
+该修改只影响 TypeScript 类型定义，不影响逻辑代码。
+
 ## v0.0.41 (2023-09-15)
 
 ### core
@@ -26,6 +40,10 @@
 
 - 修复了 native 模块导致 QQ 无法启动的问题 (#7)
 - 普通合并转发、伪造合并转发支持所有 Windows QQ 版本 (e98d26cd2956d65618fdf2645b0442813b0ad307)
+
+### koishi-plugin-adapter
+
+- 支持发送语音消息 (0f872ca68b8e0f5f9dfd16682143d2df4ca81176)
 
 ## v0.0.39 (2023-09-09)
 
