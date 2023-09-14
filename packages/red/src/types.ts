@@ -105,7 +105,7 @@ export interface MessageSendForwardPayload {
 
 export interface UploadResponse {
   md5: string
-  imageInfo: {
+  imageInfo?: {
     width: number
     height: number
     type: string // png
