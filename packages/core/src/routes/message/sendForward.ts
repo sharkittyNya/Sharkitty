@@ -1,4 +1,4 @@
-import type { MessageSendForwardPayload } from '@chronocat/red'
+import type { UnsafeMessageSendForwardPayload } from '@chronocat/red'
 import type { msg } from 'miraigo'
 import miraigo from 'miraigo'
 import type { Root } from 'protobufjs/light'
@@ -12,13 +12,15 @@ const PbMultiMsgTransmit = (miraigo as unknown as Root).lookupType(
   'msg.PbMultiMsgTransmit',
 ) as unknown as typeof msg.PbMultiMsgTransmit
 
+const defaultSendForwardCover = '（Chronocat 合并转发消息）'
+
 export let sendForwardMsgBuffer = Buffer.alloc(0)
-export let sendForwardCoverBuffer = Buffer.alloc(0)
+export let sendForwardCover = defaultSendForwardCover
 
 let task = Promise.resolve<unknown>(undefined)
 
 router.message.unsafeSendForward.$body('json')(async ({ body }) => {
-  const payload = body as MessageSendForwardPayload
+  const payload = body as UnsafeMessageSendForwardPayload
 
   const srcContact = await uixCache.preprocessObject(payload.srcContact)
   const dstContact = await uixCache.preprocessObject(payload.dstContact)
@@ -27,7 +29,7 @@ router.message.unsafeSendForward.$body('json')(async ({ body }) => {
     senderShowName: string
   }[]
   let msgBuffer = Buffer.alloc(0)
-  let coverBuffer = Buffer.alloc(0)
+  let cover = defaultSendForwardCover
 
   if (!payload.msgInfos && !payload.msgElements)
     throw new Error('message body not found')
@@ -65,25 +67,9 @@ router.message.unsafeSendForward.$body('json')(async ({ body }) => {
       ).finish(),
     )
 
-    if (payload.coverElements) {
+    if (payload.cover) {
       msgInfos[0]!.senderShowName += '_WITHCOVER'
-
-      processElements(payload.coverElements)
-
-      coverBuffer = Buffer.from(
-        PbMultiMsgTransmit.encode(
-          PbMultiMsgTransmit.create({
-            pbItemList: [
-              {
-                fileName: 'MultiMsg',
-                buffer: {
-                  msg: payload.coverElements,
-                },
-              },
-            ],
-          }),
-        ).finish(),
-      )
+      cover = payload.cover
     }
   }
 
@@ -92,7 +78,7 @@ router.message.unsafeSendForward.$body('json')(async ({ body }) => {
     .then(async () => {
       try {
         sendForwardMsgBuffer = msgBuffer
-        sendForwardCoverBuffer = coverBuffer
+        sendForwardCover = cover
 
         return await multiForwardMsgWithComment({
           msgInfos,

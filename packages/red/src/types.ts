@@ -92,13 +92,13 @@ export interface MessageSendPayload {
   elements: Object.Partial<Element, 'deep'>[]
 }
 
-export interface MessageSendForwardPayload {
+export interface UnsafeMessageSendForwardPayload {
   msgInfos?: {
     msgId: string
     senderShowName: string
   }[]
   msgElements?: msg.IMessage[]
-  coverElements?: msg.IMessage[]
+  cover?: string
   srcContact: Peer
   dstContact: Peer
 }
