@@ -56,43 +56,48 @@ router.upload.$httpOnly('POST')(
       bb.on('close', async () => {
         if (!f) {
           res.writeHead(400)
-          res.end(`400 bad request`)
+          res.end('400 bad request')
           return
         }
 
-        const { filePath, fileInfo } = await f
+        try {
+          const { filePath, fileInfo } = await f
 
-        const fileType: {
-          mime: string
-        } = await getFileType(filePath)
+          const fileType: {
+            mime: string
+          } = await getFileType(filePath)
 
-        const category = fileType.mime.split('/')[0]
+          const category = fileType.mime.split('/')[0]
 
-        const [md5, imageInfo, fileSize] = await Promise.all([
-          getFileMd5(filePath),
-          category === 'image' ? getImageSizeFromPath(filePath) : undefined,
-          getFileSize(filePath),
-        ])
+          const [md5, imageInfo, fileSize] = await Promise.all([
+            getFileMd5(filePath),
+            category === 'image' ? getImageSizeFromPath(filePath) : undefined,
+            getFileSize(filePath),
+          ])
 
-        const richMediaPath = await getRichMediaFilePath({
-          md5HexStr: md5,
-          fileName: fileInfo.filename,
-          elementType: 2,
-          elementSubType: 0,
-          thumbSize: 0,
-          needCreate: true,
-          fileType: 1,
-        })
+          const richMediaPath = await getRichMediaFilePath({
+            md5HexStr: md5,
+            fileName: fileInfo.filename,
+            elementType: 2,
+            elementSubType: 0,
+            thumbSize: 0,
+            needCreate: true,
+            fileType: 1,
+          })
 
-        await copyFile(filePath, richMediaPath as string)
+          await copyFile(filePath, richMediaPath as string)
 
-        resolve({
-          md5,
-          imageInfo,
-          fileSize,
-          filePath,
-          ntFilePath: richMediaPath,
-        })
+          resolve({
+            md5,
+            imageInfo,
+            fileSize,
+            filePath,
+            ntFilePath: richMediaPath,
+          })
+        } catch (e) {
+          res.writeHead(500)
+          res.end('500 internal server error')
+        }
       })
 
       req.pipe(bb)
