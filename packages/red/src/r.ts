@@ -87,6 +87,7 @@ const b = () => {
 
     remoteAudio: (
       uploadResponse: UploadResponse,
+      duration: number,
       waveAmplitudes?: number[],
     ) => ({
       elementId: '',
@@ -99,7 +100,7 @@ const b = () => {
         fileId: 0,
         fileSubId: '',
         fileSize: String(uploadResponse.fileSize),
-        duration: 1,
+        duration,
         formatType: 1,
         voiceType: 1,
         voiceChangeType: 0,
