@@ -16,6 +16,14 @@
   --ifm-color-primary-light-develop: #33925d;
   --ifm-color-primary-lighter-develop: #359962;
   --ifm-color-primary-lightest-develop: #3cad6e;
+
+  --ifm-color-primary-contribute: #ff0000;
+  --ifm-color-primary-dark-contribute: #e60000;
+  --ifm-color-primary-darker-contribute: #d90000;
+  --ifm-color-primary-darkest-contribute: #b30000;
+  --ifm-color-primary-light-contribute: #ff1a1a;
+  --ifm-color-primary-lighter-contribute: #ff2626;
+  --ifm-color-primary-lightest-contribute: #ff4d4d;
 }
 
 [data-theme='dark'] {
@@ -34,6 +42,14 @@
   --ifm-color-primary-light-develop: #29d5b0;
   --ifm-color-primary-lighter-develop: #32d8b4;
   --ifm-color-primary-lightest-develop: #4fddbf;
+
+  --ifm-color-primary-contribute: #ff9999;
+  --ifm-color-primary-dark-contribute: #ff7070;
+  --ifm-color-primary-darker-contribute: #ff5c5c;
+  --ifm-color-primary-darkest-contribute: #ff1f1f;
+  --ifm-color-primary-light-contribute: #ffc2c2;
+  --ifm-color-primary-lighter-contribute: #ffd6d6;
+  --ifm-color-primary-lightest-contribute: #ffffff;
 }
 
 [data-area='develop'] {
@@ -54,6 +70,26 @@
   --ifm-color-primary-light: var(--ifm-color-primary-light-develop);
   --ifm-color-primary-lighter: var(--ifm-color-primary-lighter-develop);
   --ifm-color-primary-lightest: var(--ifm-color-primary-lightest-develop);
+}
+
+[data-area='contribute'] {
+  --ifm-color-primary: var(--ifm-color-primary-contribute);
+  --ifm-color-primary-dark: var(--ifm-color-primary-dark-contribute);
+  --ifm-color-primary-darker: var(--ifm-color-primary-darker-contribute);
+  --ifm-color-primary-darkest: var(--ifm-color-primary-darkest-contribute);
+  --ifm-color-primary-light: var(--ifm-color-primary-light-contribute);
+  --ifm-color-primary-lighter: var(--ifm-color-primary-lighter-contribute);
+  --ifm-color-primary-lightest: var(--ifm-color-primary-lightest-contribute);
+}
+
+[data-theme='dark'][data-area='contribute'] {
+  --ifm-color-primary: var(--ifm-color-primary-contribute);
+  --ifm-color-primary-dark: var(--ifm-color-primary-dark-contribute);
+  --ifm-color-primary-darker: var(--ifm-color-primary-darker-contribute);
+  --ifm-color-primary-darkest: var(--ifm-color-primary-darkest-contribute);
+  --ifm-color-primary-light: var(--ifm-color-primary-light-contribute);
+  --ifm-color-primary-lighter: var(--ifm-color-primary-lighter-contribute);
+  --ifm-color-primary-lightest: var(--ifm-color-primary-lightest-contribute);
 }
 
 .button--common {
