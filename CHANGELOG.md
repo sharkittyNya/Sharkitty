@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v0.0.42
+## v0.0.42 (2023-09-16)
 
 ### core
 
@@ -10,6 +10,7 @@
 ### red
 
 - r 助手支持 `remoteAudio()` (5e401924a773a3767606a6b138f7702aae1484d8)
+- `r.remoteAudio()` 添加 `duration` 为必须参数 (30c62e599d7a9848947485a41c794d5fccbf6494)
 - 合并转发载荷类型由 `MessageSendForwardPayload` 修改为 `UnsafeMessageSendForwardPayload` (363db56fa707045f0c99a92456680b34e68bd231)
 
 该修改只影响 TypeScript 类型定义，不影响逻辑代码。
