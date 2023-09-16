@@ -30,7 +30,7 @@ const processComponent = (c: Component) =>
 const processCommit = (c: Component, s: string) =>
   s.replace(
     /\(([a-z\d]{8})([a-z\d]{32})\)/g,
-    `([$1](${
+    `([\`$1\`](${
       /(https:\/\/github\.com\/chrononeko\/[\w-]*).*/.exec(
         componentMap[c],
       )?.[1] || 'https://github.com/chrononeko/chronocat'
