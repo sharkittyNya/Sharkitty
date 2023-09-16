@@ -61,7 +61,7 @@ export class WebsocketRouterServerInstance implements RouterServerInstance {
 
           if (type === 'meta::connect') {
             if (!(await authorizer(payload))) {
-              client.close(401)
+              client.close(3000, 'Unauthorized')
               return
             }
             this.wsAuthedClients.push(client)
@@ -76,7 +76,7 @@ export class WebsocketRouterServerInstance implements RouterServerInstance {
               await this.handleRoute(route, client, packet)
             })
 
-            client.on('disconnect', () =>
+            client.on('close', () =>
               this.wsAuthedClients.splice(
                 this.wsAuthedClients.indexOf(client),
                 1,
@@ -98,7 +98,7 @@ export class WebsocketRouterServerInstance implements RouterServerInstance {
             }
           } else throw new Error('Invalid API type')
         } catch (e) {
-          client.close(401)
+          client.close(3000, 'Unauthorized')
         }
       })
     })

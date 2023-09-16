@@ -62,7 +62,7 @@ export class WebsocketRouterServerInstance implements RouterServerInstance {
               await this.handleRoute(route, client, packet)
             })
 
-            client.on('disconnect', () => {
+            client.on('close', () => {
               throw new Error('Disconnected')
             })
 
