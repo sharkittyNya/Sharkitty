@@ -1,11 +1,15 @@
 # CHANGELOG
 
-## v0.0.42 (2023-09-16)
+## v0.0.42 (2023-09-17)
 
 ### core
 
 - 修复了 API `upload` 可能会无限等待响应的问题 (38ea51dd0a48ac3a42b6d1e7f4fde891b7611cb7)
 - 修复了 API `upload` 上传未知格式文件会失败的问题 (bfd0ba13013a5fd91025a4d1e4cc8c08b449163c)
+- 修复了 WebSocket 鉴权失败和断连时的问题 @XiYang6666 (#10)
+
+现在，WebSocket 鉴权失败后会遵循 WebSocket 标准，以状态码 `3000`
+关闭连接。详见 Issue 内讨论。
 
 ### red
 
