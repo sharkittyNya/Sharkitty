@@ -110,6 +110,26 @@ const b = () => {
         ],
       },
     }),
+
+    remoteFile: (uploadResponse: UploadResponse) => ({
+      elementId: '',
+      elementType: 3,
+      fileElement: {
+        fileMd5: '',
+        fileName: path.basename(uploadResponse.filePath),
+        filePath: uploadResponse.filePath,
+        fileSize: String(uploadResponse.fileSize),
+        picHeight: 0,
+        picWidth: 0,
+        picThumbPath: new Map(),
+        file10MMd5: '',
+        fileSha: '',
+        fileSha3: '',
+        fileUuid: '',
+        fileSubId: '',
+        thumbFileSize: 750,
+      },
+    }),
   }
 
   return Object.defineProperties(
