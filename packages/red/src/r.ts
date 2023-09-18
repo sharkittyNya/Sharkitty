@@ -64,6 +64,15 @@ const b = () => {
       },
     }),
 
+    reply: (replayMsgSeq: string, replayMsgId?: string) => ({
+      elementId: '',
+      elementType: 7,
+      replyElement: {
+        replayMsgId,
+        replayMsgSeq,
+      },
+    }),
+
     remoteImage: (uploadResponse: UploadResponse, picType: number) => ({
       elementId: '',
       elementType: 2,
