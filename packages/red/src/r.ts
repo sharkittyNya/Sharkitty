@@ -1,6 +1,6 @@
 import path from 'node:path'
 import type { Object as ToolBeltObject } from 'ts-toolbelt'
-import type { Element, UploadResponse } from './types'
+import type { Element, Peer, UploadResponse } from './types'
 
 const b = () => {
   const reg = {
@@ -29,17 +29,17 @@ const b = () => {
   const h = {
     reg,
 
-    peerPrivate: (peerUin: string) =>
+    peerPrivate: (peerUin: string): Peer =>
       r('peer/private', {
         peerUin,
       }),
 
-    peerGroup: (peerUin: string) =>
+    peerGroup: (peerUin: string): Peer =>
       r('peer/group', {
         peerUin,
       }),
 
-    text: (content: string) => ({
+    text: (content: string): ToolBeltObject.Partial<Element, 'deep'> => ({
       elementId: '',
       elementType: 1,
       textElement: {
@@ -51,7 +51,10 @@ const b = () => {
       },
     }),
 
-    at: (name: string, id: string) => ({
+    at: (
+      name: string,
+      id: string,
+    ): ToolBeltObject.Partial<Element, 'deep'> => ({
       elementId: '',
       elementType: 1,
       textElement: {
@@ -64,7 +67,10 @@ const b = () => {
       },
     }),
 
-    reply: (replayMsgSeq: string, replayMsgId?: string) => ({
+    reply: (
+      replayMsgSeq: string,
+      replayMsgId?: string,
+    ): ToolBeltObject.Partial<Element, 'deep'> => ({
       elementId: '',
       elementType: 7,
       replyElement: {
@@ -73,7 +79,10 @@ const b = () => {
       },
     }),
 
-    remoteImage: (uploadResponse: UploadResponse, picType: number) => ({
+    remoteImage: (
+      uploadResponse: UploadResponse,
+      picType: number,
+    ): ToolBeltObject.Partial<Element, 'deep'> => ({
       elementId: '',
       elementType: 2,
       extBufForUI: '',
@@ -99,7 +108,7 @@ const b = () => {
       uploadResponse: UploadResponse,
       duration: number,
       waveAmplitudes?: number[],
-    ) => ({
+    ): ToolBeltObject.Partial<Element, 'deep'> => ({
       elementId: '',
       elementType: 4,
       pttElement: {
