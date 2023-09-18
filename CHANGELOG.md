@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## v0.0.43 (2023-09-19)
+
+### core
+
+- 修复了 `message::recv` 的 payload 可能为空的问题 (6c421411dfb02ae59fc3136d457dc39e9f7c8693)
+- 修复了 API 响应的相关问题 (#14)
+
+### red
+
+- r 助手支持 `remoteFile()` (d1d9f2239dc3db2d64462f79ca035e972c7f117b)
+- 完善 `Message` 类型 (846f2d60c9c252e59f8173c9001f12708f7e9377)
+
 ## v0.0.42 (2023-09-17)
 
 ### core
@@ -26,6 +38,11 @@
 - 支持普通合并转发
 - 普通合并转发、伪造合并转发支持所有 Windows QQ 版本
 - 支持伪造合并转发消息发送者使用 QQ 号指定 (53062537c27b59df7ec6e5564b165fb402edd3b5)
+
+### koishi-plugin-adapter
+
+- 支持发送文件 (24db317b9f9a39645bd5312771602d0722818df0)
+- 适配了 Koishi v4.14.6 和 Satori v3 (4b8fb8cb0b6246fdd4d11dba56a351c94fcdc15d)
 
 ## v0.0.40 (2023-09-10)
 
