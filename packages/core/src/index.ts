@@ -236,7 +236,7 @@ export const chronocat = async () => {
         }
         for (const msg of msgList) {
           if (msg.sendStatus > 1) {
-            sendCallbackMap[msg.msgId]?.(msg)
+            sendCallbackMap[msg.msgId]?.(await uixCache.preprocessObject(msg))
             delete sendCallbackMap[msg.msgId]
           }
         }

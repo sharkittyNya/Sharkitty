@@ -3,10 +3,12 @@ import type { msg } from 'miraigo'
 import miraigo from 'miraigo'
 import type { Root } from 'protobufjs/light'
 import { multiForwardMsgWithComment } from '../../ipc/definitions/msgService'
+import { sendQueue } from '../../ipc/globalVars'
 import { getMsgCache } from '../../msgCache'
 import { router } from '../../router'
 import { uixCache } from '../../uixCache'
-import { sleep } from '../../utils/time'
+import { detachPromise } from '../../utils/detachPromise'
+import { sleep, timeout } from '../../utils/time'
 
 const PbMultiMsgTransmit = (miraigo as unknown as Root).lookupType(
   'msg.PbMultiMsgTransmit',
@@ -75,23 +77,33 @@ router.message.unsafeSendForward.$body('json')(async ({ body }) => {
 
   task = task
     .then(() => sleep(80))
-    .then(async () => {
-      try {
-        sendForwardMsgBuffer = msgBuffer
-        sendForwardCover = cover
+    .then(
+      () =>
+        new Promise((resolve, reject) => {
+          sendForwardMsgBuffer = msgBuffer
+          sendForwardCover = cover
 
-        return await multiForwardMsgWithComment({
-          msgInfos,
-          srcContact,
-          dstContact,
-          commentElements: [],
-        })
-      } catch (e) {
-        console.log(e)
+          sendQueue.push(resolve)
 
-        throw e
-      }
-    })
+          detachPromise(
+            multiForwardMsgWithComment({
+              msgInfos,
+              srcContact,
+              dstContact,
+              commentElements: [],
+            }),
+          )
+
+          setTimeout(() => {
+            const index = sendQueue.indexOf(resolve)
+            if (index >= 0) {
+              sendQueue.splice(index, 1)
+              reject()
+            }
+          }, timeout)
+        }),
+    )
+    .catch((e) => console.log(e))
 
   return await task
 })
