@@ -1,5 +1,6 @@
 import path from 'node:path'
-import type { UploadResponse } from './types'
+import type { Object as ToolBeltObject } from 'ts-toolbelt'
+import type { Element, UploadResponse } from './types'
 
 const b = () => {
   const reg = {
@@ -111,7 +112,9 @@ const b = () => {
       },
     }),
 
-    remoteFile: (uploadResponse: UploadResponse) => ({
+    remoteFile: (
+      uploadResponse: UploadResponse,
+    ): ToolBeltObject.Partial<Element, 'deep'> => ({
       elementId: '',
       elementType: 3,
       fileElement: {
@@ -121,7 +124,7 @@ const b = () => {
         fileSize: String(uploadResponse.fileSize),
         picHeight: 0,
         picWidth: 0,
-        picThumbPath: new Map(),
+        picThumbPath: {},
         file10MMd5: '',
         fileSha: '',
         fileSha3: '',
