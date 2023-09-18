@@ -82,18 +82,17 @@ export const chronocat = async () => {
           }
         }
 
-        send(
-          'message::recv',
-          await Promise.all(
-            payload.msgList.filter(filterMessage).map(async (msg) => {
-              await prepareRole(msg)
-              msg = await uixCache.preprocessObject(msg)
-              setMsgCache(msg)
-              fillRole(msg)
-              return msg
-            }),
-          ),
+        const filteredPayload = await Promise.all(
+          payload.msgList.filter(filterMessage).map(async (msg) => {
+            await prepareRole(msg)
+            msg = await uixCache.preprocessObject(msg)
+            setMsgCache(msg)
+            fillRole(msg)
+            return msg
+          }),
         )
+
+        if (filteredPayload.length) send('message::recv', filteredPayload)
         return
       }
 
