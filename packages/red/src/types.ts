@@ -395,7 +395,13 @@ export interface GrayTipElement {
   localGrayTipElement?: unknown
   blockGrayTipElement?: unknown
   aioOpGrayTipElement?: unknown
-  jsonGrayTipElement?: unknown
+  jsonGrayTipElement?: JsonGrayTipElement
+}
+
+export interface JsonGrayTipElement {
+  busiId: string
+  jsonStr: string
+  isServer: boolean
 }
 
 export interface PttElement {
