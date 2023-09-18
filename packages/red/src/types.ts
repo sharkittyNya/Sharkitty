@@ -251,7 +251,7 @@ export interface Message {
   guildName: string
   channelName: string
   elements: Element[]
-  records: unknown[]
+  records: Message[]
   emojiLikesList: unknown[]
   commentCnt: string
   directMsgFlag: number
