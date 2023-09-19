@@ -49,6 +49,7 @@ export class HttpRouterServerInstance implements RouterServerInstance {
           if (route.options.requireAuthorize && !(await authorizer(req))) {
             res.writeHead(401)
             res.end('401 unauthorized')
+            return
           }
 
           const readBodyToBuffer = (req: IncomingMessage) => {
