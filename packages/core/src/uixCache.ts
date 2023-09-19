@@ -114,11 +114,14 @@ const preprocessObject = async <T extends object>(
   for (const [key, value, obj] of eAll) {
     const cKey = genCorrespondingName(key)
     if (key === 'peerUin' && obj['chatType'] === 2) obj['peerUid'] = value
-    if (key === 'peerUid' && !(value as string).startsWith('u_'))
+    if (
+      key === 'peerUid' &&
+      !(typeof value === 'string' && value.startsWith('u_'))
+    )
       obj['peerUin'] = value
     if (cKey && !obj[cKey] && map[value as string]) {
       obj[cKey] = map[value as string]
-      if ((value as string).startsWith('u_')) delete obj[key]
+      if (typeof value === 'string' && value.startsWith('u_')) delete obj[key]
     }
   }
   return origin
