@@ -1,7 +1,7 @@
 {
   "name": "@chronocat/core",
   "description": "小巧轻便的 Red 实现",
-  "version": "0.0.43",
+  "version": "0.0.44",
   "license": "AGPL-3.0",
   "author": {
     "name": "Il Harper",
@@ -20,7 +20,7 @@
   },
   "devDependencies": {
     "@chronocat/module-native": "0.0.40",
-    "@chronocat/red": "0.0.43",
+    "@chronocat/red": "0.0.44",
     "@types/busboy": "^1.5.0",
     "@types/mime": "^3.0.1",
     "@types/ws": "^8.5.5",
