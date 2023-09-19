@@ -68,14 +68,35 @@ const b = () => {
     }),
 
     reply: (
+      /**
+       * 消息序号，必填。
+       *
+       * 可由消息 ID 通过 message/getHistory 换取。
+       */
       replayMsgSeq: string,
+
+      /**
+       * 消息 ID，选填。
+       *
+       * 不填则在手机非 NT 版本
+       * QQ（8.9.63 以下版本）无法看到引用消息。
+       */
       replayMsgId?: string,
+
+      /**
+       * 引用消息的发送者 QQ，选填。
+       *
+       * 不填则消息前会有一个奇怪的「@」文本。
+       */
+      senderUin?: string,
     ): ToolBeltObject.Partial<Element, 'deep'> => ({
       elementId: '',
       elementType: 7,
       replyElement: {
         replayMsgId,
         replayMsgSeq,
+        senderUin,
+        senderUinStr: senderUin,
       },
     }),
 
