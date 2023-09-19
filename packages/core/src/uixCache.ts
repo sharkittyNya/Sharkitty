@@ -31,6 +31,10 @@ const genCorrespondingName = (name: string): string | undefined => {
     uin: 'uid',
     Uid: 'Uin',
     Uin: 'Uid',
+    uidStr: 'uinStr',
+    uinStr: 'uidStr',
+    UidStr: 'UinStr',
+    UinStr: 'UidStr',
   }
 
   for (const key in keyMap) {
@@ -92,9 +96,12 @@ const preprocessObject = async <T extends object>(
   for (const [key, value, obj] of eAll) {
     const cKey = genCorrespondingName(key)
     if (cKey && !obj[cKey]) {
-      if (key.toLocaleLowerCase().endsWith('uin')) {
-        if (contextGroup !== -1) performSearch(contextGroup, value)
-      }
+      const lKey = key.toLowerCase()
+      if (
+        (lKey.endsWith('uin') || lKey.endsWith('uinstr')) &&
+        contextGroup !== -1
+      )
+        performSearch(contextGroup, value)
 
       if (key === 'atNtUid') {
         performSearch(
