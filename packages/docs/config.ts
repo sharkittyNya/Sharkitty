@@ -99,6 +99,11 @@ const buildConfig = (): Config => {
             to: 'connect',
           },
           {
+            label: '配置',
+            position: 'left',
+            to: 'config',
+          },
+          {
             label: '更多',
             position: 'left',
             to: 'more/community',
@@ -132,6 +137,10 @@ const buildConfig = (): Config => {
               {
                 label: '接入',
                 to: '/connect',
+              },
+              {
+                label: '配置',
+                to: '/config',
               },
             ],
           },
