@@ -172,9 +172,7 @@ const buildConfig = (): Config => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         theme: require('prism-react-renderer/themes/github'),
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        darkTheme: require('prism-react-renderer/themes/dracula'),
-
-        additionalLanguages: ['yml'],
+        darkTheme: require('prism-react-renderer/themes/palenight'),
       },
     },
   }
