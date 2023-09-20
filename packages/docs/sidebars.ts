@@ -10,11 +10,21 @@ const sidebars: SidebarsConfig = {
         id: 'install/index',
       },
       items: [
-        'install/llqqnt',
-        'install/llqqnt-airgap',
-        'install/qqntim',
-        'install/qqntim-airgap',
-        'install/launcher',
+        {
+          type: 'category',
+          label: '本机安装',
+          link: {
+            type: 'doc',
+            id: 'install/native',
+          },
+          items: [
+            'install/llqqnt',
+            'install/llqqnt-airgap',
+            'install/qqntim',
+            'install/qqntim-airgap',
+            'install/launcher',
+          ],
+        },
       ],
     },
     {
