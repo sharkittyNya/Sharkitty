@@ -5,7 +5,7 @@ import { generateSchema, getProgramFromFiles } from 'typescript-json-schema'
 
 const settings: PartialArgs = {
   aliasRef: true,
-  titles: true,
+  titles: false,
   defaultProps: true,
   noExtraProps: true,
   propOrder: false,
