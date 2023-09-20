@@ -119,9 +119,9 @@ const buildConfig = (): Config => {
             ],
           },
           {
-            label: '社区',
+            label: '更多',
             position: 'left',
-            to: 'community',
+            to: 'more/community',
           },
           {
             href: 'https://github.com/chrononeko/chronocat',
@@ -176,8 +176,8 @@ const buildConfig = (): Config => {
             title: '更多',
             items: [
               {
-                label: '社区',
-                to: '/community',
+                label: '更多内容',
+                to: '/more/community',
               },
               {
                 label: '全站搜索',

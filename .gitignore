@@ -139,7 +139,7 @@ lib/
 dist/
 
 # Generated files
-packages/docs/docs/community/changelog.mdx
+packages/docs/docs/more/changelog.mdx
 packages/core/src/config.schema.ts
 packages/docs/static/config-v0.schema.json
 

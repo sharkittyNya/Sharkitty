@@ -9,7 +9,8 @@ export const Constructing = () => (
     <Admonition type="node">
       <p>
         此页面仍在施工中！<br></br>
-        如果你希望我们尽快完成此页面，可以通过 <Link to="/community">社区</Link>
+        如果你希望我们尽快完成此页面，可以通过
+        <Link to="/more/community">社区</Link>
         途径反馈给我们。
       </p>
     </Admonition>

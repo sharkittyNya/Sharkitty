@@ -72,7 +72,7 @@ void (async () => {
   }
 
   await writeFile(
-    resolve(__dirname, '../docs/community/changelog.mdx'),
+    resolve(__dirname, '../docs/more/changelog.mdx'),
     result.join('\n'),
   )
 })()
