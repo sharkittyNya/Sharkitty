@@ -2,8 +2,9 @@
 title: 配置
 ---
 
+import Link from '@docusaurus/Link'
 import CodeBlock from '@theme/CodeBlock'
-import ChronocatConfigSource from '!!raw-loader!../../static/chronocat.yml'
+import ChronocatConfigSource from '!!raw-loader!@site/static/chronocat.yml'
 
 Chronocat 的默认配置已经完全能够满足基础需求，因此一般情况下无需修改。而如果你希望开启多个
 Chronocat 服务或需要多账号登录，则可以参考下方的指南进行自定义配置。
@@ -64,6 +65,17 @@ Chronocat 之前，你需要将所有 `DEFINE_CHRONO_TOKEN`
 （点击编辑器以安装所需的插件）
 
 此外，我们推荐为编辑器配置一款等宽字体，这样可以极大地改善配置文件的编辑体验。
+
+## 参考
+
+参考页展示了完整的 Chronocat 配置文件结构。
+
+<Link
+  className="button button--secondary button--lg button--normal"
+  to="/config/reference"
+>
+  <span>Chronocat 配置文件参考</span>
+</Link>
 
 ## 示例
 

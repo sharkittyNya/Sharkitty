@@ -41,7 +41,15 @@ const sidebars: SidebarsConfig = {
         'connect/kiramibot',
       ],
     },
-    'config/index',
+    {
+      type: 'category',
+      label: '配置',
+      link: {
+        type: 'doc',
+        id: 'config/index',
+      },
+      items: ['config/reference'],
+    },
   ],
   more: [
     {
