@@ -138,5 +138,10 @@ build/
 lib/
 dist/
 
+# Generated files
+packages/docs/docs/community/changelog.mdx
+packages/core/src/config.schema.ts
+packages/docs/static/config-v0.schema.json
+
 # Temp files
 tmp/
