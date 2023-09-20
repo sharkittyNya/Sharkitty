@@ -99,26 +99,6 @@ const buildConfig = (): Config => {
             to: 'connect',
           },
           {
-            label: '开发',
-            position: 'left',
-            type: 'dropdown',
-            to: 'develop',
-            items: [
-              {
-                label: '协议',
-                to: 'develop/protocol',
-              },
-              {
-                label: '原生',
-                to: 'develop/native',
-              },
-              {
-                label: 'JavaScript',
-                to: 'develop/js',
-              },
-            ],
-          },
-          {
             label: '更多',
             position: 'left',
             to: 'more/community',
@@ -152,23 +132,6 @@ const buildConfig = (): Config => {
               {
                 label: '接入',
                 to: '/connect',
-              },
-            ],
-          },
-          {
-            title: '开发',
-            items: [
-              {
-                label: '协议',
-                to: '/develop/protocol',
-              },
-              {
-                label: '原生',
-                to: '/develop/native',
-              },
-              {
-                label: 'JavaScript SDK',
-                to: '/develop/js',
               },
             ],
           },
