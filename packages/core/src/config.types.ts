@@ -2,7 +2,7 @@ export interface ChronocatConfig extends ChronocatCurrentConfig {
   /**
    * @title 账号配置
    *
-   * 账号专属的配置。
+   * @description 账号专属的配置。
    *
    * @default {}
    */
@@ -15,7 +15,7 @@ export interface ChronocatCurrentConfig extends ChronocatEnableableConfig {
   /**
    * @title 服务
    *
-   * Chronocat 需要启动的服务。
+   * @description Chronocat 需要启动的服务。
    *
    * @default []
    */
@@ -26,7 +26,7 @@ export interface ChronocatServerConfig extends ChronocatEnableableConfig {
   /**
    * @title 密码
    *
-   * 服务的密码。客户端使用服务时需要提供！
+   * @description 服务的密码。客户端使用服务时需要提供！
    */
   token: string
 }
@@ -35,7 +35,7 @@ export interface ChronocatHttpServerConfig {
   /**
    * @title 监听地址
    *
-   * 服务器监听的地址。
+   * @description 服务器监听的地址。
    *
    * 如果你不知道这是什么，那么不填此项即可！
    *
@@ -52,7 +52,7 @@ export interface ChronocatRedServerConfig
   /**
    * @title 监听端口
    *
-   * 服务器监听的端口。
+   * @description 服务器监听的端口。
    *
    * 默认为 16530。
    *
@@ -70,7 +70,9 @@ export interface ChronocatSatoriServerConfig
   type: 'satori'
 
   /**
-   * 服务器监听的端口。
+   * @title 监听端口
+   *
+   * @description 服务器监听的端口。
    *
    * 默认为 5500。
    *
@@ -86,7 +88,7 @@ export interface ChronocatEnableableConfig {
   /**
    * @title 启用
    *
-   * 是否启用这个功能。
+   * @description 是否启用这个功能。
    *
    * @default true
    */
