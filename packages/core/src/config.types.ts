@@ -56,6 +56,7 @@ export interface ChronocatRedServerConfig
    *
    * 默认为 16530。
    *
+   * @TJS-type integer
    * @default 16530
    * @minimum 1
    * @maximum 65535
@@ -73,6 +74,7 @@ export interface ChronocatSatoriServerConfig
    *
    * 默认为 5500。
    *
+   * @TJS-type integer
    * @default 5500
    * @minimum 1
    * @maximum 65535
