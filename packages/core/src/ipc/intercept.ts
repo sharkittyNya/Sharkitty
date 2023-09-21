@@ -93,8 +93,4 @@ export const initListener = (
 
     return false
   }
-
-  return () => {
-    ipcMain.emit = emit
-  }
 }

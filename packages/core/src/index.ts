@@ -41,14 +41,11 @@ export const chronocat = async () => {
 
   const token = await initToken()
 
-  const { broadcastAbleServer, binaryServer } = createNormalServers(
-    token,
-    () => ({
-      version: __DEFINE_CHRONO_VERSION__,
-      name: 'chronocat',
-      authData,
-    }),
-  )
+  const { broadcastAbleServer } = createNormalServers(token, () => ({
+    version: __DEFINE_CHRONO_VERSION__,
+    name: 'chronocat',
+    authData,
+  }))
 
   const send = (type: string, payload: unknown) =>
     broadcastAbleServer.broadcast(type, payload)
@@ -245,11 +242,5 @@ export const chronocat = async () => {
     }
   }
 
-  const disposeListener = initListener(dispatch)
-
-  return () => {
-    disposeListener()
-    binaryServer.stop()
-    broadcastAbleServer.stop()
-  }
+  initListener(dispatch)
 }
