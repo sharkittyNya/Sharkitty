@@ -15,13 +15,11 @@ import { getModules } from './modules'
 import { setMsgCache } from './msgCache'
 import './routes'
 import { sendForwardMsgBuffer } from './routes/message/sendForward'
-import { createNormalServers } from './server'
+import { initServers } from './server'
 import type { ListenerData } from './types'
 import { uixCache } from './uixCache'
 import { filterMessage } from './utils/filterMessage'
-import { initToken } from './utils/token'
 
-declare const __DEFINE_CHRONO_VERSION__: string
 declare const authData: {
   uid: string
 }
@@ -39,16 +37,7 @@ const initHooks = async () => {
 export const chronocat = async () => {
   void initHooks()
 
-  const token = await initToken()
-
-  const { broadcastAbleServer } = createNormalServers(token, () => ({
-    version: __DEFINE_CHRONO_VERSION__,
-    name: 'chronocat',
-    authData,
-  }))
-
-  const send = (type: string, payload: unknown) =>
-    broadcastAbleServer.broadcast(type, payload)
+  const { send } = await initServers()
 
   const dispatch = async ({ CmdName, Payload }: ListenerData) => {
     try {
