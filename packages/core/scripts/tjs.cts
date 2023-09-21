@@ -26,7 +26,9 @@ schema.description = 'Chronocat 配置（chronocat.yml）'
 
 void writeFile(
   resolve(__dirname, '../src/config.schema.ts'),
-  `export const chronocatConfigSchema = ${JSON.stringify(schema)}\n`,
+  `import type { JSONSchemaType } from 'ajv'\nimport type { ChronocatConfig } from './config.types'\n\nexport const chronocatConfigSchema = ${JSON.stringify(
+    schema,
+  )} as unknown as JSONSchemaType<ChronocatConfig>\n`,
 )
 void writeFile(
   resolve(__dirname, '../../docs/static/config-v0.schema.json'),

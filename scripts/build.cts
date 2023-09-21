@@ -13,6 +13,10 @@ void (async () => {
     write: true,
     outdir: 'lib',
 
+    loader: {
+      '.yml': 'text',
+    },
+
     platform: 'node',
     format: 'cjs',
     tsconfig: join(cwd, 'tsconfig.json'),

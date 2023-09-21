@@ -141,6 +141,7 @@ dist/
 # Generated files
 packages/docs/docs/more/changelog.mdx
 packages/core/src/config.schema.ts
+packages/core/src/utils/config.validate.ts
 packages/docs/static/config-v0.schema.json
 
 # Temp files
