@@ -42,6 +42,8 @@ export const initServers = async () => {
   const broadcasts: ((type: string, payload: unknown) => void)[] = []
 
   for (const server of config.servers!) {
+    if (!server.enable) continue
+
     switch (server.type) {
       case 'red': {
         const { broadcastAbleServer } = createNormalServers(
