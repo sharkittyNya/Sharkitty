@@ -1,8 +1,8 @@
 {
   "extends": "@tsconfig/strictest/tsconfig",
   "compilerOptions": {
-    "target": "es2020",
-    "module": "commonjs",
+    "target": "ESNext",
+    "module": "CommonJS",
     "emitDeclarationOnly": true,
     "declaration": true,
     "composite": true,
