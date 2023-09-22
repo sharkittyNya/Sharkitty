@@ -1,5 +1,6 @@
 import type { DispatchMessage } from '../dispatch'
 import { resolveRoute } from '../router'
+import { initSatoriServer } from '../satori/server'
 import { getAuthData } from '../utils/authData'
 import { getConfig } from '../utils/config'
 import { HeaderAuthorizer, PayloadAuthorizer } from './authorizer'
@@ -74,7 +75,10 @@ export const initServers = async () => {
         })
         break
       }
+
       case 'satori': {
+        const { dispatcher } = await initSatoriServer(server)
+        dispatchers.push(dispatcher)
         break
       }
     }

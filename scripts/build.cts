@@ -15,6 +15,7 @@ void (async () => {
 
     loader: {
       '.yml': 'text',
+      '.html': 'binary',
     },
 
     platform: 'node',
