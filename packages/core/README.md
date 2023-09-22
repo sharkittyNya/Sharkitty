@@ -13,11 +13,11 @@
 
 ## 使用
 
-请查看 <a href="https://chronocat.vercel.app" target="_blank" rel="noopener noreferrer">文档</a>。
+请查看 [文档](https://chronocat.vercel.app)。
 
 ## 不支持的功能
 
-请查看文档上有关 <a href="https://chronocat.vercel.app/develop/protocol/unsupported" target="_blank" rel="noopener noreferrer">不支持的功能</a> 的页面。
+请查看文档上有关 [不支持的功能](https://chronocat.vercel.app/contribute/core/unsupported) 的页面。
 
 ## 许可
 
