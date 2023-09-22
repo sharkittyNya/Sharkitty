@@ -46,20 +46,9 @@ const loadConfig = async () => {
   }
 
   const config = load(await readFile(configPath, 'utf-8'))
-
-  if (!(validate as ValidateFunction<ChronocatConfig>)(config)) {
-    localize((validate as ValidateFunction<ChronocatConfig>).errors)
-    throw new Ajv().errorsText(
-      (validate as ValidateFunction<ChronocatConfig>).errors,
-      {
-        separator: '\n',
-      },
-    )
-  }
-
   const { uin } = await getAuthData()
 
-  return Object.assign({}, config, config.overrides?.[uin])
+  return parseConfig(config, uin)
 }
 
 export const getConfig = async () => {
@@ -74,4 +63,18 @@ async function exists(path: string): Promise<boolean> {
     return false
   }
   return true
+}
+
+function parseConfig(config: unknown, uin: string) {
+  if (!(validate as ValidateFunction<ChronocatConfig>)(config)) {
+    localize((validate as ValidateFunction<ChronocatConfig>).errors)
+    throw new Ajv().errorsText(
+      (validate as ValidateFunction<ChronocatConfig>).errors,
+      {
+        separator: '\n',
+      },
+    )
+  }
+
+  return Object.assign({}, config, config.overrides?.[uin])
 }
