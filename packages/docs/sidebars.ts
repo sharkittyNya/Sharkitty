@@ -25,6 +25,7 @@ const sidebars: SidebarsConfig = {
             'install/launcher',
           ],
         },
+        'install/docker',
       ],
     },
     {
