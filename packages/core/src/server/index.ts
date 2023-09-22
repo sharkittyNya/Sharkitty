@@ -1,3 +1,4 @@
+import type { DispatchMessage } from '../dispatch'
 import { resolveRoute } from '../router'
 import { getAuthData } from '../utils/authData'
 import { getConfig } from '../utils/config'
@@ -39,7 +40,7 @@ export const initServers = async () => {
   const config = await getConfig()
   const authData = await getAuthData()
 
-  const broadcasts: ((type: string, payload: unknown) => void)[] = []
+  const dispatchers: ((message: DispatchMessage) => void)[] = []
 
   // 使用独立循环可避免已启动的服务继续运行
   for (const server of config.servers!)
@@ -61,7 +62,16 @@ export const initServers = async () => {
             authData,
           }),
         )
-        broadcasts.push(broadcastAbleServer.broadcast.bind(broadcastAbleServer))
+        dispatchers.push((message) => {
+          switch (message.type) {
+            case 'message::recv': {
+              void message
+                .toRed()
+                .then((x) => broadcastAbleServer.broadcast('message::recv', x))
+              return
+            }
+          }
+        })
         break
       }
       case 'satori': {
@@ -70,10 +80,10 @@ export const initServers = async () => {
     }
   }
 
-  const send = (type: string, payload: unknown) =>
-    broadcasts.forEach((x) => x(type, payload))
+  const dispatchMessage = (message: DispatchMessage) =>
+    dispatchers.forEach((x) => x(message))
 
   return {
-    send,
+    dispatchMessage,
   }
 }

@@ -1,5 +1,6 @@
 import type { Group, Member, Message, Profile } from '@chronocat/red'
 import { ChatType } from '@chronocat/red'
+import { MessageRecvDispatchMessage } from './dispatch'
 import { getMemberInfo } from './ipc/definitions/groupService'
 import {
   friendMap,
@@ -41,7 +42,7 @@ export const chronocat = async () => {
   const config = await getConfig()
   if (!config.enable) return
 
-  const { send } = await initServers()
+  const { dispatchMessage } = await initServers()
 
   const dispatch = async ({ CmdName, Payload }: ListenerData) => {
     try {
@@ -82,7 +83,8 @@ export const chronocat = async () => {
           }),
         )
 
-        if (filteredPayload.length) send('message::recv', filteredPayload)
+        if (filteredPayload.length)
+          dispatchMessage(new MessageRecvDispatchMessage(filteredPayload))
         return
       }
 
