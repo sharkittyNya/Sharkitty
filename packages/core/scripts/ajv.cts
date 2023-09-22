@@ -10,6 +10,9 @@ const ajv = new Ajv({
     esm: true,
     lines: true,
   },
+
+  discriminator: true,
+  useDefaults: true,
 })
 
 ajv.addKeyword({
