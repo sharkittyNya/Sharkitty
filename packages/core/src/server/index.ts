@@ -41,6 +41,13 @@ export const initServers = async () => {
 
   const broadcasts: ((type: string, payload: unknown) => void)[] = []
 
+  // 使用独立循环可避免已启动的服务继续运行
+  for (const server of config.servers!)
+    if (server.token === 'DEFINE_CHRONO_TOKEN')
+      throw new Error(
+        '请先修改服务密码（token）。了解更多：https://chronocat.vercel.app/config',
+      )
+
   for (const server of config.servers!) {
     if (!server.enable) continue
 
