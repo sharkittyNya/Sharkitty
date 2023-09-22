@@ -7,12 +7,16 @@ import { chronocatConfigSchema } from '../src/config.schema'
 const ajv = new Ajv({
   code: {
     source: true,
+    esm: true,
+    lines: true,
   },
 })
-ajv.addKeyword('defaultProperties')
+
+ajv.addKeyword({
+  keyword: 'defaultProperties',
+  valid: true,
+})
+
 const validate = ajv.compile(chronocatConfigSchema)
-const moduleCode = standaloneCode(ajv, validate).replace(
-  /"use strict";module.exports = validate\d*;module.exports.default = (validate\d*);/,
-  `//@ts-nocheck\n\nimport type { ValidateFunction } from 'ajv'\nimport type { ChronocatConfig } from '../config.types'\n\nexport const validate = $1 as ValidateFunction<ChronocatConfig>\n\n`,
-)
+const moduleCode = standaloneCode(ajv, validate)
 void writeFile(join(__dirname, '../src/utils/config.validate.ts'), moduleCode)

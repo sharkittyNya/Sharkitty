@@ -1,3 +1,4 @@
+import type { ValidateFunction } from 'ajv'
 import Ajv from 'ajv'
 import localize from 'ajv-i18n/localize/zh'
 import { load } from 'js-yaml'
@@ -5,7 +6,7 @@ import { randomBytes } from 'node:crypto'
 import { mkdir, readFile, stat, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import defaultConfig from '../../../docs/static/chronocat.yml'
-import type { ChronocatCurrentConfig } from '../config.types'
+import type { ChronocatConfig, ChronocatCurrentConfig } from '../config.types'
 import { getAuthData } from './authData'
 import { baseDir, legacyBaseDir } from './baseDir'
 import { validate } from './config.validate'
@@ -46,11 +47,14 @@ const loadConfig = async () => {
 
   const config = load(await readFile(configPath, 'utf-8'))
 
-  if (!validate(config)) {
-    localize(validate.errors)
-    throw new Ajv().errorsText(validate.errors, {
-      separator: '\n',
-    })
+  if (!(validate as ValidateFunction<ChronocatConfig>)(config)) {
+    localize((validate as ValidateFunction<ChronocatConfig>).errors)
+    throw new Ajv().errorsText(
+      (validate as ValidateFunction<ChronocatConfig>).errors,
+      {
+        separator: '\n',
+      },
+    )
   }
 
   const { uin } = await getAuthData()
