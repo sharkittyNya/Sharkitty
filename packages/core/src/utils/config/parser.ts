@@ -15,5 +15,8 @@ export const parseConfig = (config: unknown, uin: string) => {
     )
   }
 
-  return Object.assign({}, config, config.overrides?.[uin])
+  const result = Object.assign({}, config, config.overrides?.[uin])
+  if ('overrides' in result) delete result.overrides
+
+  return result
 }
