@@ -24,13 +24,16 @@ schema.$id = 'https://chronocat.vercel.app/config-v0.schema.json'
 schema.title = 'Chronocat 配置'
 schema.description = 'Chronocat 配置（chronocat.yml）'
 
+const schemaString = JSON.stringify(schema).replaceAll(
+  '"anyOf"',
+  '"type":"object","discriminator":{"propertyName":"type"},"oneOf"',
+)
+
 void writeFile(
   resolve(__dirname, '../src/config.schema.ts'),
-  `import type { JSONSchemaType } from 'ajv'\nimport type { ChronocatConfig } from './config.types'\n\nexport const chronocatConfigSchema = ${JSON.stringify(
-    schema,
-  )} as unknown as JSONSchemaType<ChronocatConfig>\n`,
+  `import type { JSONSchemaType } from 'ajv'\nimport type { ChronocatConfig } from './config.types'\n\nexport const chronocatConfigSchema = ${schemaString} as unknown as JSONSchemaType<ChronocatConfig>\n`,
 )
 void writeFile(
   resolve(__dirname, '../../docs/static/config-v0.schema.json'),
-  JSON.stringify(schema),
+  schemaString,
 )
