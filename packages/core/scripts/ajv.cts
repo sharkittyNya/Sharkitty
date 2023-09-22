@@ -22,4 +22,4 @@ ajv.addKeyword({
 
 const validate = ajv.compile(chronocatConfigSchema)
 const moduleCode = '//@ts-nocheck\n\n' + standaloneCode(ajv, validate)
-void writeFile(join(__dirname, '../src/utils/config.validate.ts'), moduleCode)
+void writeFile(join(__dirname, '../src/utils/config/validate.ts'), moduleCode)

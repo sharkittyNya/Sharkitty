@@ -1,21 +1,12 @@
-import type { ValidateFunction } from 'ajv'
-import Ajv from 'ajv'
-import localize from 'ajv-i18n/localize/zh'
-import { load } from 'js-yaml'
 import { randomBytes } from 'node:crypto'
 import { mkdir, readFile, stat, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import defaultConfig from '../../../docs/static/chronocat.yml'
-import type { ChronocatConfig, ChronocatCurrentConfig } from '../config.types'
-import { getAuthData } from './authData'
-import { baseDir, legacyBaseDir } from './baseDir'
-import { validate } from './config.validate'
-
-let config: ChronocatCurrentConfig | undefined = undefined
+import defaultConfig from '../../../../docs/static/chronocat.yml'
+import { baseDir, legacyBaseDir } from '../baseDir'
 
 const generateToken = () => randomBytes(32).toString('hex')
 
-const loadConfig = async () => {
+export const ensureConfig = async () => {
   const configDir = join(baseDir, 'config')
   const configPath = join(configDir, 'chronocat.yml')
   const legacyTokenPath = join(legacyBaseDir, 'RED_PROTOCOL_TOKEN')
@@ -44,16 +35,6 @@ const loadConfig = async () => {
     })
     await writeFile(configPath, newConfig)
   }
-
-  const config = load(await readFile(configPath, 'utf-8'))
-  const { uin } = await getAuthData()
-
-  return parseConfig(config, uin)
-}
-
-export const getConfig = async () => {
-  if (!config) config = await loadConfig()
-  return config
 }
 
 async function exists(path: string): Promise<boolean> {
@@ -63,18 +44,4 @@ async function exists(path: string): Promise<boolean> {
     return false
   }
   return true
-}
-
-function parseConfig(config: unknown, uin: string) {
-  if (!(validate as ValidateFunction<ChronocatConfig>)(config)) {
-    localize((validate as ValidateFunction<ChronocatConfig>).errors)
-    throw new Ajv().errorsText(
-      (validate as ValidateFunction<ChronocatConfig>).errors,
-      {
-        separator: '\n',
-      },
-    )
-  }
-
-  return Object.assign({}, config, config.overrides?.[uin])
 }
