@@ -29,7 +29,10 @@ export const ensureConfig = async () => {
       await writeFile(legacyTokenPath, newToken)
     }
 
-    const newConfig = defaultConfig.replaceAll('DEFINE_CHRONO_TOKEN', newToken)
+    const newConfig = defaultConfig.replaceAll(
+      'DEFINE_CHRONO_TOKEN',
+      `'${newToken}'`,
+    )
     await mkdir(configDir, {
       recursive: true,
     })
