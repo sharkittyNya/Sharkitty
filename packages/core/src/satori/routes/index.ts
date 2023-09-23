@@ -1,3 +1,7 @@
-export const routes = {} as const
+import type { Route } from './types'
 
-export type Routes = keyof typeof routes
+const routesIntl = {} as const
+
+export type Routes = keyof typeof routesIntl
+
+export const routes: Record<Routes, Route> = routesIntl

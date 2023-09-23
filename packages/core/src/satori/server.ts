@@ -1,3 +1,4 @@
+import type { IncomingMessage, ServerResponse } from 'node:http'
 import { createServer } from 'node:http'
 import type { WebSocket } from 'ws'
 import { WebSocketServer } from 'ws'
@@ -71,7 +72,7 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
     }
 
     try {
-      const result = method(req, res)
+      const result = method(buildRouteCtx(req, res))
 
       if (!res.writableEnded) {
         res.writeHead(200, {
@@ -191,5 +192,37 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
 
   return {
     dispatcher,
+  }
+}
+
+function buildRouteCtx(
+  req: IncomingMessage,
+  res: ServerResponse<IncomingMessage>,
+) {
+  const buffer = () => {
+    const chunks: Buffer[] = []
+    return new Promise<Buffer>((resolve, reject) => {
+      req.on('data', (chunk) => {
+        chunks.push(chunk as Buffer)
+      })
+      req.on('end', () => {
+        resolve(Buffer.concat(chunks))
+      })
+      req.on('error', () => {
+        reject()
+      })
+    })
+  }
+
+  const string = () => buffer().then((b) => b.toString('utf-8'))
+
+  const json = () => string().then((s) => JSON.parse(s) as unknown)
+
+  return {
+    req,
+    res,
+    buffer,
+    string,
+    json,
   }
 }
