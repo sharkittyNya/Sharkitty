@@ -4,7 +4,7 @@ declare const authData: {
 
 const task = new Promise<typeof authData>((res) => {
   const interval: NodeJS.Timeout = setInterval(() => {
-    if (authData.uin) {
+    if ('authData' in globalThis && authData?.uin) {
       clearInterval(interval)
       res(authData)
     }
