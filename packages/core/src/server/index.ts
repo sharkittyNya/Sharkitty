@@ -14,11 +14,14 @@ declare const __DEFINE_CHRONO_VERSION__: string
 export const createNormalServers = (
   token: string,
   connectPayload: () => unknown,
+  port: number,
+  host: string,
 ) => {
   const httpServer = httpRouterServer.createServer(resolveRoute, {
     authorizer: HeaderAuthorizer(token),
     rootPath: '/api/',
-    port: 16530,
+    port,
+    host,
   })
 
   const wsServer = wsRouterServer.createServer(resolveRoute, {
@@ -62,6 +65,8 @@ export const initServers = async () => {
             name: 'chronocat',
             authData,
           }),
+          server.port!,
+          server.listen!,
         )
         dispatchers.push((message) => {
           switch (message.type) {

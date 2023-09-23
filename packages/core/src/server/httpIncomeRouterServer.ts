@@ -12,6 +12,7 @@ interface HttpIncomeRouterServerConfig
   extends RouterServerCommonConfig<IncomingMessage> {
   rootPath: string
   port: number
+  host: string
 }
 
 export class HttpRouterServerInstance implements RouterServerInstance {
