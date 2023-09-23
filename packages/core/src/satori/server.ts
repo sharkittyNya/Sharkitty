@@ -4,6 +4,7 @@ import type { WebSocket } from 'ws'
 import { WebSocketServer } from 'ws'
 import type { ChronocatSatoriServerConfig } from '../config.types'
 import type { DispatchMessage } from '../dispatch'
+import { timeout } from '../utils/time'
 import index from './index.html'
 import type { Routes } from './routes'
 import { routes } from './routes'
@@ -170,7 +171,7 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
 
     setTimeout(() => {
       if (!authorized) ws.close(3000, 'Unauthorized')
-    }, 10000)
+    }, timeout)
   })
 
   const dispatcher = (message: DispatchMessage) =>
