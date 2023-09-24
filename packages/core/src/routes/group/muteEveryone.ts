@@ -1,5 +1,5 @@
-import type { GroupMuteEveryonePayload } from '@chronocat/red'
 import { setGroupShutUp } from '../../ipc/definitions/groupService'
+import type { GroupMuteEveryonePayload } from '../../red'
 import { router } from '../../router'
 
 router.group.muteEveryone.$body('json')(async ({ body }) => {

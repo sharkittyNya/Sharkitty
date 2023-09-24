@@ -1,5 +1,5 @@
-import type { Message, MessageSendPayload } from '@chronocat/red'
-import { MsgType, SendType } from '@chronocat/red'
+import type { Message, MessageSendPayload } from '../red'
+import { MsgType, SendType } from '../red'
 
 export const filterMessage = (message: MessageSendPayload | Message) =>
   'peer' in message

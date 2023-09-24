@@ -1,8 +1,8 @@
-import type { Media } from '@chronocat/red'
 import { getType } from 'mime/lite'
 import { createReadStream } from 'node:fs'
 import { downloadRichMedia } from '../../ipc/definitions/msgService'
 import { richMediaDownloadMap } from '../../ipc/globalVars'
+import type { Media } from '../../red'
 import { router } from '../../router'
 import { uixCache } from '../../uixCache'
 

@@ -1,6 +1,6 @@
-import type { MessageSendPayload } from '@chronocat/red'
 import { sendMsg } from '../../ipc/definitions/msgService'
 import { sendQueue } from '../../ipc/globalVars'
+import type { MessageSendPayload } from '../../red'
 import { router } from '../../router'
 import { uixCache } from '../../uixCache'
 import { detachPromise } from '../../utils/detachPromise'

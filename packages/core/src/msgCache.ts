@@ -1,4 +1,4 @@
-import type { Message, Peer } from '@chronocat/red'
+import type { Message, Peer } from './red'
 
 const privateCache: Record<string, Message> = {}
 const groupCache: Record<string, Message> = {}

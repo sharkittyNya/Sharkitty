@@ -1,9 +1,9 @@
-import type { GroupGetMemeberListPayload } from '@chronocat/red'
 import {
   createMemberListScene,
   destroyMemberListScene,
   getNextMemberList,
 } from '../../ipc/definitions/groupService'
+import type { GroupGetMemeberListPayload } from '../../red'
 import { router } from '../../router'
 import { detachPromise } from '../../utils/detachPromise'
 

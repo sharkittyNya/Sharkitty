@@ -1,4 +1,4 @@
-import type { Group, Message, Profile } from '@chronocat/red'
+import type { Group, Message, Profile } from '../red'
 import type { Detail, IpcEvent, IpcInfo, Uuid } from '../types'
 
 export const requestCallbackMap: Record<

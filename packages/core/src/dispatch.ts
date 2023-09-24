@@ -1,4 +1,4 @@
-import type { Message } from '@chronocat/red'
+import type { Message } from './red'
 
 export interface DispatchMessage {
   type: 'message::recv'

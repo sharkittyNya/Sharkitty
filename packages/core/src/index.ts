@@ -1,5 +1,3 @@
-import type { Group, Member, Message, Profile } from '@chronocat/red'
-import { ChatType } from '@chronocat/red'
 import { MessageRecvDispatchMessage } from './dispatch'
 import { getMemberInfo } from './ipc/definitions/groupService'
 import {
@@ -14,6 +12,8 @@ import {
 import { initListener } from './ipc/intercept'
 import { getModules } from './modules'
 import { setMsgCache } from './msgCache'
+import type { Group, Member, Message, Profile } from './red'
+import { ChatType } from './red'
 import './routes'
 import { sendForwardMsgBuffer } from './routes/message/sendForward'
 import { initServers } from './server'

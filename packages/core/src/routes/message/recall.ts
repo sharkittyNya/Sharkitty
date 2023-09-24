@@ -1,5 +1,5 @@
-import type { MessageRecallPayload } from '@chronocat/red'
 import { recallMsg } from '../../ipc/definitions/msgService'
+import type { MessageRecallPayload } from '../../red'
 import { router } from '../../router'
 import { uixCache } from '../../uixCache'
 

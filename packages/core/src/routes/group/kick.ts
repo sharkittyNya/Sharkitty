@@ -1,5 +1,5 @@
-import type { GroupKickPayload } from '@chronocat/red'
 import { kickMember } from '../../ipc/definitions/groupService'
+import type { GroupKickPayload } from '../../red'
 import { router } from '../../router'
 import { uixCache } from '../../uixCache'
 

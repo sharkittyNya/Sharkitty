@@ -1,6 +1,6 @@
-import type { GroupMuteMemberPayload } from '@chronocat/red'
 import type { MuteMember } from '../../ipc/definitions/groupService'
 import { setMemberShutUp } from '../../ipc/definitions/groupService'
+import type { GroupMuteMemberPayload } from '../../red'
 import { router } from '../../router'
 import { uixCache } from '../../uixCache'
 

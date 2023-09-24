@@ -1,5 +1,5 @@
-import type { MetaConnectPayload } from '@chronocat/red'
 import type { IncomingMessage } from 'node:http'
+import type { MetaConnectPayload } from '../red'
 
 export const HeaderAuthorizer = (token: string) => (req: IncomingMessage) =>
   req.headers.authorization?.slice(0, 7) === 'Bearer ' &&

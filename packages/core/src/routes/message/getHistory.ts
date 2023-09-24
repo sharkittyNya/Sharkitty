@@ -1,5 +1,5 @@
-import type { MessageGetHistoryPayload } from '@chronocat/red'
 import { getMsgsIncludeSelf } from '../../ipc/definitions/msgService'
+import type { MessageGetHistoryPayload } from '../../red'
 import { router } from '../../router'
 import { uixCache } from '../../uixCache'
 
