@@ -15,7 +15,7 @@ const settings: PartialArgs = {
 }
 
 const program = getProgramFromFiles([
-  resolve(__dirname, '../src/config.types.ts'),
+  resolve(__dirname, '../src/config/types.ts'),
 ])
 
 const schema = generateSchema(program, 'ChronocatConfig', settings)!
@@ -30,8 +30,8 @@ const schemaString = JSON.stringify(schema).replaceAll(
 )
 
 void writeFile(
-  resolve(__dirname, '../src/config.schema.ts'),
-  `import type { JSONSchemaType } from 'ajv'\nimport type { ChronocatConfig } from './config.types'\n\nexport const chronocatConfigSchema = ${schemaString} as unknown as JSONSchemaType<ChronocatConfig>\n`,
+  resolve(__dirname, '../src/config/schema.ts'),
+  `import type { JSONSchemaType } from 'ajv'\nimport type { ChronocatConfig } from './types'\n\nexport const chronocatConfigSchema = ${schemaString} as unknown as JSONSchemaType<ChronocatConfig>\n`,
 )
 void writeFile(
   resolve(__dirname, '../../docs/static/config-v0.schema.json'),

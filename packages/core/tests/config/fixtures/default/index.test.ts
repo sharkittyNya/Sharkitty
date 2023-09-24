@@ -1,8 +1,8 @@
 import { load } from 'js-yaml'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import type { ChronocatCurrentConfig } from '../../../../src/config.types'
-import { parseConfig } from '../../../../src/utils/config/parser'
+import { parseConfig } from '../../../../src/config/parser'
+import type { ChronocatCurrentConfig } from '../../../../src/config/types'
 
 test('配置文件解析器应当正确解析 默认配置文件', async () => {
   expect.assertions(2)

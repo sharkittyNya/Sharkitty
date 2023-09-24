@@ -2,7 +2,7 @@ import Ajv from 'ajv'
 import standaloneCode from 'ajv/dist/standalone'
 import { writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { chronocatConfigSchema } from '../src/config.schema'
+import { chronocatConfigSchema } from '../src/config/schema'
 
 const ajv = new Ajv({
   code: {
@@ -22,4 +22,4 @@ ajv.addKeyword({
 
 const validate = ajv.compile(chronocatConfigSchema)
 const moduleCode = '//@ts-nocheck\n\n' + standaloneCode(ajv, validate)
-void writeFile(join(__dirname, '../src/utils/config/validate.ts'), moduleCode)
+void writeFile(join(__dirname, '../src/config/validate.ts'), moduleCode)

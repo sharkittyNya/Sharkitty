@@ -1,11 +1,11 @@
 import { load } from 'js-yaml'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import type { ChronocatCurrentConfig } from '../../config.types'
-import { getAuthData } from '../authData'
-import { baseDir } from '../baseDir'
+import { getAuthData } from '../utils/authData'
+import { baseDir } from '../utils/baseDir'
 import { ensureConfig } from './ensure'
 import { parseConfig } from './parser'
+import type { ChronocatCurrentConfig } from './types'
 
 let config: ChronocatCurrentConfig | undefined = undefined
 

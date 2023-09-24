@@ -1,3 +1,4 @@
+import { getConfig } from './config'
 import { MessageRecvDispatchMessage } from './dispatch'
 import { getMemberInfo } from './ipc/definitions/groupService'
 import {
@@ -19,7 +20,6 @@ import { sendForwardMsgBuffer } from './routes/message/sendForward'
 import { initServers } from './server'
 import type { ListenerData } from './types'
 import { uixCache } from './uixCache'
-import { getConfig } from './utils/config'
 import { filterMessage } from './utils/filterMessage'
 
 declare const authData: {
