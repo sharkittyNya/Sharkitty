@@ -8,8 +8,8 @@ import { timeout } from '../utils/time'
 import index from './index.html'
 import type { Routes } from './routes'
 import { routes } from './routes'
-import type { SatoriWebSocketIncomingMessage } from './types'
-import { SatoriOp } from './types'
+import type { WebSocketIncomingMessage } from './types'
+import { Op } from './types'
 
 declare const __DEFINE_CHRONO_VERSION__: string
 
@@ -107,23 +107,23 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
       const message = JSON.parse(
         // eslint-disable-next-line @typescript-eslint/no-base-to-string
         raw.toString(),
-      ) as SatoriWebSocketIncomingMessage
+      ) as WebSocketIncomingMessage
 
       switch (message.op) {
-        case SatoriOp.Ping: {
+        case Op.Ping: {
           ws.send(
             JSON.stringify({
-              op: SatoriOp.Pong,
+              op: Op.Pong,
             }),
           )
           return
         }
 
-        case SatoriOp.Identify: {
+        case Op.Identify: {
           if (authorized) {
             ws.send(
               JSON.stringify({
-                op: SatoriOp.Event,
+                op: Op.Event,
                 body: {
                   type: 'chrono-unsafe-dropped-identify-package',
                 },
@@ -148,7 +148,7 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
 
           ws.send(
             JSON.stringify({
-              op: SatoriOp.Ready,
+              op: Op.Ready,
             }),
           )
 
@@ -158,7 +158,7 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
         default: {
           ws.send(
             JSON.stringify({
-              op: SatoriOp.Event,
+              op: Op.Event,
               body: {
                 type: 'chrono-unsafe-unknown-opcode',
               },
@@ -181,7 +181,7 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
           events.forEach((body) =>
             ws.send(
               JSON.stringify({
-                op: SatoriOp.Event,
+                op: Op.Event,
                 body,
               }),
             ),

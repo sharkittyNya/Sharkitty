@@ -1,8 +1,8 @@
-export type SatoriWebSocketIncomingMessage =
-  | SatoriWebSocketIncomingHeartbeatMessage
-  | SatoriWebSocketIncomingVerifyMessage
+export type WebSocketIncomingMessage =
+  | WebSocketIncomingHeartbeatMessage
+  | WebSocketIncomingVerifyMessage
 
-export enum SatoriOp {
+export enum Op {
   Event = 0,
   Ping = 1,
   Pong = 2,
@@ -10,13 +10,13 @@ export enum SatoriOp {
   Ready = 4,
 }
 
-export interface SatoriWebSocketIncomingHeartbeatMessage {
-  op: SatoriOp.Ping
+export interface WebSocketIncomingHeartbeatMessage {
+  op: Op.Ping
   body: never
 }
 
-export interface SatoriWebSocketIncomingVerifyMessage {
-  op: SatoriOp.Identify
+export interface WebSocketIncomingVerifyMessage {
+  op: Op.Identify
   body?: {
     token?: string
   }
