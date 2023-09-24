@@ -137,9 +137,6 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
             return
           }
 
-          // TODO: 校验 platform 和 self_id
-          // 此校验必须在 token 之后
-
           authorized = true
           authorizedClients.push(ws)
           ws.on('close', () =>
