@@ -12,6 +12,8 @@ test('配置文件解析器应当正确解析 空文件', async () => {
   try {
     parseConfig(config, '1')
   } catch (e) {
-    expect(e).toBe('data 应当是 object 类型')
+    expect(e).toBe(
+      'Chronocat 加载配置失败，请检查 chronocat.yml。详细信息：\n问题 1：#/type：应当是 object 类型',
+    )
   }
 })
