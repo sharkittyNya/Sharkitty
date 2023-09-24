@@ -1,8 +1,8 @@
-import { selfGet } from './self/get'
+import { loginGet } from './login/get'
 import type { Route } from './types'
 
 const routesIntl = {
-  'self.get': selfGet,
+  'login.get': loginGet,
 } as const
 
 export type Routes = keyof typeof routesIntl
