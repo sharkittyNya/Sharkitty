@@ -73,7 +73,11 @@ export const initServers = async () => {
             case 'message::recv': {
               void message
                 .toRed()
-                .then((x) => broadcastAbleServer.broadcast('message::recv', x))
+                .then((x) =>
+                  x
+                    ? broadcastAbleServer.broadcast('message::recv', x)
+                    : undefined,
+                )
               return
             }
           }
