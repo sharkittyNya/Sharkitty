@@ -27,7 +27,7 @@ void (async () => {
   await mkdir(pathDist, { recursive: true })
 
   await Promise.all(
-    ['core', 'red']
+    ['core']
       .map(
         (x) =>
           require(`../packages/${x}/package.json`) as {
