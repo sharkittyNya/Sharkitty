@@ -1,7 +1,7 @@
 {
   "name": "@chronocat/core",
   "description": "小巧轻便的 Red 实现",
-  "version": "0.0.45",
+  "version": "0.0.46",
   "license": "AGPL-3.0",
   "author": {
     "name": "Il Harper",
