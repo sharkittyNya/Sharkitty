@@ -1,6 +1,19 @@
 # CHANGELOG
 
-## v0.0.45
+## v0.0.46 (2023-09-25)
+
+### core
+
+- 添加了 Chronocat 配置文件的类型定义 (3b85d7737ad18637047e68038d4e7055ffecb1b7)
+- 添加了 Chronocat 配置文件类型定义到 JSON Schema 的生成 (28527870ada1b5e0928c44fd251184a04a8d44a3)
+- 支持了 Chronocat 配置文件的解析、校验、自动生成和迁移 (2cb1aa009a55334092ec3eff29314d9d4549075a)
+- 移除了插件卸载逻辑 (7ea7b3fa75eb20ab7fa789d4b571349f1992f8a0)
+- 支持根据配置文件启动任意个数的服务 (4069e711e36322a26df7bb051a5d30371c163c0c)
+- 禁止服务使用默认 token 启动 (a4a6cb76c88b91fda0c7c2385dfafea044c0bde0)
+- 支持了 Satori 协议 (b974114b93c4cc6277556f7a350a12a763fb3fd5)
+- Satori：支持了 API `login.get` (4abd5ed61b085c957a69fc484fb8b43ad973538d)
+
+## v0.0.45 (2023-09-20)
 
 ### core
 
