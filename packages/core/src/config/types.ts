@@ -1,4 +1,22 @@
-export interface ChronocatConfig extends ChronocatCurrentConfig {
+export interface ChronocatConfig {
+  /**
+   * @title 启用
+   *
+   * @description 是否启用这个功能。
+   *
+   * @default true
+   */
+  enable?: boolean
+
+  /**
+   * @title 服务
+   *
+   * @description Chronocat 需要启动的服务。
+   *
+   * @default []
+   */
+  servers?: (ChronocatRedServerConfig | ChronocatSatoriServerConfig)[]
+
   /**
    * @title 账号配置
    *
@@ -11,18 +29,32 @@ export interface ChronocatConfig extends ChronocatCurrentConfig {
   }
 }
 
-export interface ChronocatCurrentConfig extends ChronocatEnableableConfig {
+export interface ChronocatCurrentConfig {
+  /**
+   * @title 启用
+   *
+   * @description 是否启用这个功能。
+   */
+  enable?: boolean
+
   /**
    * @title 服务
    *
    * @description Chronocat 需要启动的服务。
-   *
-   * @default []
    */
   servers?: (ChronocatRedServerConfig | ChronocatSatoriServerConfig)[]
 }
 
-export interface ChronocatServerConfig extends ChronocatEnableableConfig {
+export interface ChronocatServerConfig {
+  /**
+   * @title 启用
+   *
+   * @description 是否启用这个功能。
+   *
+   * @default true
+   */
+  enable?: boolean
+
   /**
    * @title 密码
    *
@@ -82,15 +114,4 @@ export interface ChronocatSatoriServerConfig
    * @maximum 65535
    */
   port?: number
-}
-
-export interface ChronocatEnableableConfig {
-  /**
-   * @title 启用
-   *
-   * @description 是否启用这个功能。
-   *
-   * @default true
-   */
-  enable?: boolean
 }
