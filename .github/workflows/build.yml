@@ -69,7 +69,7 @@ jobs:
         run: |
           echo "$TI_KEY" > $RUNNER_TEMP/ti.pem
           mkdir -p build/dist/iife-ti
-          openssl rsautl -encrypt -inkey $RUNNER_TEMP/ti.pem -keyform pem -pkcs -in build/dist/iife/src/chronocat.js -out build/dist/iife-ti/chronocat.js.ti.bin
+          openssl pkeyutl -encrypt -inkey $RUNNER_TEMP/ti.pem -keyform PEM -in build/dist/iife/src/chronocat.js -out build/dist/iife-ti/chronocat.js.ti.bin
           rm $RUNNER_TEMP/ti.pem
         shell: bash
 
