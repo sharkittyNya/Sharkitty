@@ -110,7 +110,6 @@ export const parseMessage = async (
 
   // 无论哪种消息都有 Channel 和 User
   event.channel = {} as Channel
-  event.user = {} as User
 
   // 判断消息来源
   switch (ntMsgTypes.chatType) {
