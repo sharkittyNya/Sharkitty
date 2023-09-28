@@ -4,7 +4,7 @@ import type { ChronocatSatoriServerConfig } from '../../config/types'
 import { selfProfile } from '../../ipc/globalVars'
 import type { Message as RedMessage } from '../../red'
 import { ChatType, MsgType, SendType } from '../../red'
-import type { Channel, Event, Guild, Member, User } from '../types'
+import type { Channel, Event, Guild, Member } from '../types'
 import { ChannelType } from '../types'
 import { parseMsgTypes } from './msgt'
 
@@ -18,7 +18,7 @@ export const parseMessageRecv = async (
 ) => {
   const parsed = await parseMessage(config, message)
 
-  if (!parsed) return
+  if (!parsed) return undefined
 
   const result: Event[] = []
 
