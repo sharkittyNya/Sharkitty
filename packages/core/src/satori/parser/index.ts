@@ -63,7 +63,7 @@ export const parseMessageRecv = async (
           content: undefined as unknown as string,
         },
       })
-    else if (!event.user?.name)
+    else if (!event.user?.name && !event.member?.name)
       result.push({
         id: undefined as unknown as number,
         platform: 'chronocat',
