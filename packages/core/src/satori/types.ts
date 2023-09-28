@@ -155,7 +155,44 @@ export interface Guild {
   avatar: string
 }
 
-export interface Login {}
+export interface Login {
+  /**
+   * 用户对象
+   */
+  user?: User
+
+  /**
+   * 在线状态
+   */
+  status: LoginStatus
+}
+
+export enum LoginStatus {
+  /**
+   * 离线
+   */
+  OFFLINE = 0,
+
+  /**
+   * 在线
+   */
+  ONLINE = 1,
+
+  /**
+   * 连接中
+   */
+  CONNECT = 2,
+
+  /**
+   * 断开连接
+   */
+  DISCONNECT = 3,
+
+  /**
+   * 重新连接
+   */
+  RECONNECT = 4,
+}
 
 export interface Member {
   /**
@@ -233,4 +270,16 @@ export interface User {
    * 是否为机器人
    */
   is_bot?: boolean
+}
+
+export interface Role {
+  /**
+   * 角色 ID
+   */
+  id: string
+
+  /**
+   * 角色名称
+   */
+  name: string
 }
