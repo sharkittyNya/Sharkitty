@@ -4,6 +4,7 @@ import type { WebSocket } from 'ws'
 import { WebSocketServer } from 'ws'
 import type { ChronocatSatoriServerConfig } from '../config/types'
 import type { DispatchMessage } from '../dispatch'
+import { selfProfile } from '../ipc/globalVars'
 import { timeout } from '../utils/time'
 import index from './index.html'
 import type { Routes } from './routes'
@@ -16,6 +17,11 @@ declare const __DEFINE_CHRONO_VERSION__: string
 const prefix = '/v1/'
 const poweredBy = `Chronocat/${__DEFINE_CHRONO_VERSION__}`
 
+const buildEventIdCounter = () => {
+  let i = 0
+  return () => ++i
+}
+
 export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
   // 预处理 self_url
   if (!config.self_url || config.self_url === 'https://chronocat.vercel.app')
@@ -24,6 +30,8 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
     config.self_url = config.self_url.slice(0, config.self_url.length - 1)
 
   const authorizedClients: WebSocket[] = []
+
+  const getId = buildEventIdCounter()
 
   const server = createServer((req, res) => {
     if (!req.url) {
@@ -131,6 +139,10 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
               JSON.stringify({
                 op: Op.Event,
                 body: {
+                  id: getId(),
+                  platform: 'chronocat',
+                  self_id: selfProfile.value!.uin,
+                  timestamp: new Date().getTime(),
                   type: 'chrono-unsafe-warning-2132',
                 },
               }),
@@ -163,6 +175,10 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
             JSON.stringify({
               op: Op.Event,
               body: {
+                id: getId(),
+                platform: 'chronocat',
+                self_id: selfProfile.value!.uin,
+                timestamp: new Date().getTime(),
                 type: 'chrono-unsafe-warning-2133',
               },
             }),
@@ -185,7 +201,10 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
             ws.send(
               JSON.stringify({
                 op: Op.Event,
-                body,
+                body: {
+                  ...body,
+                  id: getId(),
+                },
               }),
             ),
           ),
