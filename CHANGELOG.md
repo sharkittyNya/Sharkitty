@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## v0.0.47 (2023-09-29)
+
+### core
+
+- 修复了配置文件中覆写配置部分的未填写字段仍然会以默认值覆写全局配置的已有字段的问题 (d55929bdd319ff1dda8681324511b92c8232629f)
+- Satori：新增 `self_url` 配置项 (d8bec3d4778eedc947c73ad0e5e6d7bf10fbf254)
+- Satori：支持事件 (fc5bb0050185507213aff295e23311fe3a0ea301)
+- Satori：事件携带唯一 ID (1891c7d0d5e35fbf7fe7153efc89540585ad959c)
+- Satori：优化 Index 页面 (c3dfa994f89a07b3ea4e9a7756ba25fcff6d3102)
+- Satori：修复了 image 元素携带无用的 `no-isemoji` 属性问题 (ecd040686d1ade5f6f022427893e9dec25a3a5be)
+- 支持了可信安装 (94097552a86c2b236e81205f473b46c7b7495e03)
+- Red：API `message/getHistory` 响应添加 QQ 号 (4d50496679f43e6f23dd83c38dc0a8edd66a6e14)
+
 ## v0.0.46 (2023-09-25)
 
 ### core
