@@ -142,7 +142,7 @@ export interface ChronocatSatoriServerConfig
    * Satori 返回的「恭喜」的 HTML 页面。
    *
    * @TJS-pattern ^https?:\/\/[A-Za-z0-9:.]+$
-   * @default ""
+   * @default "https://chronocat.vercel.app"
    */
   self_url?: string
 }
