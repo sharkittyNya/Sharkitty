@@ -23,7 +23,7 @@ export const parseMessageRecv = async (
   const result: Event[] = []
 
   for (const event of parsed) {
-    if (!event.message?.id && !event.user?.id)
+    if (!event.message?.id && !event.user?.id) {
       result.push({
         id: undefined as unknown as number,
         platform: 'chronocat',
@@ -32,7 +32,8 @@ export const parseMessageRecv = async (
 
         type: 'chrono-unsafe-warning-2127',
       })
-    else if (!event.message?.id)
+      continue
+    } else if (!event.message?.id)
       result.push({
         id: undefined as unknown as number,
         platform: 'chronocat',
@@ -79,7 +80,8 @@ export const parseMessageRecv = async (
           content: undefined as unknown as string,
         },
       })
-    else result.push(event)
+
+    result.push(event)
   }
 
   return result
