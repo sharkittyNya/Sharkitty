@@ -6,10 +6,12 @@ import { uixCache } from '../../uixCache'
 router.message.getHistory.$body('json')(async ({ body }) => {
   const { peer, offsetMsgId, count } = body as MessageGetHistoryPayload
 
-  return await getMsgsIncludeSelf({
-    peer: await uixCache.preprocessObject(peer),
-    msgId: offsetMsgId!,
-    cnt: count,
-    queryOrder: true,
-  })
+  return await uixCache.preprocessObject(
+    await getMsgsIncludeSelf({
+      peer: await uixCache.preprocessObject(peer),
+      msgId: offsetMsgId!,
+      cnt: count,
+      queryOrder: true,
+    }),
+  )
 })

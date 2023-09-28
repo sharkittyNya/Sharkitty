@@ -29,7 +29,7 @@ export const downloadRichMedia = defineIpcApi<
 >('IPC_UP_2', 'ns-ntApi-2', 'nodeIKernelMsgService/downloadRichMedia')
 
 export const getMsgsIncludeSelf = defineIpcApi<
-  unknown,
+  object,
   [
     {
       peer: Peer
