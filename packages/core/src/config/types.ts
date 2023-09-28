@@ -114,4 +114,35 @@ export interface ChronocatSatoriServerConfig
    * @maximum 65535
    */
   port?: number
+
+  /**
+   * @title 客户端访问 Satori 服务时的地址。
+   *
+   * @description 客户端将会使用这个地址访问 Satori。
+   *
+   * 大多数情况下可以不填写此配置，但如果你的 Satori
+   * 服务与客户端框架位于不同的网络主机（如 Docker
+   * 环境），那么你需要填写客户端访问 Satori 时的地址。
+   *
+   * 举两个例子：
+   *
+   * - 当 Satori 服务与客户端分别位于局域网下的两台主机时，self_url
+   * 应当形如：
+   *
+   * http://192.168.1.2:5500
+   *
+   * - 当网络由 Docker Compose 或 Kubernetes 管理时，self_url
+   * 应当形如：
+   *
+   * http://chronocat.local:5500
+   *
+   * 判断地址是否正确的方法：
+   *
+   * 从客户端所在的网络环境直接访问此地址，应当看到
+   * Satori 返回的「恭喜」的 HTML 页面。
+   *
+   * @TJS-pattern ^https?:\/\/[A-Za-z0-9:.]+$
+   * @default ""
+   */
+  self_url?: string
 }
