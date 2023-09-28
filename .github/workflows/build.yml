@@ -67,10 +67,12 @@ jobs:
         env:
           TI_KEY: ${{ secrets.TI_KEY }}
         run: |
-          echo "$TI_KEY" > $RUNNER_TEMP/ti.pem
           mkdir -p build/dist/iife-ti
-          openssl pkeyutl -encrypt -inkey $RUNNER_TEMP/ti.pem -keyform PEM -in build/dist/iife/src/chronocat.js -out build/dist/iife-ti/chronocat.js.ti.bin
+          sha1sum build/dist/iife/src/chronocat.js > build/dist/iife-ti/chronocat.js.sha
+          echo "$TI_KEY" > $RUNNER_TEMP/ti.pem
+          openssl pkeyutl -encrypt -inkey $RUNNER_TEMP/ti.pem -keyform PEM -pkeyopt rsa_padding_mode:pks1 -in build/dist/iife-ti/chronocat.js.sha -out build/dist/iife-ti/chronocat.js.ti.bin
           rm $RUNNER_TEMP/ti.pem
+          cat build/dist/iife/src/chronocat.js >> build/dist/iife-ti/chronocat.js.ti.bin
         shell: bash
 
       - name: Upload IIFE-TI
