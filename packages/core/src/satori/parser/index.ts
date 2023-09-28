@@ -271,6 +271,8 @@ async function parseGuildMemberAddedMessage(
     }&spec=640`,
   }
 
+  if (event2.member) delete event2.member
+
   return [event2, ...extraEvents]
 }
 
@@ -302,6 +304,8 @@ async function parseGuildMemberMuteMessage(
       message.elements[0]!.grayTipElement!.groupElement!.shutUp!.member.uin
     }&spec=640`,
   }
+
+  if (event2.member) delete event2.member
 
   return [event2, ...extraEvents]
 }
@@ -355,6 +359,8 @@ async function parseGuildMemberAddedLegacyInviteMessage(
     name: undefined as unknown as string,
     avatar: `http://q.qlogo.cn/headimg_dl?dst_uin=${userId}&spec=640`,
   }
+
+  if (event2.member) delete event2.member
 
   return [event2, ...extraEvents]
 }
