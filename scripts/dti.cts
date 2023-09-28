@@ -1,12 +1,22 @@
-import { publicDecrypt } from 'node:crypto'
+import type { Buffer } from 'node:buffer'
+import { verify } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 
+const checkScript = (key: Buffer, rawFile: Buffer) =>
+  new Promise<Buffer>((res, rej) => {
+    const partSig = rawFile.subarray(0, 1024)
+    const partData = rawFile.subarray(1024)
+
+    verify('sha256', partData, key, partSig, (e, r) =>
+      e ? rej(e) : r ? res(partData) : rej(new Error('Check failed.')),
+    )
+  })
+
 void (async () => {
-  console.log(
-    publicDecrypt(
-      await readFile(resolve(__dirname, '../packages/docs/static/ti.pub')),
-      await readFile(process.argv[2]!),
-    ).toString('utf-8'),
+  const key = await readFile(
+    resolve(__dirname, '../packages/docs/static/ti.pub'),
   )
+  const rawFile = await readFile(process.argv[2]!)
+  await checkScript(key, rawFile)
 })()

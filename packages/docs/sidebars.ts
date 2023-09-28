@@ -26,6 +26,7 @@ const sidebars: SidebarsConfig = {
           ],
         },
         'install/docker',
+        'install/trusted-installation',
       ],
     },
     {
