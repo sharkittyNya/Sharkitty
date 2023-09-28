@@ -67,6 +67,7 @@ jobs:
         env:
           TI_KEY: ${{ secrets.TI_KEY }}
         run: |
+          mkdir -p build/dist/iife-ti
           echo "$TI_KEY" > $RUNNER_TEMP/ti.pem
           openssl dgst -sha256 -sign $RUNNER_TEMP/ti.pem -keyform PEM -out build/dist/iife-ti/chronocat.js.ti.bin -binary build/dist/iife/src/chronocat.js
           rm $RUNNER_TEMP/ti.pem
