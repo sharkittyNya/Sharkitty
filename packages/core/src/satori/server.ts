@@ -17,6 +17,12 @@ const prefix = '/v1/'
 const poweredBy = `Chronocat/${__DEFINE_CHRONO_VERSION__}`
 
 export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
+  // 预处理 self_url
+  if (!config.self_url || config.self_url === 'https://chronocat.vercel.app')
+    config.self_url = `http://127.0.0.1:${config.port}`
+  if (config.self_url.endsWith('/'))
+    config.self_url = config.self_url.slice(0, config.self_url.length - 1)
+
   const authorizedClients: WebSocket[] = []
 
   const server = createServer((req, res) => {
@@ -125,7 +131,7 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
               JSON.stringify({
                 op: Op.Event,
                 body: {
-                  type: 'chrono-unsafe-dropped-identify-package',
+                  type: 'chrono-unsafe-warning-2132',
                 },
               }),
             )
@@ -157,7 +163,7 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
             JSON.stringify({
               op: Op.Event,
               body: {
-                type: 'chrono-unsafe-unknown-opcode',
+                type: 'chrono-unsafe-warning-2133',
               },
             }),
           )
@@ -174,7 +180,7 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
   const dispatcher = (message: DispatchMessage) =>
     authorizedClients.forEach(
       (ws) =>
-        void message.toSatori().then((events) =>
+        void message.toSatori(config).then((events) =>
           events.forEach((body) =>
             ws.send(
               JSON.stringify({
