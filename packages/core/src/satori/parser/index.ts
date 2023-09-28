@@ -431,7 +431,8 @@ async function parseElements(
                 downloadType: 2,
               }),
             ).toString('base64url')}`,
-            'chrono-unsafe-isemoji': m.picElement!.picSubType === 1,
+            'chrono-unsafe-isemoji':
+              m.picElement!.picSubType === 1 || undefined,
             'chrono-unsafe-filepath': m.picElement!.sourcePath,
             'chrono-unsafe-filetype': m.picElement!.picType,
           }),
