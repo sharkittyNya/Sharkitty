@@ -70,7 +70,7 @@ jobs:
           mkdir -p build/dist/iife-ti
           sha1sum build/dist/iife/src/chronocat.js > build/dist/iife-ti/chronocat.js.sha
           echo "$TI_KEY" > $RUNNER_TEMP/ti.pem
-          openssl pkeyutl -encrypt -inkey $RUNNER_TEMP/ti.pem -keyform PEM -pkeyopt rsa_padding_mode:pks1 -in build/dist/iife-ti/chronocat.js.sha -out build/dist/iife-ti/chronocat.js.ti.bin
+          openssl pkeyutl -encrypt -inkey $RUNNER_TEMP/ti.pem -keyform PEM -pkeyopt rsa_padding_mode:pkcs1 -in build/dist/iife-ti/chronocat.js.sha -out build/dist/iife-ti/chronocat.js.ti.bin
           rm $RUNNER_TEMP/ti.pem
           cat build/dist/iife/src/chronocat.js >> build/dist/iife-ti/chronocat.js.ti.bin
         shell: bash
