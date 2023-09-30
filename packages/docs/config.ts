@@ -38,19 +38,39 @@ const themeConfig: ThemeConfig = {
 
     items: [
       {
-        label: '安装',
+        label: '使用',
         position: 'left',
+        type: 'dropdown',
         to: 'install',
+        items: [
+          {
+            label: '安装',
+            to: 'install',
+          },
+          {
+            label: '接入',
+            to: 'connect',
+          },
+          {
+            label: '配置',
+            to: 'config',
+          },
+        ],
       },
       {
-        label: '接入',
+        label: '开发',
         position: 'left',
-        to: 'connect',
+        to: 'develop',
       },
       {
-        label: '配置',
+        label: '贡献',
         position: 'left',
-        to: 'config',
+        to: 'contribute',
+      },
+      {
+        label: 'FAQ',
+        position: 'left',
+        to: 'faq/1',
       },
       {
         label: '更多',
@@ -92,8 +112,29 @@ const themeConfig: ThemeConfig = {
         ],
       },
       {
+        title: '开发与贡献',
+        items: [
+          {
+            label: 'Satori',
+            to: '/develop/satori',
+          },
+          {
+            label: 'RedProtocol',
+            to: '/develop/red',
+          },
+          {
+            label: '贡献',
+            to: '/contribute',
+          },
+        ],
+      },
+      {
         title: '更多',
         items: [
+          {
+            label: 'FAQ',
+            to: '/faq/1',
+          },
           {
             label: '更多内容',
             to: '/more/community',
