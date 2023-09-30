@@ -1,13 +1,22 @@
 :root {
-  --ifm-color-primary: #0077b3;
-  --ifm-color-primary-dark: #006ba1;
-  --ifm-color-primary-darker: #006598;
-  --ifm-color-primary-darkest: #00537d;
-  --ifm-color-primary-light: #0083c5;
-  --ifm-color-primary-lighter: #0089ce;
-  --ifm-color-primary-lightest: #009be9;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+
+  --ifm-color-primary: var(--ifm-color-primary-normal);
+  --ifm-color-primary-dark: var(--ifm-color-primary-dark-normal);
+  --ifm-color-primary-darker: var(--ifm-color-primary-darker-normal);
+  --ifm-color-primary-darkest: var(--ifm-color-primary-darkest-normal);
+  --ifm-color-primary-light: var(--ifm-color-primary-light-normal);
+  --ifm-color-primary-lighter: var(--ifm-color-primary-lighter-normal);
+  --ifm-color-primary-lightest: var(--ifm-color-primary-lightest-normal);
+
+  --ifm-color-primary-normal: #0077b3;
+  --ifm-color-primary-dark-normal: #006ba1;
+  --ifm-color-primary-darker-normal: #006598;
+  --ifm-color-primary-darkest-normal: #00537d;
+  --ifm-color-primary-light-normal: #0083c5;
+  --ifm-color-primary-lighter-normal: #0089ce;
+  --ifm-color-primary-lightest-normal: #009be9;
 
   --ifm-color-primary-develop: #2e8555;
   --ifm-color-primary-dark-develop: #29784c;
@@ -27,13 +36,21 @@
 }
 
 [data-theme='dark'] {
-  --ifm-color-primary: #47b4eb;
-  --ifm-color-primary-dark: #2ba9e8;
-  --ifm-color-primary-darker: #1ea3e6;
-  --ifm-color-primary-darkest: #1587c1;
-  --ifm-color-primary-light: #63bfee;
-  --ifm-color-primary-lighter: #70c5ef;
-  --ifm-color-primary-lightest: #9ad6f4;
+  --ifm-color-primary: var(--ifm-color-primary-normal);
+  --ifm-color-primary-dark: var(--ifm-color-primary-dark-normal);
+  --ifm-color-primary-darker: var(--ifm-color-primary-darker-normal);
+  --ifm-color-primary-darkest: var(--ifm-color-primary-darkest-normal);
+  --ifm-color-primary-light: var(--ifm-color-primary-light-normal);
+  --ifm-color-primary-lighter: var(--ifm-color-primary-lighter-normal);
+  --ifm-color-primary-lightest: var(--ifm-color-primary-lightest-normal);
+
+  --ifm-color-primary-normal: #47b4eb;
+  --ifm-color-primary-dark-normal: #2ba9e8;
+  --ifm-color-primary-darker-normal: #1ea3e6;
+  --ifm-color-primary-darkest-normal: #1587c1;
+  --ifm-color-primary-light-normal: #63bfee;
+  --ifm-color-primary-lighter-normal: #70c5ef;
+  --ifm-color-primary-lightest-normal: #9ad6f4;
 
   --ifm-color-primary-develop: #25c2a0;
   --ifm-color-primary-dark-develop: #21af90;
@@ -50,6 +67,26 @@
   --ifm-color-primary-light-contribute: #ffc2c2;
   --ifm-color-primary-lighter-contribute: #ffd6d6;
   --ifm-color-primary-lightest-contribute: #ffffff;
+}
+
+[data-area='normal'] {
+  --ifm-color-primary: var(--ifm-color-primary-normal);
+  --ifm-color-primary-dark: var(--ifm-color-primary-dark-normal);
+  --ifm-color-primary-darker: var(--ifm-color-primary-darker-normal);
+  --ifm-color-primary-darkest: var(--ifm-color-primary-darkest-normal);
+  --ifm-color-primary-light: var(--ifm-color-primary-light-normal);
+  --ifm-color-primary-lighter: var(--ifm-color-primary-lighter-normal);
+  --ifm-color-primary-lightest: var(--ifm-color-primary-lightest-normal);
+}
+
+[data-theme='dark'][data-area='normal'] {
+  --ifm-color-primary: var(--ifm-color-primary-normal);
+  --ifm-color-primary-dark: var(--ifm-color-primary-dark-normal);
+  --ifm-color-primary-darker: var(--ifm-color-primary-darker-normal);
+  --ifm-color-primary-darkest: var(--ifm-color-primary-darkest-normal);
+  --ifm-color-primary-light: var(--ifm-color-primary-light-normal);
+  --ifm-color-primary-lighter: var(--ifm-color-primary-lighter-normal);
+  --ifm-color-primary-lightest: var(--ifm-color-primary-lightest-normal);
 }
 
 [data-area='develop'] {
@@ -99,12 +136,18 @@
 
 .button.button--normal {
   @extend .button--common;
-  --ifm-button-background-color: var(--ifm-color-primary);
-  --ifm-button-border-color: var(--ifm-color-primary);
+  --ifm-button-background-color: var(--ifm-color-primary-normal);
+  --ifm-button-border-color: var(--ifm-color-primary-normal);
 }
 
 .button.button--develop {
   @extend .button--common;
   --ifm-button-background-color: var(--ifm-color-primary-develop);
   --ifm-button-border-color: var(--ifm-color-primary-develop);
+}
+
+.button.button--contribute {
+  @extend .button--common;
+  --ifm-button-background-color: var(--ifm-color-primary-contribute);
+  --ifm-button-border-color: var(--ifm-color-primary-contribute);
 }
