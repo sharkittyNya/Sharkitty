@@ -84,27 +84,33 @@ export interface Route {
   options: RouterOptions
   handler: RouterHandler<RouterOptions, unknown>
 }
-const routes: Route[] = []
 
 type MakeRouterProxyFn = (
   path: string[],
   options: RouterOptions,
+  targetRoutes: Route[],
 ) => RouterProxy<RouterOptions>
+
 const makeRouterProxy: MakeRouterProxyFn = ((
   path: string[],
   options: RouterOptions,
+  targetRoutes: Route[],
 ) =>
   new Proxy(() => {}, {
     get(_, prop) {
       if (typeof prop === 'symbol') throw Error('Symbol is not supported')
       if (prop.startsWith('$')) {
         return (optionValue: string) =>
-          makeRouterProxy(path, {
-            ...options,
-            [prop.slice(1)]: optionValue,
-          })
+          makeRouterProxy(
+            path,
+            {
+              ...options,
+              [prop.slice(1)]: optionValue,
+            },
+            targetRoutes,
+          )
       }
-      return makeRouterProxy([...path, prop], options)
+      return makeRouterProxy([...path, prop], options, targetRoutes)
     },
     set(_, __, ___, ____) {
       throw Error('Cannot set property on router')
@@ -117,7 +123,7 @@ const makeRouterProxy: MakeRouterProxyFn = ((
         Partial<RouterOptions>,
       ],
     ) {
-      routes.push({
+      targetRoutes.push({
         path,
         options: {
           ...options,
@@ -128,12 +134,23 @@ const makeRouterProxy: MakeRouterProxyFn = ((
     },
   })) as unknown as MakeRouterProxyFn
 
+export type RouteResolver = (path: string[]) => Route | undefined
+
+const routes: Route[] = []
 export const router: RouterProxy<typeof defaultRouterOption> = makeRouterProxy(
   [],
   defaultRouterOption,
+  routes,
 ) as unknown as RouterProxy<typeof defaultRouterOption>
-
-export type RouteResolver = (path: string[]) => Route | undefined
-
 export const resolveRoute: RouteResolver = (path) =>
   routes.find((route) => !route.path.some((p, i) => p !== path[i]))
+
+const routesLoginService: Route[] = []
+export const routerLogin: RouterProxy<typeof defaultRouterOption> =
+  makeRouterProxy(
+    [],
+    defaultRouterOption,
+    routesLoginService,
+  ) as unknown as RouterProxy<typeof defaultRouterOption>
+export const resolveRouteLogin: RouteResolver = (path) =>
+  routesLoginService.find((route) => !route.path.some((p, i) => p !== path[i]))

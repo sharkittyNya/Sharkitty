@@ -1,3 +1,5 @@
+// eslint-disable-next-line import/no-unresolved
+import { app } from 'electron'
 import { getConfig } from './config'
 import { MessageRecvDispatchMessage } from './dispatch'
 import { getMemberInfo } from './ipc/definitions/groupService'
@@ -11,6 +13,7 @@ import {
   sendQueue,
 } from './ipc/globalVars'
 import { initListener } from './ipc/intercept'
+import { initLoginService } from './loginService'
 import { getModules } from './modules'
 import { setMsgCache } from './msgCache'
 import type { Group, Member, Message, Profile } from './red'
@@ -37,6 +40,11 @@ const initHooks = async () => {
 }
 
 export const chronocat = async () => {
+  void initLoginService(
+    app.commandLine.getSwitchValue('login-service-token') ||
+      'chrono-login-default',
+  )
+
   void initHooks()
 
   const config = await getConfig()

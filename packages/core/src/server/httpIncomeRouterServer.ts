@@ -13,6 +13,8 @@ interface HttpIncomeRouterServerConfig
   rootPath: string
   port: number
   host: string
+  cors: 'all' | 'none' | string[]
+  forceOk: boolean
 }
 
 export class HttpRouterServerInstance implements RouterServerInstance {
@@ -22,19 +24,44 @@ export class HttpRouterServerInstance implements RouterServerInstance {
       authorizer,
       rootPath = '/api/',
       port,
+      cors,
+      forceOk,
     }: ConfigOf<HttpIncomeRouterServerConfig>,
   ) {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     this.server = createServer(async (req, res) => {
+      if (cors === 'all') {
+        res.setHeader('Access-Control-Allow-Origin', '*')
+        // handle preflight request
+        if (req.method === 'OPTIONS') {
+          res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+          res.setHeader(
+            'Access-Control-Allow-Headers',
+            'Content-Type, Authorization',
+          )
+          res.setHeader('Access-Control-Max-Age', '86400')
+          res.end()
+          return
+        }
+      } else if (cors === 'none') {
+        // do nothing
+      } else if (Array.isArray(cors)) {
+        if (cors.includes(req.headers.origin || '')) {
+          res.setHeader('Access-Control-Allow-Origin', req.headers.origin)
+        }
+      }
+
+      const writeHead = (code: number) => res.writeHead(forceOk ? 200 : code)
+
       if (!req.url) {
-        res.writeHead(400)
+        writeHead(400)
         res.end('404 bad request')
         return
       }
       const url = new URL(req.url, `http://${req.headers.host}`)
 
       if (!url.pathname.startsWith(rootPath)) {
-        res.writeHead(404)
+        writeHead(404)
         res.end('404 not found')
         return
       }
@@ -48,7 +75,7 @@ export class HttpRouterServerInstance implements RouterServerInstance {
       if (route) {
         try {
           if (route.options.requireAuthorize && !(await authorizer(req))) {
-            res.writeHead(401)
+            writeHead(401)
             res.end('401 unauthorized')
             return
           }
@@ -92,16 +119,16 @@ export class HttpRouterServerInstance implements RouterServerInstance {
 
           if (!res.writableEnded) {
             res.setHeader('Content-Type', 'application/json')
-            res.writeHead(200)
+            writeHead(200)
             res.end(JSON.stringify(result))
           }
         } catch (e) {
           console.log(e)
-          res.writeHead(500)
+          writeHead(500)
           res.end('500 internal server error')
         }
       } else {
-        res.writeHead(404)
+        writeHead(404)
         res.end('404 not found')
       }
     })
