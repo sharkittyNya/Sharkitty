@@ -1,14 +1,11 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
+import type { IncomingMessage, ServerResponse } from 'node:http'
 import { WebSocket } from 'ws'
+import type { Route, RouteResolver } from '../router'
 import type {
-  ConfigOf,
-  RouteResolver,
   RouterServer,
   RouterServerCommonConfig,
   RouterServerInstance,
 } from './abstract'
-import type { Route } from '../router'
 
 type JSONPacket = {
   type: string
@@ -34,9 +31,9 @@ export class WebsocketRouterServerInstance implements RouterServerInstance {
       authorizer,
       address,
       connectPayload,
-    }: ConfigOf<WebSocketOutcomeRouterServerConfig>,
+    }: Partial<WebSocketOutcomeRouterServerConfig>,
   ) {
-    this.client = new WebSocket(address)
+    this.client = new WebSocket(address!)
     const client = this.client
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     client.on('open', async () => {
@@ -48,7 +45,7 @@ export class WebsocketRouterServerInstance implements RouterServerInstance {
           const { type, payload } = packet
 
           if (type === 'meta::connect') {
-            if (!(await authorizer(payload))) {
+            if (!(await authorizer!(payload))) {
               client.close(401)
               return
             }
@@ -61,7 +58,7 @@ export class WebsocketRouterServerInstance implements RouterServerInstance {
               if (typeof type !== 'string') return
               const path = packet.type.split('::')
               const route = resolveRoute(path)
-              await this.handleRoute(route, client, packet)
+              await this.handleRoute(route!, client, packet)
             })
 
             client.on('close', () => {
@@ -71,15 +68,15 @@ export class WebsocketRouterServerInstance implements RouterServerInstance {
             client.send(
               JSON.stringify({
                 type: 'meta::connect',
-                payload: connectPayload(),
+                payload: connectPayload!(),
               }),
             )
           } else if (typeof type === 'string') {
             const path = type.split('::')
             const route = resolveRoute(path)
-            if (route.options.requireAuthorize) throw Error('Authorize needed')
+            if (route?.options.requireAuthorize) throw Error('Authorize needed')
             else {
-              await this.handleRoute(route, client, packet)
+              await this.handleRoute(route!, client, packet)
             }
           } else throw new Error('Invalid API type')
         } catch (e) {
@@ -90,7 +87,7 @@ export class WebsocketRouterServerInstance implements RouterServerInstance {
   }
 
   public readonly client: WebSocket
-  private authorizedClient: WebSocket
+  private authorizedClient: WebSocket | undefined
 
   async handleRoute(route: Route, client: WebSocket, packet: JSONPacket) {
     const reply = (payload: unknown) =>
@@ -133,7 +130,10 @@ export class WebsocketRouterServerInstance implements RouterServerInstance {
 
       const ctx = {
         body: payload,
-        http: undefined,
+        http: undefined as unknown as {
+          req: IncomingMessage
+          res: ServerResponse
+        },
       }
 
       try {
@@ -155,7 +155,7 @@ export class WebsocketRouterServerInstance implements RouterServerInstance {
   }
 
   broadcast(type: string, payload: unknown): void {
-    this.authorizedClient.send(
+    this.authorizedClient!.send(
       JSON.stringify({
         type,
         payload,

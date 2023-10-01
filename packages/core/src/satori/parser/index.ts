@@ -350,12 +350,12 @@ async function parseGuildMemberAddedLegacyInviteMessage(
   const [_, operatorId, userId] = execArr
 
   event2.operator = {
-    id: operatorId as string,
+    id: operatorId,
     name: undefined as unknown as string,
   }
 
   event2.user = {
-    id: userId as string,
+    id: userId,
     name: undefined as unknown as string,
     avatar: `http://q.qlogo.cn/headimg_dl?dst_uin=${userId}&spec=640`,
   }
