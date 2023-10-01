@@ -1,20 +1,20 @@
-import type { Server } from 'node:http'
-import { WebSocketServer } from 'ws'
+import type { IncomingMessage, Server, ServerResponse } from 'node:http'
 import type { WebSocket } from 'ws'
+import { WebSocketServer } from 'ws'
+import type { MetaConnectPayload } from '../red'
+import type { Route, RouteResolver } from '../router'
 import type {
-  ConfigOf,
-  RouteResolver,
   RouterServer,
   RouterServerCommonConfig,
   RouterServerInstance,
 } from './abstract'
-import type { Route } from '../router'
 
 type JSONPacket = {
   type: string
   payload: JSONPayloadPacket
   echo: unknown
 }
+
 type JSONPayloadPacket = unknown
 
 type WebSocketInitiator =
@@ -30,7 +30,7 @@ type WebSocketInitiator =
 type WebSocketIncomeRouterServerConfig = {
   rootPath: string
   connectPayload: () => unknown
-} & RouterServerCommonConfig<JSONPayloadPacket> &
+} & RouterServerCommonConfig<MetaConnectPayload> &
   WebSocketInitiator
 
 export class WebsocketRouterServerInstance implements RouterServerInstance {
@@ -42,7 +42,7 @@ export class WebsocketRouterServerInstance implements RouterServerInstance {
       mountHTTPServer,
       port,
       connectPayload,
-    }: ConfigOf<WebSocketIncomeRouterServerConfig>,
+    }: Partial<WebSocketIncomeRouterServerConfig>,
   ) {
     this.server = new WebSocketServer({
       server: mountHTTPServer,
@@ -60,7 +60,7 @@ export class WebsocketRouterServerInstance implements RouterServerInstance {
           const { type, payload } = packet
 
           if (type === 'meta::connect') {
-            if (!(await authorizer(payload))) {
+            if (!(await authorizer!(payload as MetaConnectPayload))) {
               client.close(3000, 'Unauthorized')
               return
             }
@@ -86,13 +86,13 @@ export class WebsocketRouterServerInstance implements RouterServerInstance {
             client.send(
               JSON.stringify({
                 type: 'meta::connect',
-                payload: connectPayload(),
+                payload: connectPayload!(),
               }),
             )
           } else if (typeof type === 'string') {
             const path = type.split('::')
             const route = resolveRoute(path)
-            if (route.options.requireAuthorize) throw Error('Authorize needed')
+            if (route?.options.requireAuthorize) throw Error('Authorize needed')
             else {
               await this.handleRoute(route, client, packet)
             }
@@ -107,11 +107,15 @@ export class WebsocketRouterServerInstance implements RouterServerInstance {
   public readonly server: WebSocketServer
   public readonly wsAuthedClients: WebSocket[] = []
 
-  async handleRoute(route: Route, client: WebSocket, packet: JSONPacket) {
+  async handleRoute(
+    route: Route | undefined,
+    client: WebSocket,
+    packet: JSONPacket,
+  ) {
     const reply = (payload: unknown) =>
       client.send(
         JSON.stringify({
-          type: `${route.path.join('::')}::reply`,
+          type: `${route?.path.join('::')}::reply`,
           payload,
           echo: packet.echo,
         }),
@@ -148,7 +152,10 @@ export class WebsocketRouterServerInstance implements RouterServerInstance {
 
       const ctx = {
         body: payload,
-        http: undefined,
+        http: undefined as unknown as {
+          req: IncomingMessage
+          res: ServerResponse
+        },
       }
 
       try {

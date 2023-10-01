@@ -218,7 +218,7 @@ export const chronocat = async () => {
         const { msgRecord } = Payload as {
           msgRecord: Message
         }
-        sendCallbackMap[msgRecord.msgId] = sendQueue.shift()
+        sendCallbackMap[msgRecord.msgId] = sendQueue.shift()!
         return
       }
 

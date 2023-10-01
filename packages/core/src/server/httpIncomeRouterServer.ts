@@ -1,8 +1,7 @@
-import type { IncomingMessage, Server } from 'node:http'
+import type { IncomingMessage, Server, ServerResponse } from 'node:http'
 import { createServer } from 'node:http'
+import type { RouteResolver } from '../router'
 import type {
-  ConfigOf,
-  RouteResolver,
   RouterServer,
   RouterServerCommonConfig,
   RouterServerInstance,
@@ -26,7 +25,7 @@ export class HttpRouterServerInstance implements RouterServerInstance {
       port,
       cors,
       forceOk,
-    }: ConfigOf<HttpIncomeRouterServerConfig>,
+    }: Partial<HttpIncomeRouterServerConfig>,
   ) {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     this.server = createServer(async (req, res) => {
@@ -46,7 +45,7 @@ export class HttpRouterServerInstance implements RouterServerInstance {
       } else if (cors === 'none') {
         // do nothing
       } else if (Array.isArray(cors)) {
-        if (cors.includes(req.headers.origin || '')) {
+        if (req.headers.origin && cors.includes(req.headers.origin || '')) {
           res.setHeader('Access-Control-Allow-Origin', req.headers.origin)
         }
       }
@@ -74,7 +73,7 @@ export class HttpRouterServerInstance implements RouterServerInstance {
       const route = resolveRoute(path)
       if (route) {
         try {
-          if (route.options.requireAuthorize && !(await authorizer(req))) {
+          if (route.options.requireAuthorize && !(await authorizer!(req))) {
             writeHead(401)
             res.end('401 unauthorized')
             return
@@ -108,9 +107,12 @@ export class HttpRouterServerInstance implements RouterServerInstance {
           }
 
           const ctx = {
-            http: route.options.httpOnly && {
+            http: (route.options.httpOnly && {
               req,
               res,
+            }) as unknown as {
+              req: IncomingMessage
+              res: ServerResponse
             },
             body,
           }

@@ -28,28 +28,28 @@ router.upload.$httpOnly('POST')(
       bb.on('error', reject)
 
       bb.on('file', (_name, file, info) => {
-        f = (async () => {
-          const saveTo = join(baseDir, `redprotocol-upload`)
-          await mkdir(saveTo, { recursive: true })
-          const filePath = join(
-            saveTo,
-            `${randomFillSync(Buffer.alloc(16)).toString('hex')}-${
-              info.filename
-            }`,
-          )
+        const saveTo = join(baseDir, `redprotocol-upload`)
+        const filePath = join(
+          saveTo,
+          `${randomFillSync(Buffer.alloc(16)).toString('hex')}-${
+            info.filename
+          }`,
+        )
 
-          return await new Promise((resolve2, reject2) =>
-            file
-              .pipe(createWriteStream(filePath))
-              .on('finish', () =>
-                resolve2({
-                  filePath,
-                  fileInfo: info,
-                }),
-              )
-              .on('error', reject2),
-          )
-        })()
+        f = mkdir(saveTo, { recursive: true }).then(
+          () =>
+            new Promise((resolve2, reject2) =>
+              file
+                .pipe(createWriteStream(filePath))
+                .on('finish', () =>
+                  resolve2({
+                    filePath,
+                    fileInfo: info,
+                  }),
+                )
+                .on('error', reject2),
+            ),
+        )
       })
 
       // eslint-disable-next-line @typescript-eslint/no-misused-promises

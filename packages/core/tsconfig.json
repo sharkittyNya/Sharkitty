@@ -3,18 +3,6 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "lib",
-    "noPropertyAccessFromIndexSignature": false,
-    "target": "ES2022",
-    "strict": false,
-    "exactOptionalPropertyTypes": false,
-    "plugins": [
-      {
-        "name": "typescript-strict-plugin",
-        "paths": [
-          "src/routes"
-        ]
-      }
-    ]
   },
   "include": [
     "src",

@@ -1,23 +1,20 @@
 import type { RouteResolver } from '../router'
 
-export type RouterServerCommonConfig<AuthorizerInput> = {
+export interface RouterServerCommonConfig<AuthorizerInput> {
   authorizer: (input: AuthorizerInput) => boolean | Promise<boolean>
 }
 
-export type ConfigOf<ConfigType> = Partial<ConfigType> &
-  RouterServerCommonConfig<unknown>
-
 export interface RouterServer<
-  ConfigType extends RouterServerCommonConfig<unknown>,
+  // 无法满足的协变
+  // https://stackoverflow.com/questions/67738449/generic-function-parameter-with-unknown-args
+  ConfigType, // extends RouterServerCommonConfig<unknown>
 > {
   createServer(
     resolveRoute: RouteResolver,
-    config: ConfigOf<ConfigType>,
+    config: Partial<ConfigType>,
   ): RouterServerInstance
 }
 
 export interface RouterServerInstance {
   stop(): void
 }
-
-export type { RouteResolver }

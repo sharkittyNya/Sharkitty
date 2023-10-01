@@ -1,4 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
+import type { Object } from 'ts-toolbelt'
 
 type RouterOptions = {
   body: BodyType
@@ -13,6 +14,7 @@ const defaultRouterOption = {
 } as const
 
 type BodyType = 'binary' | 'json' | 'text' | 'none'
+
 type RouterHandlerContext<RouterOption extends RouterOptions> = {
   body: RouterOption['body'] extends 'text'
     ? string
@@ -30,6 +32,7 @@ type RouterHandlerContext<RouterOption extends RouterOptions> = {
         res: ServerResponse
       }
 }
+
 type RouterHandler<RouterOption extends RouterOptions, T> = (
   ctx: RouterHandlerContext<RouterOption>,
 ) => T | Promise<T>
@@ -50,20 +53,9 @@ type RouterOptionDeclaratorKeys = {
   [key in keyof RouterOptions as `$${string & key}`]: unknown
 }
 
-type Merge<A, B> = {
-  [K in keyof A | keyof B]: K extends keyof B
-    ? [B[K]] extends [undefined]
-      ? K extends keyof A
-        ? A[K]
-        : never
-      : B[K]
-    : K extends keyof A
-    ? A[K]
-    : never
-}
-
 type RouterOptionsDeclarators<RouterOption extends RouterOptions> =
   RouterOptionsToDeclarator<RouterOption>
+
 type RouterProxy<RouterOption extends RouterOptions> = {
   [K in keyof Omit<
     never,
@@ -72,7 +64,7 @@ type RouterProxy<RouterOption extends RouterOptions> = {
 } & {
   (handler: RouterHandler<RouterOption, unknown>): undefined
   <T extends Partial<RouterOptions>>(
-    handler: RouterHandler<Merge<RouterOption, T>, unknown>,
+    handler: RouterHandler<Object.Merge<RouterOption, T>, unknown>,
     options: T,
   ): undefined
 } & {

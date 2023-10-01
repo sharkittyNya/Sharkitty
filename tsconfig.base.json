@@ -10,5 +10,7 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
+    "noUncheckedIndexedAccess": false,
+    "noPropertyAccessFromIndexSignature": false
   }
 }

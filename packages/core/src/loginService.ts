@@ -1,12 +1,12 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { resolveRouteLogin, routerLogin } from './router'
+// eslint-disable-next-line import/no-unresolved
+import type { WebContents } from 'electron'
 // eslint-disable-next-line import/no-unresolved
 import { app, BrowserWindow, ipcMain } from 'electron'
 import { HeaderAuthorizer } from './server/authorizer'
 import { httpRouterServer } from './server/httpIncomeRouterServer'
+import type { IpcEvent } from './types'
 import { getAuthData } from './utils/authData'
-import { inspect } from 'util'
 
 interface QuickLoginAccount {
   name: string
@@ -14,8 +14,8 @@ interface QuickLoginAccount {
 }
 
 interface LoginState {
-  qrcode?: string
-  quickLoginAccounts?: QuickLoginAccount[]
+  qrcode?: string | null
+  quickLoginAccounts?: QuickLoginAccount[] | null
 }
 
 const loginState: LoginState = {}
@@ -131,11 +131,22 @@ export const initLoginService = (token: string) => {
 
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const originEmit = ipcMain.emit.bind(ipcMain)
-  ipcMain.emit = (...args) => {
+  ipcMain.emit = (eventName: string | symbol, ...p: unknown[]) => {
     try {
-      if (args?.[2]?.eventName === 'chronocat') {
-        console.log(inspect(args))
-        const { type, data } = args[3][0]
+      const p1 = p?.[1] as IpcEvent
+      const p2 = p?.[2] as unknown[] | undefined
+
+      if (p1?.eventName === 'chronocat') {
+        const { type, data } = p2![0] as {
+          type: 'quickloginList'
+          data: QuickLoginAccount[]
+        } & {
+          type: 'qrcode'
+          data: string
+        } & {
+          type: 'quickloginError'
+        }
+
         if (type === 'quickloginList') {
           loginState.quickLoginAccounts = data
           loginState.qrcode = null
@@ -152,7 +163,7 @@ export const initLoginService = (token: string) => {
       console.error(e)
     }
 
-    return originEmit(...args)
+    return originEmit(eventName, ...p)
   }
 
   void getAuthData().then(() => {
@@ -161,11 +172,12 @@ export const initLoginService = (token: string) => {
   })
 }
 
-const runScriptInRenderer = (renderer, script: string) => {
+const runScriptInRenderer = (
+  renderer: BrowserWindow | WebContents,
+  script: string,
+) =>
   // use javascript: protocol to run script in renderer
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-  renderer.loadURL(`javascript:eval(decodeURI(\`${encodeURI(script)}\`))`)
-}
+  void renderer.loadURL(`javascript:eval(decodeURI(\`${encodeURI(script)}\`))`)
 
 const runScriptInAllRenderers = (script: string) => {
   for (const renderer of BrowserWindow.getAllWindows()) {
