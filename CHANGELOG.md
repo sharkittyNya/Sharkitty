@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v0.0.48 (2023-10-02)
+
+### core
+
+- 更新登录逻辑 (8317e0eeb30977e45553c5fe3d2f74956371e842)
+- Satori：修复了 Channel 和 Member 对象错误携带 `avatar` 字段的问题 (b1f862e642291be2518f780284401cea291898e1)
+- Satori：无法获取用户名时不提供 `user.name` (55c3b2313d0f5ff252192a29bcd646506e68d420)
+- Satori：不使用 `POST` 调用 API 时返回 `405 Method Not Allowed` (8136cfc5fcb5426142a55541ba6272fb38eb7eb7)
+- Red：修复了 API `message/fetchRichMedia` 返回缩略图而非原图的问题 (5e5b3941a7036dd76822d3fbf1dacf9864f691de)
+
 ## v0.0.47 (2023-09-29)
 
 ### core
