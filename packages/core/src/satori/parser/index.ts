@@ -102,7 +102,7 @@ export const parseMessage = async (
 
   event.user = {
     id: message.senderUin,
-    name: message.sendNickName,
+    name: (message.sendNickName || undefined) as unknown as string,
     avatar: `http://q.qlogo.cn/headimg_dl?dst_uin=${message.senderUin}&spec=640`,
   }
 
