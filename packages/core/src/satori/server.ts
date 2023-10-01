@@ -9,6 +9,7 @@ import { timeout } from '../utils/time'
 import index from './index.html'
 import type { Routes } from './routes'
 import { routes } from './routes'
+import { assets } from './routes/assets'
 import type { WebSocketIncomingMessage } from './types'
 import { Op } from './types'
 
@@ -72,7 +73,35 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
       return
     }
 
-    const method = routes[url.pathname.slice(prefix.length) as Routes]
+    const path = url.pathname.slice(prefix.length)
+
+    if (path.startsWith('assets')) {
+      if (req.method !== 'GET') {
+        res.writeHead(405)
+        res.end('405 method not allowed')
+        return
+      }
+
+      try {
+        void assets({
+          raw: path.slice(prefix.length + 'assets/'.length),
+          ...buildRouteCtx(req, res),
+        })
+
+        if (!res.writableEnded) throw new Error()
+
+        return
+      } catch (e) {
+        console.log(e)
+
+        res.writeHead(500)
+        res.end('500 internal server error')
+
+        return
+      }
+    }
+
+    const method = routes[path as Routes]
 
     if (!method) {
       res.writeHead(404)
