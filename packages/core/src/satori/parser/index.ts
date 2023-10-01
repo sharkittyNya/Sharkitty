@@ -125,13 +125,11 @@ export const parseMessage = async (
       event.member = {} as Member
 
       if (message.sendMemberName) event.member.name = message.sendMemberName
-      event.member.avatar = `http://q.qlogo.cn/headimg_dl?dst_uin=${message.senderUin}&spec=640`
 
       event.channel.type = ChannelType.TEXT
       event.channel.id = event.guild.id = message.peerUid
       event.channel.name = event.guild.name = message.peerName
-      event.channel.avatar =
-        event.guild.avatar = `https://p.qlogo.cn/gh/${message.peerUid}/${message.peerUid}/640`
+      event.guild.avatar = `https://p.qlogo.cn/gh/${message.peerUid}/${message.peerUid}/640`
       break
   }
 
