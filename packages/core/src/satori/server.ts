@@ -81,8 +81,8 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
     }
 
     if (req.method !== 'POST') {
-      res.writeHead(400)
-      res.end('400 bad request')
+      res.writeHead(405)
+      res.end('405 method not allowed')
       return
     }
 
