@@ -26,7 +26,7 @@ router.message.fetchRichMedia.$body('json').$httpOnly(true)(
         peerUid,
         elementId,
         thumbSize: 0,
-        downloadType: 2,
+        downloadType: 1,
       },
     })
 
