@@ -3,6 +3,7 @@ import { resolveRouteLogin, routerLogin } from './router'
 import type { WebContents } from 'electron'
 // eslint-disable-next-line import/no-unresolved
 import { app, BrowserWindow, ipcMain } from 'electron'
+import index from '../static/login.html'
 import loginJs from '../static/login.js.txt'
 import { HeaderAuthorizer } from './server/authorizer'
 import { httpRouterServer } from './server/httpIncomeRouterServer'
@@ -122,4 +123,13 @@ routerLogin.qrcode(() => {
 routerLogin.quickLogin.$body('json')(({ body }) => {
   const { id } = body as { id: string }
   runScriptInAllRenderers(`quickLogin('${parseInt(id)}')`)
+})
+
+routerLogin.$httpOnly('GET')(({ http }) => {
+  http.res.writeHead(200, {
+    'Content-Type': 'text/html; charset=UTF-8',
+    'Cache-Control': 'no-cache',
+    'Content-Length': index.byteLength,
+  })
+  http.res.end(index)
 })
