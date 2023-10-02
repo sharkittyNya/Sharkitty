@@ -3,6 +3,7 @@ import { resolveRouteLogin, routerLogin } from './router'
 import type { WebContents } from 'electron'
 // eslint-disable-next-line import/no-unresolved
 import { app, BrowserWindow, ipcMain } from 'electron'
+import loginJs from '../static/login.js.txt'
 import { HeaderAuthorizer } from './server/authorizer'
 import { httpRouterServer } from './server/httpIncomeRouterServer'
 import type { IpcEvent } from './types'
@@ -47,85 +48,7 @@ export const initLoginService = (token: string) => {
 
   app.once('browser-window-created', (_event, window) => {
     window.webContents.on('did-finish-load', () => {
-      runScriptInRenderer(
-        window.webContents,
-        `
-      function waitForFunction(y, m = 100) { return new Promise(s => {
-        let e;
-        const check = () => { let d = y(); d && (clearInterval(e), s(d)) }
-        e = setInterval(check, m)
-      }) }
-      function waitForElement(y, m = 100) { return waitForFunction(() => document.querySelector(y), m) }
-
-      !(async()=>{
-        const sleep = (ms)=>new Promise(rs=>setTimeout(rs, ms))
-        await sleep(100)
-
-        const autoLoginPanel = document.querySelector('.auto-login')
-        const scanPanel = document.querySelector('.scan')
-
-        const moreAccountBtn = document.querySelector('[aria-label="更多账号"]')
-        const newAccountBtn = document.querySelector('[aria-label="添加账号"]')
-
-
-        const getUinByAvatarPath = path=>path.split('/Data/')[1].split('/')[0]
-
-        const sendMessageBack = (type, data)=>{
-          ipcRenderer.send('chronocat', JSON.parse(JSON.stringify({type, data})))
-        }
-
-        let qrcodeRefreshHandler = null
-        window.getQRCode = async ()=>{
-          newAccountBtn.click()
-          const qrcodeElement = await waitForElement('.qr-code-img > img')
-          const qrcode = qrcodeElement.src
-          sendMessageBack('qrcode', qrcode)
-
-          if(qrcodeRefreshHandler) clearInterval(qrcodeRefreshHandler)
-          qrcodeRefreshHandler = setInterval(async ()=>{
-            const refreshBtn = document.querySelector('.refresh')?.firstElementChild
-            if(refreshBtn) {
-              refreshBtn.click()
-              await sleep(100)
-            }
-
-            const qrcodeElement = await waitForElement('.qr-code-img > img')
-            sendMessageBack('qrcode', qrcodeElement.src)
-          }, 400)
-        }
-
-        if(moreAccountBtn) {
-          moreAccountBtn.click()
-          await sleep(100)
-          const loginList = [...(await waitForElement('.manage-account')).children].map(v=>({
-            name: v.querySelector('.process-txt').innerText,
-            id: getUinByAvatarPath(v.querySelector('.avatar').style.backgroundImage),
-            login: ()=>v.firstElementChild.click()
-          }))
-
-          window.quickLogin = (id)=>{
-            const account = loginList.find(v=>v.id===id)
-            if(account) account.login()
-            else sendMessageBack('quickloginError', 'account not found')
-          }
-
-          sendMessageBack('quickloginList', loginList)
-        } else {
-          window.quickLogin = ()=>{
-            document.evaluate('//span[text()="登录"]', document).iterateNext().parentElement.parentElement.click()
-          }
-
-          sendMessageBack('quickloginList', [
-            {
-              name: document.querySelector('.name').innerText,
-              id: getUinByAvatarPath(document.querySelector('.avatar').style.backgroundImage),
-            }
-          ])
-        }
-      })()
-
-      `,
-      )
+      runScriptInRenderer(window.webContents, loginJs)
     })
   })
 
