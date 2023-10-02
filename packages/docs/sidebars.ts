@@ -29,6 +29,7 @@ const sidebars: SidebarsConfig = {
         'install/trusted-installation',
       ],
     },
+    'launch/index',
     {
       type: 'category',
       label: '接入',

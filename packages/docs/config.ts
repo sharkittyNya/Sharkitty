@@ -48,6 +48,10 @@ const themeConfig: ThemeConfig = {
             to: 'install',
           },
           {
+            label: '启动',
+            to: 'launch',
+          },
+          {
             label: '接入',
             to: 'connect',
           },
@@ -100,6 +104,10 @@ const themeConfig: ThemeConfig = {
           {
             label: '安装',
             to: '/install',
+          },
+          {
+            label: '启动',
+            to: '/launch',
           },
           {
             label: '接入',

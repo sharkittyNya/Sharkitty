@@ -1,0 +1,78 @@
+---
+title: 启动
+---
+
+Chronocat 提供了多种启动方式，你可以根据自己的需求进行选择。
+
+## 常规启动（推荐）
+
+在你没有特殊需求的情况下，我们总是推荐使用常规方式启动 Chronocat。
+
+直接点击「QQ」进行启动即可。QQ 启动并登录账号后，Chronocat 会自动启动。
+
+直接使用浏览器访问 Chronocat 启动的 Satori 服务即可判断 Chronocat 是否正在运行。
+
+## 使用 Chronocat CLI 无头启动（推荐）
+
+如果你追求更低的内存占用，则可以使用 Chronocat CLI 启动。QQ
+将不会以窗口模式启动，因此占用内存将会大幅降低。使用 Chronocat CLI 模式的情况下，QQ
+的内存占用约在 60M 左右。
+
+如果你正在开发基于 Chronocat 的框架或适配器，则可以内置 Chronocat
+CLI，并使用 Chronocat CLI 进行无头启动。
+
+### 直接启动
+
+直接点击「chronocli」文件进行启动即可。Chronocat CLI
+会自动提示你进行登录。你也可以使用给出的网页链接在网页中登录。
+
+## 辅助登录
+
+如果你希望在正常启动 QQ 的同时使用 Chronocat 进行 QQ 登录，则可以选择辅助登录。
+
+启动 QQ 时附加如下的命令行参数或环境变量，则 Chronocat 将启用辅助登录。
+
+```sh
+./QQ --chrono-mode=login
+```
+
+```ini
+CHRONO_MODE=login
+```
+
+登录服务的服务密码默认随机生成。可附加如下的命令行参数或环境变量用作登录服务的服务密码。如果同时存在，则使用命令行参数。
+
+```sh
+./QQ --chrono-admin-token=my-token
+```
+
+```ini
+CHRONO_ADMIN_TOKEN=my-token
+```
+
+登录服务的默认监听地址为
+`0.0.0.0:16340`。可附加如下的命令行参数或环境变量来改变登录服务的监听地址。如果同时存在，则使用命令行参数。
+
+```sh
+./QQ --chrono-admin-listen=127.0.0.1:16341
+```
+
+```ini
+CHRONO_ADMIN_LISTEN=127.0.0.1:16341
+```
+
+## 手动无头启动
+
+如果你正在开发基于 Chronocat 的框架或适配器，你也可以选择使用手动无头启动。
+
+启动 QQ 时附加如下的命令行参数或环境变量，则 Chronocat 将使用无头启动。
+
+```sh
+./QQ --chrono-mode=headless
+```
+
+```ini
+CHRONO_MODE=headless
+```
+
+启用 `headless` 时会自动同时启用 `login`。
