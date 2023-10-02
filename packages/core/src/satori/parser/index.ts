@@ -254,7 +254,7 @@ async function parseGuildMemberAddedMessage(
   message: RedMessage,
 ) {
   const [event2, extraEvents] = await parseChatMessage(config, event, message)
-  event2.type = 'guild-added'
+  event2.type = 'guild-member-added'
 
   event2.operator = {
     id: message.elements[0]!.grayTipElement!.groupElement!.adminUin!,
@@ -339,7 +339,7 @@ async function parseGuildMemberAddedLegacyInviteMessage(
   message: RedMessage,
 ) {
   const [event2, extraEvents] = await parseChatMessage(config, event, message)
-  event2.type = 'guild-added'
+  event2.type = 'guild-member-added'
 
   const execArr = regexGuildMemberAddedLegacyInviteMessage.exec(
     message.elements[0]!.grayTipElement!.xmlElement!.content!,
