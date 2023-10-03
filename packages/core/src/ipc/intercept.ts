@@ -10,7 +10,7 @@ export const initListener = (
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const emit = ipcMain.emit
 
-  let i = 1
+  // let i = 1
 
   ipcMain.emit = function (eventName: string | symbol, ...p: unknown[]) {
     const p0 = p[0] as {
