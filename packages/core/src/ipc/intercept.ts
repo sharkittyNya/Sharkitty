@@ -10,6 +10,8 @@ export const initListener = (
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const emit = ipcMain.emit
 
+  let i = 1
+
   ipcMain.emit = function (eventName: string | symbol, ...p: unknown[]) {
     const p0 = p[0] as {
       sender: {
@@ -47,9 +49,10 @@ export const initListener = (
             responseMap[evt.callbackId]!.resolved = detail
 
           // console.log(
-          //   `%cChronocat%cResponse%c${requestMap[evt.callbackId]!.EventName}/${
-          //     requestMap[evt.callbackId]!.Method
-          //   }`,
+          //   `%c${i++}%cChronocat%cResponse%c${
+          //     requestMap[evt.callbackId]!.EventName
+          //   }/${requestMap[evt.callbackId]!.Method}`,
+          //   'background:#6ff;color:black;padding: 2px 4px;',
           //   'background:#111;color:white;padding: 2px 8px;',
           //   'background:#292;color:white;padding: 2px 8px;',
           //   'background:#555;color:white;padding: 2px 8px;',
@@ -57,13 +60,17 @@ export const initListener = (
           //   detail,
           // )
         } else {
-          // console.log(
-          //   `%cChronocat%cEvent%c${evt.eventName}/${detail[0]!.cmdName}`,
-          //   'background:#111;color:white;padding: 2px 8px;',
-          //   'background:#229;color:white;padding: 2px 8px;',
-          //   'background:#555;color:white;padding: 2px 8px;',
-          //   detail[0]?.payload,
-          // )
+          // if (evt.eventName !== 'BQQNT_IPC_inspector:log')
+          //   console.log(
+          //     `%c${i++}%cChronocat%cEvent%c${evt.eventName}/${
+          //       detail[0]!.cmdName
+          //     }`,
+          //     'background:#6ff;color:black;padding: 2px 4px;',
+          //     'background:#111;color:white;padding: 2px 8px;',
+          //     'background:#229;color:white;padding: 2px 8px;',
+          //     'background:#555;color:white;padding: 2px 8px;',
+          //     detail[0]?.payload,
+          //   )
         }
         delete requestMap[evt.callbackId]
       }
@@ -84,7 +91,8 @@ export const initListener = (
     requestMap[p1?.callbackId] = ipcInfo
 
     // console.debug(
-    //   `%cChronocat%cRequest%c${ipcInfo.EventName}/${ipcInfo.Method}`,
+    //   `%c${i++}%cChronocat%cRequest%c${ipcInfo.EventName}/${ipcInfo.Method}`,
+    //   'background:#6ff;color:black;padding: 2px 4px;',
     //   'background:#111;color:white;padding: 2px 8px;',
     //   'background:#922;color:white;padding: 2px 8px;',
     //   'background:#555;color:white;padding: 2px 8px;',
