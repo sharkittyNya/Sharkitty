@@ -26,6 +26,14 @@ declare const authData: {
   uid: string
 }
 
+declare global {
+  // eslint-disable-next-line no-var
+  var __CHRONO_DEBUG__: {
+    uixCache: typeof uixCache
+    enableInterceptLog: typeof enableInterceptLog
+  }
+}
+
 const initHooks = async () => {
   try {
     const modules = await getModules()
@@ -37,8 +45,7 @@ const initHooks = async () => {
 }
 
 export const chronocat = async () => {
-  // @ts-expect-error set global
-  global.CHRONO_DEBUG = {
+  global.__CHRONO_DEBUG__ = {
     uixCache,
     enableInterceptLog,
   }

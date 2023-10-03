@@ -96,14 +96,15 @@ export const initListener = (
     responseMap[p1?.callbackId] ??= {}
     requestMap[p1?.callbackId] = ipcInfo
 
-    // console.debug(
-    //   `%c${i++}%cChronocat%cRequest%c${ipcInfo.EventName}/${ipcInfo.Method}`,
-    //   'background:#6ff;color:black;padding: 2px 4px;',
-    //   'background:#111;color:white;padding: 2px 8px;',
-    //   'background:#922;color:white;padding: 2px 8px;',
-    //   'background:#555;color:white;padding: 2px 8px;',
-    //   ipcInfo.Args?.[1],
-    // )
+    if (enableInterceptLog.enable)
+      console.debug(
+        `%c${i++}%cChronocat%cRequest%c${ipcInfo.EventName}/${ipcInfo.Method}`,
+        'background:#6ff;color:black;padding: 2px 4px;',
+        'background:#111;color:white;padding: 2px 8px;',
+        'background:#922;color:white;padding: 2px 8px;',
+        'background:#555;color:white;padding: 2px 8px;',
+        ipcInfo.Args?.[1],
+      )
 
     return false
   }
