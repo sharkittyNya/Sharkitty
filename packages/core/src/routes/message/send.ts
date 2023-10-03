@@ -17,6 +17,7 @@ router.message.send.$body('json')(async ({ body }) => {
 
   const param = {
     msgId: '0',
+    msgAttributeInfos: new Map(),
     peer: await uixCache.preprocessObject(payload.peer),
     msgElements: await uixCache.preprocessObject(payload.elements, {
       contextGroup:
