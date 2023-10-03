@@ -4,13 +4,17 @@ import { ipcMain } from 'electron'
 import type { Detail, IpcEvent, IpcInfo, ListenerData } from '../types'
 import { requestCallbackMap, requestMap, responseMap } from './globalVars'
 
+export const enableInterceptLog = {
+  enable: false,
+}
+
 export const initListener = (
   listener: (data: ListenerData) => void | Promise<void>,
 ) => {
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const emit = ipcMain.emit
 
-  // let i = 1
+  let i = 1
 
   ipcMain.emit = function (eventName: string | symbol, ...p: unknown[]) {
     const p0 = p[0] as {
@@ -48,29 +52,31 @@ export const initListener = (
           if (responseMap[evt.callbackId])
             responseMap[evt.callbackId]!.resolved = detail
 
-          // console.log(
-          //   `%c${i++}%cChronocat%cResponse%c${
-          //     requestMap[evt.callbackId]!.EventName
-          //   }/${requestMap[evt.callbackId]!.Method}`,
-          //   'background:#6ff;color:black;padding: 2px 4px;',
-          //   'background:#111;color:white;padding: 2px 8px;',
-          //   'background:#292;color:white;padding: 2px 8px;',
-          //   'background:#555;color:white;padding: 2px 8px;',
-          //   requestMap[evt.callbackId]!.Args?.[1],
-          //   detail,
-          // )
+          if (enableInterceptLog.enable)
+            console.log(
+              `%c${i++}%cChronocat%cResponse%c${
+                requestMap[evt.callbackId]!.EventName
+              }/${requestMap[evt.callbackId]!.Method}`,
+              'background:#6ff;color:black;padding: 2px 4px;',
+              'background:#111;color:white;padding: 2px 8px;',
+              'background:#292;color:white;padding: 2px 8px;',
+              'background:#555;color:white;padding: 2px 8px;',
+              requestMap[evt.callbackId]!.Args?.[1],
+              detail,
+            )
         } else {
-          // if (evt.eventName !== 'BQQNT_IPC_inspector:log')
-          //   console.log(
-          //     `%c${i++}%cChronocat%cEvent%c${evt.eventName}/${
-          //       detail[0]!.cmdName
-          //     }`,
-          //     'background:#6ff;color:black;padding: 2px 4px;',
-          //     'background:#111;color:white;padding: 2px 8px;',
-          //     'background:#229;color:white;padding: 2px 8px;',
-          //     'background:#555;color:white;padding: 2px 8px;',
-          //     detail[0]?.payload,
-          //   )
+          if (enableInterceptLog.enable)
+            if (evt.eventName !== 'BQQNT_IPC_inspector:log')
+              console.log(
+                `%c${i++}%cChronocat%cEvent%c${evt.eventName}/${
+                  detail[0]!.cmdName
+                }`,
+                'background:#6ff;color:black;padding: 2px 4px;',
+                'background:#111;color:white;padding: 2px 8px;',
+                'background:#229;color:white;padding: 2px 8px;',
+                'background:#555;color:white;padding: 2px 8px;',
+                detail[0]?.payload,
+              )
         }
         delete requestMap[evt.callbackId]
       }

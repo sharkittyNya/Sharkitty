@@ -55,6 +55,29 @@ export const getRichMediaFilePath = defineIpcApi<
   ]
 >('IPC_UP_2', 'ns-ntApi-2', 'nodeIKernelMsgService/getRichMediaFilePath')
 
+export const getRichMediaFilePathForGuild = defineIpcApi<
+  unknown,
+  [
+    {
+      path_info: {
+        md5HexStr: string
+        fileName: string
+        elementType: number
+        elementSubType: number
+        thumbSize: number
+        needCreate: boolean
+        fileType: number
+        downloadType: number
+        file_uuid: string
+      }
+    },
+  ]
+>(
+  'IPC_UP_2',
+  'ns-ntApi-2',
+  'nodeIKernelMsgService/getRichMediaFilePathForGuild',
+)
+
 export const sendMsg = defineIpcApi<
   unknown,
   [

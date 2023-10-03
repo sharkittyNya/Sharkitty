@@ -10,7 +10,7 @@ import {
   sendCallbackMap,
   sendQueue,
 } from './ipc/globalVars'
-import { initListener } from './ipc/intercept'
+import { enableInterceptLog, initListener } from './ipc/intercept'
 import { getModules } from './modules'
 import { setMsgCache } from './msgCache'
 import type { Group, Member, Message, Profile } from './red'
@@ -40,9 +40,8 @@ export const chronocat = async () => {
   // @ts-expect-error set global
   global.CHRONO_DEBUG = {
     uixCache,
+    enableInterceptLog,
   }
-  // @ts-expect-error set global
-  console.log(global, global.CHRONO_DEBUG)
 
   void initHooks()
 

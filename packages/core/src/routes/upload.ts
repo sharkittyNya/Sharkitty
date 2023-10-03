@@ -9,9 +9,13 @@ import {
   getFileType,
   getImageSizeFromPath,
 } from '../ipc/definitions/fsApi'
-import { getRichMediaFilePath } from '../ipc/definitions/msgService'
+import {
+  getRichMediaFilePath,
+  getRichMediaFilePathForGuild,
+} from '../ipc/definitions/msgService'
 import { router } from '../router'
 import { baseDir } from '../utils/baseDir'
+import { qqVersion } from '../utils/qqVersion'
 
 router.upload.$httpOnly('POST')(
   ({ http: { req, res } }) =>
@@ -80,15 +84,30 @@ router.upload.$httpOnly('POST')(
             getFileSize(filePath),
           ])
 
-          const richMediaPath = await getRichMediaFilePath({
-            md5HexStr: md5,
-            fileName: fileInfo.filename,
-            elementType: 2, // TODO: 根据 mime 决定，使文件能放入对应文件夹
-            elementSubType: 0,
-            thumbSize: 0,
-            needCreate: true,
-            fileType: 1,
-          })
+          const richMediaPath =
+            qqVersion > 17000
+              ? await getRichMediaFilePathForGuild({
+                  path_info: {
+                    md5HexStr: md5,
+                    fileName: fileInfo.filename,
+                    elementType: 2, // TODO: 根据 mime 决定，使文件能放入对应文件夹
+                    elementSubType: 0,
+                    thumbSize: 0,
+                    needCreate: true,
+                    fileType: 1,
+                    file_uuid: '',
+                    downloadType: 1,
+                  },
+                })
+              : await getRichMediaFilePath({
+                  md5HexStr: md5,
+                  fileName: fileInfo.filename,
+                  elementType: 2, // TODO: 根据 mime 决定，使文件能放入对应文件夹
+                  elementSubType: 0,
+                  thumbSize: 0,
+                  needCreate: true,
+                  fileType: 1,
+                })
 
           await copyFile(filePath, richMediaPath as string)
 
@@ -100,6 +119,7 @@ router.upload.$httpOnly('POST')(
             ntFilePath: richMediaPath,
           })
         } catch (e) {
+          console.log(e)
           res.writeHead(500)
           res.end('500 internal server error')
         }
