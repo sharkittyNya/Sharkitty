@@ -37,6 +37,13 @@ const initHooks = async () => {
 }
 
 export const chronocat = async () => {
+  // @ts-expect-error set global
+  global.CHRONO_DEBUG = {
+    uixCache,
+  }
+  // @ts-expect-error set global
+  console.log(global, global.CHRONO_DEBUG)
+
   void initHooks()
 
   const config = await getConfig()

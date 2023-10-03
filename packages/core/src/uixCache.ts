@@ -16,9 +16,9 @@ const enumerateAll = (
   const enumerate = (obj: Record<string, unknown>) => {
     for (const key in obj) {
       if (obj[key] instanceof Map) continue
-      if (obj[key] instanceof Object)
-        enumerate(obj[key] as Record<string, unknown>)
-      else entries.push([key, obj[key], obj])
+      if (typeof obj[key] !== 'object' && typeof obj[key] !== 'function')
+        entries.push([key, obj[key], obj])
+      else enumerate(obj[key] as Record<string, unknown>)
     }
   }
   enumerate(obj as Record<string, unknown>)
@@ -78,7 +78,8 @@ const cacheObject = (object: Record<string, unknown>) => {
         parseInt(obj[cKey] as string) == 0 ||
         !obj[cKey] ||
         (obj[cKey] as string).includes('*') ||
-        map[value as string]
+        map[value as string] ||
+        parseInt(value as string) == 0
       )
         continue
 
@@ -120,16 +121,23 @@ const preprocessObject = async <T extends object>(
 
   for (const [key, value, obj] of eAll) {
     const cKey = genCorrespondingName(key)
-    if (key === 'peerUin' && obj['chatType'] === 2) {
-      delete obj['peerUin']
-      obj['peerUid'] = value
-    }
     if (
+      key === 'peerUin' &&
+      obj['chatType'] === 2 &&
+      parseInt(value as string) !== 0
+    ) {
+      obj['peerUid'] = value
+    } else if (
       key === 'peerUid' &&
-      !(typeof value === 'string' && value.startsWith('u_'))
+      !(typeof value === 'string' && value.startsWith('u_')) &&
+      parseInt(value as string) !== 0
     )
       obj['peerUin'] = value
-    if (cKey && !obj[cKey] && map[value as string]) {
+    else if (
+      cKey &&
+      (!obj[cKey] || parseInt(obj[cKey] as string) === 0) &&
+      map[value as string]
+    ) {
       obj[cKey] = map[value as string]
       if (typeof value === 'string' && value.startsWith('u_')) delete obj[key]
     }
@@ -145,6 +153,7 @@ export const uixCache = {
   addToMap,
   preprocessArrayOfUix,
   map,
+  enumerateAll,
 }
 
 export type UixCache = typeof uixCache
