@@ -9,6 +9,7 @@ import { HeaderAuthorizer } from './server/authorizer'
 import { httpRouterServer } from './server/httpIncomeRouterServer'
 import type { IpcEvent } from './types'
 import { getAuthData } from './utils/authData'
+import { generateToken } from './utils/token'
 
 interface QuickLoginAccount {
   name: string
@@ -22,21 +23,25 @@ interface LoginState {
 
 const loginState: LoginState = {}
 
-export const initLoginService = (token: string) => {
-  if (!app.commandLine.hasSwitch('login-service')) return
-  // --login-service=host:port or --login-service=port
-  const loginService =
-    app.commandLine.getSwitchValue('login-service') || '16340'
-  let [host, port] = loginService.split(':')
+export const initLoginService = () => {
+  const listen =
+    app.commandLine.getSwitchValue('chrono-admin-listen') ||
+    process.env['CHRONO_ADMIN_LISTEN'] ||
+    '0.0.0.0:16340'
+
+  const token =
+    app.commandLine.getSwitchValue('chrono-admin-token') ||
+    process.env['CHRONO_ADMIN_TOKEN'] ||
+    generateToken()
+
+  let [host, port] = listen.split(':')
   if (!port) {
     port = host
     host = '0.0.0.0'
   }
 
   console.warn(
-    "\n\n\n\n|-------------- Login Service --------------|\n   Chronocat's login service\n",
-    `\n\tRunning on: ${host}:${port}\n\tToken: ${token}`,
-    '\n\n|--------------------------------------------|\n\n\n\n',
+    `访问此链接以登录：\nhttp://${host}:${port}/#${host}:${port}@${token}`,
   )
 
   const server = httpRouterServer.createServer(resolveRouteLogin, {

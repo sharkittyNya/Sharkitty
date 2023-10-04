@@ -1,4 +1,5 @@
 import { getConfig } from './config'
+import { isChronocatMode } from './config/mode'
 import { MessageRecvDispatchMessage } from './dispatch'
 import { getMemberInfo } from './ipc/definitions/groupService'
 import {
@@ -11,6 +12,7 @@ import {
   sendQueue,
 } from './ipc/globalVars'
 import { enableInterceptLog, initListener } from './ipc/intercept'
+import { initLoginService } from './loginService'
 import { getModules } from './modules'
 import { setMsgCache } from './msgCache'
 import type { Group, Member, Message, Profile } from './red'
@@ -52,6 +54,8 @@ export const chronocat = async () => {
     }
 
   void initHooks()
+
+  if (await isChronocatMode('login')) initLoginService()
 
   const config = await getConfig()
   if (!config.enable) return
