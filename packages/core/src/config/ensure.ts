@@ -1,10 +1,8 @@
-import { randomBytes } from 'node:crypto'
 import { mkdir, readFile, stat, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import defaultConfig from '../../../docs/static/chronocat.yml'
 import { baseDir, legacyBaseDir } from '../utils/baseDir'
-
-const generateToken = () => randomBytes(32).toString('hex')
+import { generateToken } from '../utils/token'
 
 export const ensureConfig = async () => {
   const configDir = join(baseDir, 'config')
