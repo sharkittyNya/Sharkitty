@@ -25,7 +25,26 @@ const sidebars: SidebarsConfig = {
             'install/launcher',
           ],
         },
-        'install/docker',
+        {
+          type: 'category',
+          label: 'Docker',
+          link: {
+            type: 'doc',
+            id: 'install/docker/index',
+          },
+          items: [
+            {
+              type: 'category',
+              label: '官方镜像',
+              link: {
+                type: 'doc',
+                id: 'install/docker/official/index',
+              },
+              items: ['install/docker/official/reference'],
+            },
+            'install/docker/community',
+          ],
+        },
         'install/trusted-installation',
       ],
     },

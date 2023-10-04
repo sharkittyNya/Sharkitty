@@ -1,0 +1,38 @@
+---
+title: 参考
+---
+
+## 调试
+
+如果你需要进入容器调试，可以使用下面的命令。
+
+进入容器（启动所有服务）：
+
+```sh
+docker run --rm -it chronoc/at /sbin/my_init -- bash -l
+```
+
+进入容器（不启动任何服务）：
+
+```sh
+docker run --rm -it chronoc/at bash
+```
+
+## 内存占用
+
+## 镜像体积
+
+基于下面的实际情况：
+
+- 镜像应当永远使用 Chronocat 的最新版本
+- 镜像可以使用 QQ 和 LiteLoaderQQNT 的稳定版本
+
+我们对镜像进行了分层，将 QQ 和 LiteLoaderQQNT
+作为镜像的下层存储。因此，我们也推荐在升级镜像版本时，先拉取新的版本，再删除旧的版本。
+
+各层体积的粗略值如下：
+
+- 基础镜像使用 `phusion/baseimage:jammy-1.0.1`，体积为 229MB
+- base 镜像的公共体积约为 800MB
+- 本地存在任一版本的 base 镜像的情况下，在不同 base 镜像间移动需要重新拉取约 400MB 的层
+- `chronoc/at` 层约为 1MB
