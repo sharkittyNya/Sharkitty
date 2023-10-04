@@ -9,6 +9,7 @@ import { HeaderAuthorizer } from './server/authorizer'
 import { httpRouterServer } from './server/httpIncomeRouterServer'
 import type { IpcEvent } from './types'
 import { getAuthData } from './utils/authData'
+import { sleep } from './utils/time'
 import { generateToken } from './utils/token'
 
 interface QuickLoginAccount {
@@ -52,11 +53,13 @@ export const initLoginService = () => {
     cors: 'all',
   })
 
-  app.once('browser-window-created', (_event, window) => {
+  app.on('browser-window-created', (_event, window) => {
     window.webContents.on('did-finish-load', () => {
       runScriptInRenderer(window.webContents, loginJs)
     })
   })
+
+  void sleep(3000).then(() => runScriptInAllRenderers(loginJs))
 
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const originEmit = ipcMain.emit.bind(ipcMain)
@@ -74,18 +77,33 @@ export const initLoginService = () => {
           data: string
         } & {
           type: 'quickloginError'
+        } & {
+          type: 'error'
+          data: unknown
         }
 
-        if (type === 'quickloginList') {
-          loginState.quickLoginAccounts = data
-          loginState.qrcode = null
-        } else if (type === 'qrcode') {
-          loginState.qrcode = data
-          loginState.quickLoginAccounts = null
-        } else if (type === 'quickloginError') {
-          loginState.quickLoginAccounts = null
-          loginState.qrcode = null
+        switch (type) {
+          case 'quickloginList': {
+            loginState.quickLoginAccounts = data
+            loginState.qrcode = null
+            break
+          }
+          case 'qrcode': {
+            loginState.qrcode = data
+            loginState.quickLoginAccounts = null
+            break
+          }
+          case 'quickloginError': {
+            loginState.quickLoginAccounts = null
+            loginState.qrcode = null
+            break
+          }
+          case 'error': {
+            console.log('quickLogin error: ', data)
+            break
+          }
         }
+
         return true
       }
     } catch (e) {
@@ -130,7 +148,7 @@ routerLogin.quickLogin.$body('json')(({ body }) => {
   runScriptInAllRenderers(`quickLogin('${parseInt(id)}')`)
 })
 
-routerLogin.$httpOnly('GET')(({ http }) => {
+routerLogin.$requireAuthorize(false).$httpOnly('GET')(({ http }) => {
   http.res.writeHead(200, {
     'Content-Type': 'text/html; charset=UTF-8',
     'Cache-Control': 'no-cache',

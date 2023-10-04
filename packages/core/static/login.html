@@ -428,7 +428,7 @@
             localStorage.setItem('serverAddr', serverAddr)
             await switchToPage('.syncState')
             try {
-              const defaultToken = hashToken[0] ?? 'chrono-login-default'
+              const defaultToken = hashToken[1]
               await updateStatesWithToken(defaultToken)
               storedToken = defaultToken
               startStateUpdateLoop()
