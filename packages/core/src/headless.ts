@@ -33,11 +33,20 @@ export const initHeadless = () => {
         setInterval(() => {
           if (!globalThis.authData) return
 
-          app.removeAllListeners('window-all-closed')
-          BrowserWindow.getAllWindows().map((v) => {
-            v.removeAllListeners('close')
-            v.close()
-          })
+          try {
+            app.removeAllListeners('window-all-closed')
+            BrowserWindow.getAllWindows().map((v) => {
+              try {
+                v.removeAllListeners('close')
+                v.close()
+              } catch (e) {
+                // console.log('headless: close BW failed', e)
+                // Ignore
+              }
+            })
+          } catch (e) {
+            console.log('headless: get BWs failed ', e)
+          }
         }, 5000),
       8000,
     )
@@ -102,6 +111,6 @@ export const initHeadless = () => {
     // // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-member-access
     // require('module')._load = newLoad
   } catch (e) {
-    console.log(e)
+    console.log('headless: ', e)
   }
 }

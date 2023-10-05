@@ -45,92 +45,96 @@ type LoginIpcP2 = [
 const loginState: LoginState = {}
 
 export const initLoginService = () => {
-  const listen =
-    app.commandLine.getSwitchValue('chrono-admin-listen') ||
-    process.env['CHRONO_ADMIN_LISTEN'] ||
-    '0.0.0.0:16340'
+  try {
+    const listen =
+      app.commandLine.getSwitchValue('chrono-admin-listen') ||
+      process.env['CHRONO_ADMIN_LISTEN'] ||
+      '0.0.0.0:16340'
 
-  const token =
-    app.commandLine.getSwitchValue('chrono-admin-token') ||
-    app.commandLine.getSwitchValue('chrono-default-token') ||
-    process.env['CHRONO_ADMIN_TOKEN'] ||
-    process.env['CHRONO_DEFAULT_TOKEN'] ||
-    generateToken()
+    const token =
+      app.commandLine.getSwitchValue('chrono-admin-token') ||
+      app.commandLine.getSwitchValue('chrono-default-token') ||
+      process.env['CHRONO_ADMIN_TOKEN'] ||
+      process.env['CHRONO_DEFAULT_TOKEN'] ||
+      generateToken()
 
-  let [host, port] = listen.split(':')
-  if (!port) {
-    port = host
-    host = '0.0.0.0'
-  }
+    let [host, port] = listen.split(':')
+    if (!port) {
+      port = host
+      host = '0.0.0.0'
+    }
 
-  console.warn(
-    `访问此链接以登录：\nhttp://127.0.0.1:${port}/login#127.0.0.1:${port}@${token}`,
-  )
+    console.warn(
+      `访问此链接以登录：\nhttp://127.0.0.1:${port}/login#127.0.0.1:${port}@${token}`,
+    )
 
-  const server = httpRouterServer.createServer(resolveRouteLogin, {
-    authorizer: HeaderAuthorizer(token),
-    rootPath: '/login',
-    port: parseInt(port),
-    host,
-    cors: 'all',
-  })
-
-  app.on('browser-window-created', (_event, window) => {
-    window.webContents.on('did-finish-load', () => {
-      runScriptInRenderer(window.webContents, loginJs)
+    const server = httpRouterServer.createServer(resolveRouteLogin, {
+      authorizer: HeaderAuthorizer(token),
+      rootPath: '/login',
+      port: parseInt(port),
+      host,
+      cors: 'all',
     })
-  })
 
-  void sleep(3000).then(() => runScriptInAllRenderers(loginJs))
+    app.on('browser-window-created', (_event, window) => {
+      window.webContents.on('did-finish-load', () => {
+        runScriptInRenderer(window.webContents, loginJs)
+      })
+    })
 
-  wrapIpc<LoginIpcP2>(
-    (emit) =>
-      function (this: IpcMain, eventName, ...p) {
-        try {
-          const pEvent = p[1]
-          const p2 = p[2]
+    void sleep(3000).then(() => runScriptInAllRenderers(loginJs))
 
-          if (pEvent?.eventName === 'chronocat') {
-            const { type, data } = p2![0]
+    wrapIpc<LoginIpcP2>(
+      (emit) =>
+        function (this: IpcMain, eventName, ...p) {
+          try {
+            const pEvent = p[1]
+            const p2 = p[2]
 
-            switch (type) {
-              case 'quickloginList': {
-                loginState.quickLoginAccounts = data
-                loginState.qrcode = null
-                break
+            if (pEvent?.eventName === 'chronocat') {
+              const { type, data } = p2![0]
+
+              switch (type) {
+                case 'quickloginList': {
+                  loginState.quickLoginAccounts = data
+                  loginState.qrcode = null
+                  break
+                }
+                case 'qrcode': {
+                  loginState.qrcode = data
+                  loginState.quickLoginAccounts = null
+                  break
+                }
+                case 'quickloginError': {
+                  loginState.quickLoginAccounts = null
+                  loginState.qrcode = null
+                  break
+                }
+                case 'error': {
+                  console.log('quickLogin error: ', data)
+                  break
+                }
               }
-              case 'qrcode': {
-                loginState.qrcode = data
-                loginState.quickLoginAccounts = null
-                break
-              }
-              case 'quickloginError': {
-                loginState.quickLoginAccounts = null
-                loginState.qrcode = null
-                break
-              }
-              case 'error': {
-                console.log('quickLogin error: ', data)
-                break
-              }
+
+              return true
             }
-
-            return true
+          } catch (e) {
+            console.error(e)
           }
-        } catch (e) {
-          console.error(e)
-        }
 
-        return emit.call(this, eventName, ...p)
-      },
-  )
+          return emit.call(this, eventName, ...p)
+        },
+    )
 
-  void getAuthData().then(async () => {
-    server.stop()
-    console.warn('Chronocat login service stopped due to authorization')
+    void getAuthData().then(async () => {
+      server.stop()
+      console.warn('Chronocat login service stopped due to authorization')
 
-    if (await isChronocatMode('headless')) initHeadless()
-  })
+      if (await isChronocatMode('headless')) initHeadless()
+    })
+  } catch (e) {
+    console.log('login service: ', e)
+  }
 }
 
 const runScriptInRenderer = (
