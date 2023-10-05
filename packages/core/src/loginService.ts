@@ -1,13 +1,12 @@
+import type { IpcMain, WebContents } from 'electron'
 import { resolveRouteLogin, routerLogin } from './router'
 // eslint-disable-next-line import/no-unresolved
-import type { WebContents } from 'electron'
-// eslint-disable-next-line import/no-unresolved
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow } from 'electron'
 import index from '../static/login.html'
 import loginJs from '../static/login.js.txt'
+import { wrapIpc } from './ipc/wrap'
 import { HeaderAuthorizer } from './server/authorizer'
 import { httpRouterServer } from './server/httpIncomeRouterServer'
-import type { IpcEvent } from './types'
 import { getAuthData } from './utils/authData'
 import { sleep } from './utils/time'
 import { generateToken } from './utils/token'
@@ -21,6 +20,25 @@ interface LoginState {
   qrcode?: string | null
   quickLoginAccounts?: QuickLoginAccount[] | null
 }
+
+type LoginIpcP2 = [
+  | {
+      type: 'quickloginList'
+      data: QuickLoginAccount[]
+    }
+  | {
+      type: 'qrcode'
+      data: string
+    }
+  | {
+      type: 'quickloginError'
+      data: never
+    }
+  | {
+      type: 'error'
+      data: unknown
+    },
+]
 
 const loginState: LoginState = {}
 
@@ -61,57 +79,47 @@ export const initLoginService = () => {
 
   void sleep(3000).then(() => runScriptInAllRenderers(loginJs))
 
-  // eslint-disable-next-line @typescript-eslint/unbound-method
-  const originEmit = ipcMain.emit.bind(ipcMain)
-  ipcMain.emit = (eventName: string | symbol, ...p: unknown[]) => {
-    try {
-      const p1 = p?.[1] as IpcEvent
-      const p2 = p?.[2] as unknown[] | undefined
+  wrapIpc<LoginIpcP2>(
+    (emit) =>
+      function (this: IpcMain, eventName, ...p) {
+        try {
+          const pEvent = p[1]
+          const p2 = p[2]
 
-      if (p1?.eventName === 'chronocat') {
-        const { type, data } = p2![0] as {
-          type: 'quickloginList'
-          data: QuickLoginAccount[]
-        } & {
-          type: 'qrcode'
-          data: string
-        } & {
-          type: 'quickloginError'
-        } & {
-          type: 'error'
-          data: unknown
+          if (pEvent?.eventName === 'chronocat') {
+            const { type, data } = p2![0]
+
+            switch (type) {
+              case 'quickloginList': {
+                loginState.quickLoginAccounts = data
+                loginState.qrcode = null
+                break
+              }
+              case 'qrcode': {
+                loginState.qrcode = data
+                loginState.quickLoginAccounts = null
+                break
+              }
+              case 'quickloginError': {
+                loginState.quickLoginAccounts = null
+                loginState.qrcode = null
+                break
+              }
+              case 'error': {
+                console.log('quickLogin error: ', data)
+                break
+              }
+            }
+
+            return true
+          }
+        } catch (e) {
+          console.error(e)
         }
 
-        switch (type) {
-          case 'quickloginList': {
-            loginState.quickLoginAccounts = data
-            loginState.qrcode = null
-            break
-          }
-          case 'qrcode': {
-            loginState.qrcode = data
-            loginState.quickLoginAccounts = null
-            break
-          }
-          case 'quickloginError': {
-            loginState.quickLoginAccounts = null
-            loginState.qrcode = null
-            break
-          }
-          case 'error': {
-            console.log('quickLogin error: ', data)
-            break
-          }
-        }
-
-        return true
-      }
-    } catch (e) {
-      console.error(e)
-    }
-
-    return originEmit(eventName, ...p)
-  }
+        return emit.call(this, eventName, ...p)
+      },
+  )
 
   void getAuthData().then(() => {
     server.stop()

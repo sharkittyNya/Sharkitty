@@ -1,14 +1,14 @@
 import type { Group, Message, Profile } from '../red'
-import type { Detail, IpcEvent, IpcInfo, Uuid } from '../types'
+import type { IpcDetail, IpcEvent, IpcInfo, Uuid } from './types'
 
 export const requestCallbackMap: Record<
   Uuid,
-  (this: IpcEvent, detail: Detail) => void
+  (this: IpcEvent, detail: IpcDetail) => void
 > = {}
 export const responseMap: Record<
   Uuid,
   {
-    resolved?: Detail
+    resolved?: IpcDetail
   }
 > = {}
 export const requestMap: Record<Uuid, IpcInfo> = {}

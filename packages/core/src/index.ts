@@ -12,6 +12,7 @@ import {
   sendQueue,
 } from './ipc/globalVars'
 import { enableInterceptLog, initListener } from './ipc/intercept'
+import type { IpcListenerData } from './ipc/types'
 import { initLoginService } from './loginService'
 import { getModules } from './modules'
 import { setMsgCache } from './msgCache'
@@ -20,7 +21,6 @@ import { ChatType } from './red'
 import './routes'
 import { sendForwardMsgBuffer } from './routes/message/sendForward'
 import { initServers } from './server'
-import type { ListenerData } from './types'
 import { uixCache } from './uixCache'
 import { filterMessage } from './utils/filterMessage'
 
@@ -62,7 +62,7 @@ export const chronocat = async () => {
 
   const { dispatchMessage } = await initServers()
 
-  const dispatch = async ({ CmdName, Payload }: ListenerData) => {
+  const dispatch = async ({ CmdName, Payload }: IpcListenerData) => {
     try {
       uixCache.cacheObject(Payload as Record<string, unknown>)
     } catch (e) {

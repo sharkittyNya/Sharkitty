@@ -1,9 +1,9 @@
 // https://github.com/import-js/eslint-plugin-import/issues/2802
 // eslint-disable-next-line import/no-unresolved
 import { ipcMain } from 'electron'
-import type { Detail, IpcEvent } from '../types'
 import { timeout } from '../utils/time'
 import { requestCallbackMap } from './globalVars'
+import type { IpcDetail, IpcEvent } from './types'
 
 const generateUUID = () => {
   let d = new Date().getTime()
@@ -31,7 +31,7 @@ export const invoke = async (
         channel,
         {
           sender: {
-            send: (...args: [string, IpcEvent, Detail]) => {
+            send: (...args: [string, IpcEvent, IpcDetail]) => {
               resolve(args)
             },
             __CHRONO_HOOKED__: true,
