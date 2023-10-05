@@ -1,7 +1,6 @@
 import { getConfig } from './config'
 import { isChronocatMode } from './config/mode'
 import { MessageRecvDispatchMessage } from './dispatch'
-import { initHeadless } from './headless'
 import { getMemberInfo } from './ipc/definitions/groupService'
 import {
   friendMap,
