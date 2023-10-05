@@ -72,14 +72,23 @@ const themeConfig: ThemeConfig = {
         to: 'contribute',
       },
       {
-        label: 'FAQ',
-        position: 'left',
-        to: 'faq/1',
-      },
-      {
         label: '更多',
         position: 'left',
-        to: 'more/community',
+        type: 'dropdown',
+        items: [
+          {
+            label: 'FAQ',
+            to: 'faq/1',
+          },
+          {
+            label: '博客',
+            to: 'blog',
+          },
+          {
+            label: '更多内容',
+            to: 'more/community',
+          },
+        ],
       },
       {
         href: 'https://github.com/chrononeko/chronocat',
@@ -142,6 +151,10 @@ const themeConfig: ThemeConfig = {
           {
             label: 'FAQ',
             to: '/faq/1',
+          },
+          {
+            label: '博客',
+            to: '/blog',
           },
           {
             label: '更多内容',
