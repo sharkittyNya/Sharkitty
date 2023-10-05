@@ -50,7 +50,9 @@ export const initLoginService = () => {
 
   const token =
     app.commandLine.getSwitchValue('chrono-admin-token') ||
+    app.commandLine.getSwitchValue('chrono-default-token') ||
     process.env['CHRONO_ADMIN_TOKEN'] ||
+    process.env['CHRONO_DEFAULT_TOKEN'] ||
     generateToken()
 
   let [host, port] = listen.split(':')

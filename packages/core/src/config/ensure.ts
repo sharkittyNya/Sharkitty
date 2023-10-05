@@ -1,3 +1,6 @@
+// https://github.com/import-js/eslint-plugin-import/issues/2802
+// eslint-disable-next-line import/no-unresolved
+import { app } from 'electron'
 import { mkdir, readFile, stat, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import defaultConfig from '../../../docs/static/chronocat.yml'
@@ -11,7 +14,10 @@ export const ensureConfig = async () => {
 
   if (!(await exists(configPath))) {
     // 配置文件不存在，生成新配置
-    let newToken = generateToken()
+    let newToken =
+      app.commandLine.getSwitchValue('chrono-default-token') ||
+      process.env['CHRONO_DEFAULT_TOKEN'] ||
+      generateToken()
 
     // 检查旧 token 文件
     if (await exists(legacyTokenPath))
