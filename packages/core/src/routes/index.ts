@@ -1,3 +1,4 @@
+import './bot/exit'
 import './bot/friends'
 import './bot/groups'
 import './getSelfProfile'
