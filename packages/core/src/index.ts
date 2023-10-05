@@ -48,8 +48,6 @@ const initHooks = async () => {
 }
 
 export const chronocat = async () => {
-  if (await isChronocatMode('headless')) initHeadless()
-
   if ((await isChronocatMode('debug')) || 'CHRONO_DEBUG' in process.env)
     global.__CHRONO_DEBUG__ = {
       uixCache,

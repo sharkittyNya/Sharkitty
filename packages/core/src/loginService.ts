@@ -1,10 +1,12 @@
 import type { IpcMain, WebContents } from 'electron'
-import { resolveRouteLogin, routerLogin } from './router'
 // eslint-disable-next-line import/no-unresolved
-import { app, BrowserWindow } from 'electron'
+import { BrowserWindow, app } from 'electron'
 import index from '../static/login.html'
 import loginJs from '../static/login.js.txt'
+import { isChronocatMode } from './config/mode'
+import { initHeadless } from './headless'
 import { wrapIpc } from './ipc/wrap'
+import { resolveRouteLogin, routerLogin } from './router'
 import { HeaderAuthorizer } from './server/authorizer'
 import { httpRouterServer } from './server/httpIncomeRouterServer'
 import { getAuthData } from './utils/authData'
@@ -123,9 +125,11 @@ export const initLoginService = () => {
       },
   )
 
-  void getAuthData().then(() => {
+  void getAuthData().then(async () => {
     server.stop()
     console.warn('Chronocat login service stopped due to authorization')
+
+    if (await isChronocatMode('headless')) initHeadless()
   })
 }
 
