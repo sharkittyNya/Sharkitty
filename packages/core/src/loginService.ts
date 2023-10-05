@@ -64,7 +64,7 @@ export const initLoginService = () => {
   }
 
   console.warn(
-    `访问此链接以登录：\nhttp://${host}:${port}/#${host}:${port}@${token}`,
+    `访问此链接以登录：\nhttp://127.0.0.1:${port}/login#127.0.0.1:${port}@${token}`,
   )
 
   const server = httpRouterServer.createServer(resolveRouteLogin, {
