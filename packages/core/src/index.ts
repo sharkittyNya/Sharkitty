@@ -47,7 +47,7 @@ const initHooks = async () => {
 }
 
 export const chronocat = async () => {
-  if ('CHRONO_DEBUG' in process.env)
+  if ((await isChronocatMode('debug')) || 'CHRONO_DEBUG' in process.env)
     global.__CHRONO_DEBUG__ = {
       uixCache,
       enableInterceptLog,
