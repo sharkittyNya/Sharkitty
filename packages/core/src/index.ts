@@ -1,6 +1,7 @@
 import { getConfig } from './config'
 import { isChronocatMode } from './config/mode'
 import { MessageRecvDispatchMessage } from './dispatch'
+import { initHeadless } from './headless'
 import { getMemberInfo } from './ipc/definitions/groupService'
 import {
   friendMap,
@@ -47,6 +48,8 @@ const initHooks = async () => {
 }
 
 export const chronocat = async () => {
+  if (await isChronocatMode('headless')) initHeadless()
+
   if ((await isChronocatMode('debug')) || 'CHRONO_DEBUG' in process.env)
     global.__CHRONO_DEBUG__ = {
       uixCache,
