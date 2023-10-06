@@ -3,6 +3,7 @@ import type { BrowserWindowConstructorOptions } from 'electron'
 // eslint-disable-next-line import/no-unresolved
 import { app, BrowserWindow } from 'electron'
 import { EventEmitter } from 'node:events'
+import { start } from 'node:repl'
 import { setFlagsFromString } from 'node:v8'
 import { runInNewContext } from 'node:vm'
 import type { IpcP } from './ipc/types'
@@ -77,6 +78,8 @@ function makeProxy(obj: object, path = ''): object {
 
 export const initHeadless2 = () => {
   try {
+    start('> ')
+
     setFlagsFromString('--expose_gc')
 
     // 5 秒一 gc
