@@ -20,6 +20,8 @@ const componentMap = {
     'https://github.com/chrononeko/chronocat-js/tree/master/packages/assets-memory',
   'module-native': 'https://github.com/chrononeko/module-native/tree/master',
   miraigo: 'https://github.com/chrononeko/miraigo/tree/master',
+  docker: 'https://github.com/chrononeko/docker/tree/master',
+  cli: 'https://github.com/chrononeko/cli/tree/master',
 } as const
 
 type Component = keyof typeof componentMap
