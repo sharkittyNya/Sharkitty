@@ -88,10 +88,25 @@ void (async () => {
       await sleep(100)
       window.quickLogin = () => {
         try {
-          document
+          // document
+          //   .evaluate('//span[text()="登录"]', document)
+          //   .iterateNext()
+          //   .parentElement.parentElement.click()
+
+          let el = document
             .evaluate('//span[text()="登录"]', document)
             .iterateNext()
-            .parentElement.parentElement.click()
+          while (true) {
+            if (!el) {
+              sendMessageBack('error', 'cannot find single quick login btn')
+              break
+            }
+
+            if (el.nodeName === 'BUTTON') {
+              el.click()
+              break
+            } else el = el.parentElement
+          }
         } catch (e) {
           sendMessageBack('error', e.message + '  ' + e.stack + '  ')
         }
