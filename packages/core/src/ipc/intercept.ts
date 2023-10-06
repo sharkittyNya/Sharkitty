@@ -1,4 +1,5 @@
 import type { IpcMain } from 'electron'
+import { isChronocatMode } from '../config/mode'
 import { requestCallbackMap, requestMap, responseMap } from './globalVars'
 import type { IpcInfo, IpcListenerData, IpcP } from './types'
 import { wrapIpc } from './wrap'
@@ -83,7 +84,16 @@ export const initListener = (
           Channel: eventName as string,
         }
 
-        emit.call(this, eventName, ...p)
+        void isChronocatMode('headless').then((headless) => {
+          if (headless) {
+            // 无头模式下屏蔽 unregister 事件
+            if (!pEvent?.eventName.toLowerCase().includes('unregister'))
+              emit.call(this, eventName, ...p)
+          } else {
+            // 非无头模式，不做修改
+            emit.call(this, eventName, ...p)
+          }
+        })
 
         if (pEvent?.eventName?.includes('Log')) return false
         responseMap[pEvent?.callbackId] ??= {}
