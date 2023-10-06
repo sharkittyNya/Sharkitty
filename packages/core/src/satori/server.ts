@@ -10,6 +10,7 @@ import { timeout } from '../utils/time'
 import type { Routes } from './routes'
 import { routes } from './routes'
 import { assets } from './routes/assets'
+import type { RouteContext } from './routes/types'
 import type { WebSocketIncomingMessage } from './types'
 import { Op } from './types'
 
@@ -85,7 +86,7 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
       try {
         void assets({
           raw: path.slice(prefix.length + 'assets/'.length),
-          ...buildRouteCtx(req, res),
+          ...buildRouteCtx(config, req, res),
         })
 
         if (!res.writableEnded) throw new Error()
@@ -116,7 +117,7 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
     }
 
     try {
-      const result = method(buildRouteCtx(req, res))
+      const result = method(buildRouteCtx(config, req, res))
 
       if (!res.writableEnded) {
         res.writeHead(200, {
@@ -248,9 +249,10 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
 }
 
 function buildRouteCtx(
+  config: ChronocatSatoriServerConfig,
   req: IncomingMessage,
   res: ServerResponse<IncomingMessage>,
-) {
+): RouteContext {
   const buffer = () => {
     const chunks: Buffer[] = []
     return new Promise<Buffer>((resolve, reject) => {
@@ -271,6 +273,7 @@ function buildRouteCtx(
   const json = () => string().then((s) => JSON.parse(s) as unknown)
 
   return {
+    config,
     req,
     res,
     buffer,
