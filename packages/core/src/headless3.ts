@@ -40,32 +40,65 @@ export const initHeadless3 = () => {
       ) {
         args[0].width = 3
         args[0].height = 3
-        console.log('[headless] ConstructBW', args)
+        console.log('[headless] ConstructBW', args[0])
 
-        if (!args[0].title && !handleClearWindowsTimer)
+        if (!args[0].title && !handleClearWindowsTimer) {
+          app.removeAllListeners('window-all-closed')
           handleClearWindowsTimer = setInterval(() => {
             if (!globalThis.authData) return
 
-            app.removeAllListeners('window-all-closed')
-            BrowserWindow.getAllWindows().map((v) => {
-              v.removeAllListeners()
+            console.log('[headless] closing all windows')
 
-              // v.close()
+            setTimeout(() => {
+              BrowserWindow.getAllWindows().forEach((v) => {
+                v.removeAllListeners()
 
-              try {
-                // @ts-expect-error BaseWindow 没有 dts
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-var-requires
-                require('electron').BaseWindow.prototype.destroy.call(v)
-              } catch (e) {
-                console.log('headless3: destroy failed: ', e)
-              }
-            })
+                // v.close()
+
+                try {
+                  // @ts-expect-error BaseWindow 没有 dts
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-var-requires
+                  require('electron').BaseWindow.prototype.destroy.call(v)
+                } catch (e) {
+                  console.log('headless3: destroy failed: ', e)
+                }
+              })
+            }, 5000)
           }, 5000)
+        }
+
+        type BWKeys = Exclude<keyof BrowserWindow, 'id' | 'webContents'>
+        type BWFunctions = BrowserWindow[BWKeys]
 
         const win = new BrowserWindow(...args)
+        const winOriginMethods = {} as Record<BWKeys, BWFunctions>
+
+        for (const i in win) {
+          const ii = i as BWKeys
+
+          if (typeof win[ii] === 'function') {
+            winOriginMethods[ii] = (win[ii] as () => void).bind(win)
+
+            win[ii] = ((...args: unknown[]) => {
+              console.log('[headless3] win called ', ii, args)
+              if (ii === 'isDestroyed') {
+                console.log(
+                  '[headless3] win called isDestroyed ',
+                  new Error().stack,
+                )
+                return false
+              }
+
+              return (
+                winOriginMethods[ii] as (...p: unknown[]) => unknown
+              ).apply(win, args)
+            }) as never
+          }
+        }
+
         win.webContents.setFrameRate(1)
         win.webContents.on('paint', () => {})
-        win.show = () => console.log('[headless] Not showing window')
+        // win.show = () => console.log('[headless] Not showing window')
         return win
       },
     })
