@@ -2,25 +2,16 @@
 title: 参考
 ---
 
-## 调试
+## 资源
 
-如果你需要进入容器调试，可以使用下面的命令。
+### 内存占用
 
-进入容器（启动所有服务）：
+目前版本的容器会占用约 250MiB
+的内存。我们将在未来持续探索无头模式的更多可能性，并力求进一步降低内存占用。
 
-```sh
-docker run --rm -it chronoc/at /sbin/my_init -- bash -l
-```
+![镜像内存占用](./docker-mem.png)
 
-进入容器（不启动任何服务）：
-
-```sh
-docker run --rm -it chronoc/at bash
-```
-
-## 内存占用
-
-## 镜像体积
+### 镜像体积
 
 基于下面的实际情况：
 
@@ -37,7 +28,27 @@ docker run --rm -it chronoc/at bash
 - 本地存在任一版本的 base 镜像的情况下，在不同 base 镜像间移动需要重新拉取约 400MB 的层
 - `chronoc/at` 层约为 1MB
 
-## 截图
+## 调试
+
+### 进入容器
+
+如果你需要进入容器调试，可以使用下面的命令。
+
+进入容器（启动所有服务）：
+
+```sh
+docker run --rm -it chronoc/at /sbin/my_init -- bash -l
+```
+
+进入容器（不启动任何服务）：
+
+```sh
+docker run --rm -it chronoc/at bash
+```
+
+### 截图
+
+对容器内的虚拟显示器进行截图：
 
 ```sh
 docker exec -i chronocat bash -c 'xwd -display :1 -root -silent | xwdtopnm | pnmtopng' > screenshot.png
@@ -45,7 +56,9 @@ docker exec -i chronocat bash -c 'xwd -display :1 -root -silent | xwdtopnm | pnm
 
 你将永远得到黑屏，因此截图并无意义。
 
-## 自行构建 Chronocat 镜像
+## 开发
+
+### 自行构建 Chronocat 镜像
 
 先创建一个 builder：
 
