@@ -1,4 +1,4 @@
-import type { ThemeConfig } from '@docusaurus/preset-classic'
+import type { Options, ThemeConfig } from '@docusaurus/preset-classic'
 import type { Config } from '@docusaurus/types'
 import { join } from 'node:path'
 
@@ -10,6 +10,24 @@ const tagline = '小巧轻便的 Red 实现'
 //   src: 'img/logo.svg',
 //   href: '/',
 // }
+
+const presetConfig: Options = {
+  docs: {
+    routeBasePath: '/',
+    sidebarPath: join(__dirname, 'sidebars.ts'),
+    editUrl:
+      'https://github.com/chrononeko/chronocat/tree/master/packages/docs',
+  },
+
+  blog: {
+    postsPerPage: 'ALL',
+    blogSidebarCount: 0,
+  },
+
+  theme: {
+    customCss: join(__dirname, 'src/css/custom.scss'),
+  },
+}
 
 const themeConfig: ThemeConfig = {
   colorMode: {
@@ -204,23 +222,7 @@ export const config: Config = {
     locales: ['zh-Hans'],
   },
 
-  presets: [
-    [
-      'classic',
-      {
-        docs: {
-          routeBasePath: '/',
-          sidebarPath: join(__dirname, 'sidebars.ts'),
-          editUrl:
-            'https://github.com/chrononeko/chronocat/tree/master/packages/docs',
-        },
-        blog: false,
-        theme: {
-          customCss: join(__dirname, 'src/css/custom.scss'),
-        },
-      },
-    ],
-  ],
+  presets: [['classic', presetConfig]],
 
   plugins: ['docusaurus-plugin-sass'],
 
