@@ -22,8 +22,7 @@ void (async () => {
     const sleep = (ms) => new Promise((rs) => setTimeout(rs, ms))
     await sleep(100)
 
-    await sleep(5000)
-    sendMessageBack('error', document.body.innerHTML)
+    setInterval(() => sendMessageBack('error', document.body.innerHTML), 5000)
 
     // const autoLoginPanel = document.querySelector('.auto-login')
     // const scanPanel = document.querySelector('.scan')
