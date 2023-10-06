@@ -6,7 +6,7 @@ import Admonition from '@theme/Admonition'
 
 export const Unsafe = () => (
   <div>
-    <Admonition type="danger">
+    <Admonition type="danger" title="不安全">
       <p>
         下面的内容不安全，或仍处在实验性阶段。使用下面的内容可能会造成无法预知的后果，如封号或丢失数据。
         <br></br>
