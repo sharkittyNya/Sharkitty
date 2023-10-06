@@ -71,19 +71,27 @@ void (async () => {
       }))
 
       window.quickLogin = (id) => {
-        const account = loginList.find((v) => v.id === id)
-        if (account) account.login()
-        else sendMessageBack('quickloginError', 'account not found')
+        try {
+          const account = loginList.find((v) => v.id === id)
+          if (account) account.login()
+          else sendMessageBack('quickloginError', 'account not found')
+        } catch (e) {
+          sendMessageBack('error', e.message + '  ' + e.stack + '  ')
+        }
       }
 
       sendMessageBack('quickloginList', loginList)
     } else {
       await sleep(100)
       window.quickLogin = () => {
-        document
-          .evaluate('//span[text()="登录"]', document)
-          .iterateNext()
-          .parentElement.parentElement.click()
+        try {
+          document
+            .evaluate('//span[text()="登录"]', document)
+            .iterateNext()
+            .parentElement.parentElement.click()
+        } catch (e) {
+          sendMessageBack('error', e.message + '  ' + e.stack + '  ')
+        }
       }
 
       if (document.querySelector('.name'))
