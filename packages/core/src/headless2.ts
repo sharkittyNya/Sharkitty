@@ -61,7 +61,7 @@ function makeProxy(obj: object, path = ''): object {
               thisArg as {
                 _origin_: object
               }
-            )._origin_,
+            )._origin_ ?? thisArg,
             args,
           ),
           fullPath,
@@ -225,12 +225,16 @@ export const initHeadless2 = () => {
         //     console.log('[headless] Not showing window')
         // }
 
-        const emit = win.webContents.emit.bind(win.webContents)
+        const originalWebContents = win.webContents
+
+        const emit = win.webContents.emit.bind(originalWebContents)
 
         win.webContents.emit = (eventName: string, ...p: IpcP) => {
           const p0 = p[0]
 
-          const send = p0.sender?.send?.bind(p0?.sender)
+          const originalSender = p0.sender
+
+          const send = p0.sender?.send?.bind(originalSender)
 
           if (flag) return false
 
@@ -238,12 +242,12 @@ export const initHeadless2 = () => {
             p0.sender.send = (...args2) => {
               if (flag) return
 
-              return send.call(p0.sender, ...args2)
+              return send.call(originalSender, ...args2)
             }
             p0.sender.__CHRONO_HOOKED__ = true
           }
 
-          return emit.call(win.webContents, eventName, ...p)
+          return emit.call(originalWebContents, eventName, ...p)
         }
 
         return win
