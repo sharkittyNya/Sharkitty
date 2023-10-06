@@ -12,11 +12,11 @@ Chronocat 提供了多种启动方式，你可以根据自己的需求进行选�
 
 直接使用浏览器访问 Chronocat 启动的 Satori 服务即可判断 Chronocat 是否正在运行。
 
-## 辅助登录
+## 远程登录
 
-如果你希望在正常启动 QQ 的同时使用 Chronocat 进行 QQ 登录，则可以选择辅助登录。
+如果你希望在正常启动 QQ 的同时使用 Chronocat 进行 QQ 登录，则可以选择远程登录。
 
-启动 QQ 时附加如下的命令行参数或环境变量，则 Chronocat 将启用辅助登录。
+启动 QQ 时附加如下的命令行参数或环境变量，则 Chronocat 将启用远程登录。
 
 ```sh
 ./QQ --chrono-mode=login
@@ -25,6 +25,16 @@ Chronocat 提供了多种启动方式，你可以根据自己的需求进行选�
 ```ini
 CHRONO_MODE=login
 ```
+
+启动时，Chronocat 会在控制台打印一个链接，链接包含了登录服务使用的端口和服务密码，你可以使用这个链接进行登录。
+
+直接打开链接，登录服务地址和服务密码会自动填充。
+
+![远程登录-连接](./login-1.png)
+
+点击连接后，将会出现可用的快速登录账号。可以点击账号进行快速登录。如果不能快速登录，则需点击右边的二维码区域进行扫码登录。
+
+![远程登录-登录](./login-2.png)
 
 登录服务的服务密码默认随机生成。可附加如下的命令行参数或环境变量用作登录服务的服务密码。如果同时存在，则使用命令行参数。
 
@@ -57,11 +67,18 @@ CHRONO_ADMIN_LISTEN=127.0.0.1:16341
 启动 QQ 时附加如下的命令行参数或环境变量，则 Chronocat 将使用无头启动。
 
 ```sh
-./QQ --chrono-mode=headless
+./QQ --chrono-mode=headless3
 ```
 
 ```ini
-CHRONO_MODE=headless
+CHRONO_MODE=headless3
 ```
 
-启用 `headless` 时会自动同时启用 `login`。
+:::caution[注意 `headless3`]
+
+无头模式现在仍然处在「实验性功能」阶段。目前，只有模式
+3（`headless3`）可供使用。不要尝试其他模式。
+
+:::
+
+启用 `headless3` 时会自动同时启用 `login`。

@@ -36,3 +36,31 @@ docker run --rm -it chronoc/at bash
 - base 镜像的公共体积约为 800MB
 - 本地存在任一版本的 base 镜像的情况下，在不同 base 镜像间移动需要重新拉取约 400MB 的层
 - `chronoc/at` 层约为 1MB
+
+## 截图
+
+```sh
+docker exec -i chronocat bash -c 'xwd -display :1 -root -silent | xwdtopnm | pnmtopng' > screenshot.png
+```
+
+你将永远得到黑屏，因此截图并无意义。
+
+## 自行构建 Chronocat 镜像
+
+先创建一个 builder：
+
+```sh
+docker buildx create --name container --driver=docker-container
+```
+
+构建 base 镜像：
+
+```sh
+BUILD_DOCKER_BUILDER=container ./build-base.sh
+```
+
+构建 chronocat 镜像：
+
+```sh
+BUILD_DOCKER_BUILDER=container ./build.sh
+```
