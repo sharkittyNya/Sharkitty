@@ -114,6 +114,9 @@ export const initHeadless2 = () => {
       return ret
     }
 
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    const originalForEach = Map.prototype.forEach
+
     Map.prototype.forEach = function (cb) {
       // console.log(this, this.entries().next()?.[1]?.windowType, this.entries().next())
       if (
@@ -127,7 +130,7 @@ export const initHeadless2 = () => {
         }, 1000)
       }
 
-      Map.prototype.forEach.call(this, (r, p2, p3) => {
+      originalForEach.call(this, (r, p2, p3) => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         r.shutdown = () => {
           console.log('[headless] not shutting down', r)
@@ -238,13 +241,15 @@ export const initHeadless2 = () => {
 
           if (flag) return false
 
-          if (send && !p0.sender.__CHRONO_HOOKED__) {
+          // @ts-expect-error 111
+          if (send && !p0.sender.__CHRONO_HOOKED2__) {
             p0.sender.send = (...args2) => {
               if (flag) return
 
               return send.call(originalSender, ...args2)
             }
-            p0.sender.__CHRONO_HOOKED__ = true
+            // @ts-expect-error 111
+            p0.sender.__CHRONO_HOOKED2__ = true
           }
 
           return emit.call(originalWebContents, eventName, ...p)
