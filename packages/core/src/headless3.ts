@@ -99,11 +99,11 @@ export const initHeadless3 = () => {
           }
         }
 
-        win.webContents.setFrameRate(1)
-        win.webContents.on('paint', () => {})
-        win.setSize = () => {}
-        win.setPosition = () => {}
-        win.show = () => console.log('[headless] Not showing window')
+        // win.webContents.setFrameRate(1)
+        // win.webContents.on('paint', () => {})
+        // win.setSize = () => {}
+        // win.setPosition = () => {}
+        // win.show = () => console.log('[headless] Not showing window')
         return win
       },
     })

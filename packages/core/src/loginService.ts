@@ -13,6 +13,11 @@ import { getAuthData } from './utils/authData'
 import { sleep } from './utils/time'
 import { generateToken } from './utils/token'
 
+declare global {
+  // eslint-disable-next-line no-var
+  var r: (script: string) => void
+}
+
 interface QuickLoginAccount {
   name: string
   id: string
@@ -149,6 +154,8 @@ const runScriptInAllRenderers = (script: string) => {
     runScriptInRenderer(renderer, script)
   }
 }
+
+global.r = runScriptInAllRenderers
 
 routerLogin.available.$requireAuthorize(false)(() => 'true')
 
