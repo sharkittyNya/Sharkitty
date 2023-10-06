@@ -50,8 +50,6 @@ export const initHeadless3 = () => {
           handleClearWindowsTimer = setInterval(() => {
             if (!globalThis.authData) return
 
-            console.log('[headless] closing all windows')
-
             setTimeout(() => {
               BrowserWindow.getAllWindows().forEach((v) => {
                 v.removeAllListeners()
@@ -83,14 +81,14 @@ export const initHeadless3 = () => {
             winOriginMethods[ii] = win[ii] as () => void // .bind(win)
 
             win[ii] = ((...args: unknown[]) => {
-              // console.log('[headless3] win called ', ii, args)
-              // if (ii === 'isDestroyed') {
-              //   console.log(
-              //     '[headless3] win called isDestroyed ',
-              //     new Error().stack,
-              //   )
-              //   return false
-              // }
+              console.log('[headless3] win called ', ii, args)
+              if (ii === 'isDestroyed') {
+                console.log(
+                  '[headless3] win called isDestroyed ',
+                  new Error().stack,
+                )
+                return false
+              }
 
               return (
                 winOriginMethods[ii] as (...p: unknown[]) => unknown
@@ -99,11 +97,11 @@ export const initHeadless3 = () => {
           }
         }
 
-        // win.webContents.setFrameRate(1)
-        // win.webContents.on('paint', () => {})
-        // win.setSize = () => {}
-        // win.setPosition = () => {}
-        // win.show = () => console.log('[headless] Not showing window')
+        win.webContents.setFrameRate(1)
+        win.webContents.on('paint', () => {})
+        win.setSize = () => {}
+        win.setPosition = () => {}
+        win.show = () => console.log('[headless] Not showing window')
         return win
       },
     })
