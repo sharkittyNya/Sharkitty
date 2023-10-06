@@ -80,17 +80,17 @@ export const initHeadless3 = () => {
           const ii = i as BWKeys
 
           if (typeof win[ii] === 'function') {
-            winOriginMethods[ii] = (win[ii] as () => void).bind(win)
+            winOriginMethods[ii] = win[ii] as () => void // .bind(win)
 
             win[ii] = ((...args: unknown[]) => {
               // console.log('[headless3] win called ', ii, args)
-              if (ii === 'isDestroyed') {
-                console.log(
-                  '[headless3] win called isDestroyed ',
-                  new Error().stack,
-                )
-                return false
-              }
+              // if (ii === 'isDestroyed') {
+              //   console.log(
+              //     '[headless3] win called isDestroyed ',
+              //     new Error().stack,
+              //   )
+              //   return false
+              // }
 
               return (
                 winOriginMethods[ii] as (...p: unknown[]) => unknown
