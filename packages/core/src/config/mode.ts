@@ -5,7 +5,7 @@ let modes: string[] | undefined = undefined
 
 const splitModes = (modes: string) => modes.split(',').filter(Boolean)
 
-const loadModes = async () => {
+const loadModes = () => {
   const result = splitModes(
     app.commandLine.getSwitchValue('chrono-mode'),
   ).concat(splitModes(process.env['CHRONO_MODE'] || ''))
@@ -15,10 +15,10 @@ const loadModes = async () => {
   return [...new Set(result)]
 }
 
-export const getChronocatModes = async () => {
-  if (!modes) modes = await loadModes()
+export const getChronocatModes = () => {
+  if (!modes) modes = loadModes()
   return modes
 }
 
 export const isChronocatMode = (mode: string) =>
-  getChronocatModes().then((modes) => modes.includes(mode))
+  getChronocatModes().includes(mode)

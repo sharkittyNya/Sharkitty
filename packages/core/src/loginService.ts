@@ -126,11 +126,11 @@ export const initLoginService = () => {
         },
     )
 
-    void getAuthData().then(async () => {
+    void getAuthData().then(() => {
       server.stop()
       console.warn('Chronocat login service stopped due to authorization')
 
-      if (await isChronocatMode('headless')) initHeadless()
+      if (isChronocatMode('headless')) initHeadless()
     })
   } catch (e) {
     console.log('login service: ', e)

@@ -84,16 +84,14 @@ export const initListener = (
           Channel: eventName as string,
         }
 
-        void isChronocatMode('headless').then((headless) => {
-          if (headless) {
-            // 无头模式下屏蔽 unregister 事件
-            if (!pEvent?.eventName.toLowerCase().includes('unregister'))
-              emit.call(this, eventName, ...p)
-          } else {
-            // 非无头模式，不做修改
+        if (isChronocatMode('headless')) {
+          // 无头模式下屏蔽 unregister 事件
+          if (!pEvent?.eventName.toLowerCase().includes('unregister'))
             emit.call(this, eventName, ...p)
-          }
-        })
+        } else {
+          // 非无头模式，不做修改
+          emit.call(this, eventName, ...p)
+        }
 
         if (pEvent?.eventName?.includes('Log')) return false
         responseMap[pEvent?.callbackId] ??= {}
