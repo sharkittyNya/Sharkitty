@@ -3,6 +3,7 @@ import { isChronocatMode } from './config/mode'
 import { MessageRecvDispatchMessage } from './dispatch'
 import { initHeadless2 } from './headless2'
 import { initHeadless3 } from './headless3'
+import { initHeadless4 } from './headless4'
 import { getMemberInfo } from './ipc/definitions/groupService'
 import {
   friendMap,
@@ -51,6 +52,7 @@ const initHooks = async () => {
 export const chronocat = async () => {
   if (isChronocatMode('headless2')) initHeadless2()
   if (isChronocatMode('headless3')) initHeadless3()
+  if (isChronocatMode('headless4')) initHeadless4()
 
   if (isChronocatMode('debug') || 'CHRONO_DEBUG' in process.env)
     global.__CHRONO_DEBUG__ = {
