@@ -86,14 +86,15 @@ void (async () => {
           .parentElement.parentElement.click()
       }
 
-      sendMessageBack('quickloginList', [
-        {
-          name: document.querySelector('.name').innerText,
-          id: getUinByAvatarPath(
-            document.querySelector('.avatar').style.backgroundImage,
-          ),
-        },
-      ])
+      if (document.querySelector('.name'))
+        sendMessageBack('quickloginList', [
+          {
+            name: document.querySelector('.name').innerText,
+            id: getUinByAvatarPath(
+              document.querySelector('.avatar').style.backgroundImage,
+            ),
+          },
+        ])
     }
   } catch (e) {
     sendMessageBack('error', e.message + '  ' + e.stack + '  ')
