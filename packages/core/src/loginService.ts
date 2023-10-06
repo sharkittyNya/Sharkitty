@@ -4,7 +4,7 @@ import { BrowserWindow, app } from 'electron'
 import index from '../static/login.html'
 import loginJs from '../static/login.js.txt'
 import { isChronocatMode } from './config/mode'
-import { initHeadless } from './headless'
+import { initHeadless1 } from './headless1'
 import { wrapIpc } from './ipc/wrap'
 import { resolveRouteLogin, routerLogin } from './router'
 import { HeaderAuthorizer } from './server/authorizer'
@@ -130,7 +130,7 @@ export const initLoginService = () => {
       server.stop()
       console.warn('Chronocat login service stopped due to authorization')
 
-      if (isChronocatMode('headless')) initHeadless()
+      if (isChronocatMode('headless1')) initHeadless1()
     })
   } catch (e) {
     console.log('login service: ', e)

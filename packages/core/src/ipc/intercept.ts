@@ -84,7 +84,7 @@ export const initListener = (
           Channel: eventName as string,
         }
 
-        if (isChronocatMode('headless')) {
+        if (isChronocatMode('headless1')) {
           // 无头模式下屏蔽 unregister 事件
           if (!pEvent?.eventName.toLowerCase().includes('unregister'))
             emit.call(this, eventName, ...p)

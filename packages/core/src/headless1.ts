@@ -10,7 +10,7 @@ declare global {
   }
 }
 
-export const initHeadless = () => {
+export const initHeadless1 = () => {
   try {
     setFlagsFromString('--expose_gc')
 
