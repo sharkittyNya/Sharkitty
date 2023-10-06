@@ -67,6 +67,7 @@ function makeProxy(obj: object, path = ''): object {
           fullPath,
         )
 
+        if (!global.apiMap) global.apiMap = {}
         global.apiMap[fullPath] = ret
         console.log(`     - ${fullPath}`, ret)
         return ret
@@ -78,8 +79,6 @@ function makeProxy(obj: object, path = ''): object {
 
 export const initHeadless2 = () => {
   try {
-    start('> ')
-
     setFlagsFromString('--expose_gc')
 
     // 5 秒一 gc
@@ -140,10 +139,10 @@ export const initHeadless2 = () => {
 
     const FakeBrowserWindow = new Proxy(BrowserWindow, {
       construct(_target, args: [BrowserWindowConstructorOptions]) {
-        args[0].webPreferences = {
-          ...args[0].webPreferences,
-          // offscreen: true,
-        }
+        // args[0].webPreferences = {
+        //   ...args[0].webPreferences,
+        //   // offscreen: true,
+        // }
 
         // args[0].width = 3
         // args[0].height = 3
@@ -276,6 +275,8 @@ export const initHeadless2 = () => {
 
     // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-member-access
     require('module')._load = newLoad
+
+    start()
   } catch (e) {
     console.log('headless: ', e)
   }
