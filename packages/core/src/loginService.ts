@@ -64,7 +64,7 @@ export const initLoginService = () => {
       host = '0.0.0.0'
     }
 
-    console.warn(
+    console.log(
       `访问此链接以登录：\nhttp://127.0.0.1:${port}/login#127.0.0.1:${port}@${token}`,
     )
 
