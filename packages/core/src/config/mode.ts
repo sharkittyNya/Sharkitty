@@ -11,6 +11,7 @@ const loadModes = () => {
   ).concat(splitModes(process.env['CHRONO_MODE'] || ''))
 
   if (result.includes('headless1')) result.push('login')
+  if (result.includes('headless2')) result.push('login')
 
   return [...new Set(result)]
 }
