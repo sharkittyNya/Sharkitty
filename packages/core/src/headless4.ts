@@ -3,7 +3,6 @@ import type { BrowserWindowConstructorOptions } from 'electron'
 // https://github.com/import-js/eslint-plugin-import/issues/2802
 // eslint-disable-next-line import/no-unresolved
 import { app, BrowserWindow } from 'electron'
-import { start } from 'node:repl'
 import { setFlagsFromString } from 'node:v8'
 import { runInNewContext } from 'node:vm'
 
@@ -16,8 +15,6 @@ declare global {
 
 export const initHeadless4 = () => {
   try {
-    start()
-
     setFlagsFromString('--expose_gc')
 
     // 5 秒一 gc
@@ -27,7 +24,7 @@ export const initHeadless4 = () => {
       gc()
     }, 5000)
 
-    app.quit = () => console.log('Not quitting...')
+    app.quit = () => {}
 
     app.commandLine.appendSwitch('disable-software-rasterizer')
     app.commandLine.appendSwitch('disable-gpu')
