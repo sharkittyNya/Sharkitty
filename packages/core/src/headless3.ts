@@ -80,7 +80,7 @@ export const initHeadless3 = () => {
             winOriginMethods[ii] = (win[ii] as () => void).bind(win)
 
             win[ii] = ((...args: unknown[]) => {
-              console.log('[headless3] win called ', ii, args)
+              // console.log('[headless3] win called ', ii, args)
               if (ii === 'isDestroyed') {
                 console.log(
                   '[headless3] win called isDestroyed ',
@@ -98,7 +98,9 @@ export const initHeadless3 = () => {
 
         win.webContents.setFrameRate(1)
         win.webContents.on('paint', () => {})
-        // win.show = () => console.log('[headless] Not showing window')
+        win.setSize = () => {}
+        win.setPosition = () => {}
+        win.show = () => console.log('[headless] Not showing window')
         return win
       },
     })
