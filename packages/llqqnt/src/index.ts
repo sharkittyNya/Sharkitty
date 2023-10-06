@@ -1,3 +1,5 @@
 import { chronocat } from '@chronocat/core'
 
-export const onLoad = () => chronocat()
+void chronocat()
+
+// export const onLoad = () => chronocat()
