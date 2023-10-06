@@ -1,5 +1,33 @@
 # CHANGELOG
 
+## v0.0.50 (2023-10-07)
+
+### core
+
+- 实装了远程登录 (1d22d6d21cd3fac52e76e8bc06382f47bbbebae9)
+- 修复了远程登录无响应的问题 (7bae5f2366f461232ec2eecfc3f18b4ee83e9670)
+- 实现远程登录失败时返回错误信息 (94a2b42dccc0b3699eb0c23c957a0d8bbad90e79)
+- 修复远程登录在 Linux QQ v3.1.2-13107 上的问题 (eb5006fa252bbd20f7ba1265601e1f04bf6e3371)
+- 实装了无头模式（模式 3） (8ddea1a1938b59072fbbf3c4e2e49cc64b14d5cf)
+- 实装了无头模式（模式 4） (917f1e02fb130b39e41771c2cf6e1dccea7dfae7)
+- 仅在调试环境挂载全局变量 (25ce1cfd980aedaa76aeffb5f930393eea276d56)
+- 支持使用 `--chrono-mode` 和 `CHRONO_MODE` 设定运行环境 (b0159c0ed3bb17e1f5388cfb985193d9fb5aaaee)
+- 支持 chrono-mode 传入 `debug` (8fc0e7c15a852b089e43ff9949dc2ad50a63072c)
+- 支持使用 `--chrono-default-token` 和 `CHRONO_DEFAULT_TOKEN` 设定初始 token (a45c6a366a744c7ea7543f0cd8002e14a32b0775)
+- Satori：支持了 API `message.create` (6f80d19ea9529148c2fd953c76e14a1ac0470b87)
+- Satori：实装了消息编码器 (6601032c4f793cc201600af474052b1a4376386e)
+- Satori：修复了 API 调用未等待调用结束的问题 (2eaf3eae6df0a9208564ea97983854f723f63a22)
+- Satori：修复了消息编码器的返回数据格式 (a6d66b158d949bb9469d0a6a83496e22ae2131d0)
+- Red：新增 API `bot/exit`，用于关闭机器人 (03c066d601d87d20aa30b6ea0a0f21d10bcc4acd)
+
+### llqqnt
+
+- 直接加载核心而不等待 ready 事件 (98a3a76c93e4620ceb19f2a73c04482dcd270795)
+
+### docker
+
+- 首个版本
+
 ## v0.0.49 (2023-10-04)
 
 ### core
@@ -10,6 +38,10 @@
 - Red：修复了 17153 及以上版本发送消息闪退的问题 (b2e0910375645e922c5894b3ea22807a78e7f247)
 - Red：修复了 17153 及以上版本发送消息有概率失败的问题 (8c887cf99cd09dfd18708c853dd13a05fed30c20)
 - Red：修复了 17153 及以上版本上传文件报错 500 的问题 (8b51c3d74a9ecc5ea1d9d8f4260107b9aed3ede6)
+
+### cli
+
+- 首个版本
 
 ## v0.0.48 (2023-10-02)
 
