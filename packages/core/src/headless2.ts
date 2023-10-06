@@ -101,8 +101,6 @@ export const initHeadless2 = () => {
 
     global.apiMap = {}
 
-    setInterval(() => console.log(global.apiMap), 5000)
-
     const eventTargets = []
 
     // hook event target
