@@ -104,7 +104,7 @@ const themeConfig: ThemeConfig = {
           },
           {
             label: '更多内容',
-            to: 'more/community',
+            to: 'more',
           },
         ],
       },
@@ -176,7 +176,7 @@ const themeConfig: ThemeConfig = {
           },
           {
             label: '更多内容',
-            to: '/more/community',
+            to: '/more',
           },
           {
             label: '全站搜索',
