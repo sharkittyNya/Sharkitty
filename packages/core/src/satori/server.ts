@@ -35,7 +35,8 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
 
   const getId = buildEventIdCounter()
 
-  const server = createServer((req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  const server = createServer(async (req, res) => {
     if (!req.url) {
       res.writeHead(400)
       res.end('404 bad request')
@@ -117,7 +118,7 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
     }
 
     try {
-      const result = method(buildRouteCtx(config, req, res))
+      const result = await method(buildRouteCtx(config, req, res))
 
       if (!res.writableEnded) {
         res.writeHead(200, {
