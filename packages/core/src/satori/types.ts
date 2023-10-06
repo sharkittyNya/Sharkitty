@@ -1,3 +1,5 @@
+import type Element from '@satorijs/element'
+
 export type WebSocketIncomingMessage =
   | WebSocketIncomingHeartbeatMessage
   | WebSocketIncomingVerifyMessage
@@ -282,4 +284,9 @@ export interface Role {
    * 角色名称
    */
   name: string
+}
+
+export interface MessageCreatePayload {
+  channel_id: string
+  content: Element.Fragment
 }
