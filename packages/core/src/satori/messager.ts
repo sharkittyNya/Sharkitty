@@ -51,7 +51,7 @@ export class Messager {
     await this.flush()
 
     if (this.errors.length) throw this.errors
-    else return this.results.map((result) => result.id)
+    else return this.results.filter(Boolean)
   }
 
   flush = async () => {
