@@ -164,6 +164,16 @@ export interface Login {
   user?: User
 
   /**
+   * 平台账号
+   */
+  self_id?: string
+
+  /**
+   * 平台名称
+   */
+  platform?: string
+
+  /**
    * 在线状态
    */
   status: LoginStatus
