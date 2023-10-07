@@ -418,8 +418,8 @@ async function parseElements(
       case 2: {
         // 图片消息
         elements.push(
-          Element('image', {
-            url: `${config.self_url}/v1/assets/${Buffer.from(
+          Element('img', {
+            src: `${config.self_url}/v1/assets/${Buffer.from(
               JSON.stringify({
                 msgId: message.msgId,
                 chatType: message.chatType,
@@ -441,7 +441,7 @@ async function parseElements(
         // 文件消息
         elements.push(
           Element('file', {
-            url: `${config.self_url}/v1/assets/${Buffer.from(
+            src: `${config.self_url}/v1/assets/${Buffer.from(
               JSON.stringify({
                 msgId: message.msgId,
                 chatType: message.chatType,
@@ -460,7 +460,7 @@ async function parseElements(
         // 语音消息
         elements.push(
           Element('audio', {
-            url: `${config.self_url}/v1/assets/${Buffer.from(
+            src: `${config.self_url}/v1/assets/${Buffer.from(
               JSON.stringify({
                 msgId: message.msgId,
                 chatType: message.chatType,
@@ -484,7 +484,7 @@ async function parseElements(
         // 视频消息
         elements.push(
           Element('video', {
-            url: `${config.self_url}/v1/assets/${Buffer.from(
+            src: `${config.self_url}/v1/assets/${Buffer.from(
               JSON.stringify({
                 msgId: message.msgId,
                 chatType: message.chatType,
