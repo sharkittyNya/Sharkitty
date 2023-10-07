@@ -11,8 +11,8 @@ import type { Routes } from './routes'
 import { routes } from './routes'
 import { assets } from './routes/assets'
 import type { RouteContext } from './routes/types'
-import type { WebSocketIncomingMessage } from './types'
-import { Op } from './types'
+import type { Login, WebSocketIncomingMessage } from './types'
+import { LoginStatus, Op } from './types'
 
 declare const __DEFINE_CHRONO_VERSION__: string
 
@@ -192,9 +192,23 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
             authorizedClients.splice(authorizedClients.indexOf(ws), 1),
           )
 
+          const login: Login = {
+            user: {
+              id: selfProfile.value!.uin,
+              name: selfProfile.value!.nick,
+              is_bot: true,
+            },
+            self_id: selfProfile.value!.uin,
+            platform: 'chronocat',
+            status: LoginStatus.ONLINE,
+          }
+
           ws.send(
             JSON.stringify({
               op: Op.Ready,
+              body: {
+                logins: [login],
+              },
             }),
           )
 
