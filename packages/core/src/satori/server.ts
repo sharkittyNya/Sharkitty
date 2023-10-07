@@ -140,7 +140,7 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
 
   const wsServer = new WebSocketServer({
     server,
-    path: prefix + 'event',
+    path: prefix + 'events',
   })
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
