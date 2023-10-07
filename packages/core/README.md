@@ -1,4 +1,9 @@
 <div align="center">
+
+<a href="https://chronocat.vercel.app" target="_blank" rel="noopener noreferrer">
+<img src="https://chronocat.vercel.app/chronocat.svg" alt="Chronocat" width="200px"></img>
+</a>
+
 <a href="https://chronocat.vercel.app" target="_blank" rel="noopener noreferrer">
 <h1>Chronocat</h1>
 </a>

@@ -5,11 +5,11 @@ import { join } from 'node:path'
 const title = 'Chronocat'
 const tagline = '小巧轻便的 Red 实现'
 
-// const logo = {
-//   alt: 'Chronocat Logo',
-//   src: 'img/logo.svg',
-//   href: '/',
-// }
+const logo = {
+  alt: 'Chronocat Logo',
+  src: 'chronocat.svg',
+  href: '/',
+}
 
 const presetConfig: Options = {
   docs: {
@@ -35,7 +35,7 @@ const themeConfig: ThemeConfig = {
     respectPrefersColorScheme: true,
   },
 
-  // image: 'img/logo.png',
+  image: 'chronocat.svg',
 
   metadata: [
     {
@@ -52,7 +52,7 @@ const themeConfig: ThemeConfig = {
   navbar: {
     title,
 
-    // logo,
+    logo,
 
     items: [
       {
@@ -119,10 +119,10 @@ const themeConfig: ThemeConfig = {
   footer: {
     style: 'dark',
 
-    // logo: {
-    //   ...logo,
-    //   width: 80,
-    // },
+    logo: {
+      ...logo,
+      width: 80,
+    },
 
     links: [
       {
@@ -212,7 +212,7 @@ export const config: Config = {
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
 
-  // favicon: 'img/favicon.ico',
+  favicon: 'chronocat.ico',
 
   organizationName: 'chrononeko',
   projectName: 'chronocat',

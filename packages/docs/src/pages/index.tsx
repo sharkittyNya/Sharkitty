@@ -15,6 +15,7 @@ const HomepageHeader = () => {
   return (
     <header className={clsx('hero hero--primary', styles.heroBanner)}>
       <div className="container">
+        <img src="/chronocat.svg" width="200px" />
         <Heading as="h1" className="hero__title">
           {siteConfig.title}
         </Heading>
