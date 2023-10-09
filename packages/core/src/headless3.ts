@@ -23,8 +23,6 @@ export const initHeadless3 = () => {
       gc()
     }, 5000)
 
-    app.quit = () => {}
-
     app.commandLine.appendSwitch('disable-software-rasterizer')
     app.commandLine.appendSwitch('disable-gpu')
 
