@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## v0.0.51 (2023-10-10)
+
+### core
+
+- 增加了 Chronocat 的 Logo @Lipraty (bbe271eebdc578ca91411a24f259a1adb9fea61a)
+- Satori：修复了事件端点错误的问题 (a485533866313e1f6c3a14519c67de67d8c3adb0)
+- Satori：支持 `READY` 信令的响应数据 (12df4f8fa5edecf80875a75ad4cb7a82c82dda0d)
+- Satori：标准元素实现最新版规范 (7a328e3ce692ce4905007f921a95e3e264ad52f1)
+- Satori：API `message.create` 返回 content 字段 (f09df36a1485af3a8f3dd73502a855b813d270bc)
+- 移除了无头模式（模式 1 和模式 2） (e4e1945709beba656863331626e4cff64470a62a)
+- 修复了无头模式导致 QQ 无法正常退出的问题 (1da52f2c46b9b738423e0f375b191c0e54048e00)
+
 ## v0.0.50 (2023-10-07)
 
 ### core
