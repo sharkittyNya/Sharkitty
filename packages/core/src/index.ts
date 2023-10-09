@@ -64,6 +64,9 @@ export const chronocat = async () => {
 
   if (isChronocatMode('login')) initLoginService()
 
+  // getConfig() 包含用户配置，因此会先等待登录
+  // 这是首个等待登录的位置
+  // 所有在登录前就需要启动的服务均应在此之前
   const config = await getConfig()
   if (!config.enable) return
 
