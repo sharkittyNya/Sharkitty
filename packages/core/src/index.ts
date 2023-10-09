@@ -1,7 +1,6 @@
 import { getConfig } from './config'
 import { isChronocatMode } from './config/mode'
 import { MessageRecvDispatchMessage } from './dispatch'
-import { initHeadless2 } from './headless2'
 import { initHeadless3 } from './headless3'
 import { initHeadless4 } from './headless4'
 import { getMemberInfo } from './ipc/definitions/groupService'
@@ -50,7 +49,6 @@ const initHooks = async () => {
 }
 
 export const chronocat = async () => {
-  if (isChronocatMode('headless2')) initHeadless2()
   if (isChronocatMode('headless3')) initHeadless3()
   if (isChronocatMode('headless4')) initHeadless4()
 

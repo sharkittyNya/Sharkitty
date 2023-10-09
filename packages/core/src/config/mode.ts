@@ -10,8 +10,6 @@ const loadModes = () => {
     app.commandLine.getSwitchValue('chrono-mode'),
   ).concat(splitModes(process.env['CHRONO_MODE'] || ''))
 
-  if (result.includes('headless1')) result.push('login')
-  if (result.includes('headless2')) result.push('login')
   if (result.includes('headless3')) result.push('login')
   if (result.includes('headless4')) result.push('login')
 

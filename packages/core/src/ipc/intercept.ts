@@ -85,7 +85,7 @@ export const initListener = (
         }
 
         if (isChronocatMode('headless1')) {
-          // 无头模式下屏蔽 unregister 事件
+          // 无头模式（模式 1）下屏蔽 unregister 事件
           if (!pEvent?.eventName.toLowerCase().includes('unregister'))
             emit.call(this, eventName, ...p)
         } else {
