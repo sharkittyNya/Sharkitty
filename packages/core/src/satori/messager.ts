@@ -195,6 +195,24 @@ export class Messager {
         return
       }
 
+      case 'message': {
+        // 前面的消息直接发送，开始一条新消息
+        await this.flush()
+
+        if ('forward' in attrs) {
+          // TODO: 合并转发
+          // this.stack.unshift(new State('forward'))
+          // await this.render(children)
+          // await this.flush()
+          // this.stack.shift()
+          // await this.forward()
+        } else {
+          // 普通切割消息
+          await this.render(children, true)
+        }
+        return
+      }
+
       default: {
         // 兜底
         await this.render(children)
