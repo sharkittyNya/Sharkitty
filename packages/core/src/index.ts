@@ -197,6 +197,7 @@ export const chronocat = async () => {
       case 'nodeIKernelMsgListener/onRichMediaDownloadComplete': {
         const payload = Payload as {
           notifyInfo: {
+            fileDownType: 1 | 2
             msgId: string
             msgElementId: string
             filePath: string
@@ -204,7 +205,10 @@ export const chronocat = async () => {
         }
 
         const downloadId = `${payload.notifyInfo.msgId}::${payload.notifyInfo.msgElementId}`
-        if (richMediaDownloadMap[downloadId]) {
+        if (
+          payload.notifyInfo.fileDownType === 1 &&
+          richMediaDownloadMap[downloadId]
+        ) {
           richMediaDownloadMap[downloadId]!(payload.notifyInfo.filePath)
           delete richMediaDownloadMap[downloadId]
         }
