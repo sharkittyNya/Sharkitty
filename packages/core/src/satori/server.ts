@@ -77,7 +77,7 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
 
     const path = url.pathname.slice(prefix.length)
 
-    if (path.startsWith('assets')) {
+    if (path.startsWith('assets/')) {
       if (req.method !== 'GET') {
         res.writeHead(405)
         res.end('405 method not allowed')
@@ -85,8 +85,8 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
       }
 
       try {
-        void assets({
-          raw: path.slice(prefix.length + 'assets/'.length),
+        await assets({
+          raw: path.slice('assets/'.length),
           ...buildRouteCtx(config, req, res),
         })
 
