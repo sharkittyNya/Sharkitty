@@ -55,6 +55,8 @@ export class Messager {
   }
 
   flush = async () => {
+    if (!this.children.length) return
+
     const result = await this.common.send(this.peer, this.children)
     const parsedEvents = await new MessageRecvDispatchMessage([
       result,
