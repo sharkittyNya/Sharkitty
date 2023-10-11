@@ -34,7 +34,7 @@ const FeatureList: FeatureItem[] = [
 ]
 
 const Feature = ({ title, description, to, isDevelop }: FeatureItem) => (
-  <div className="col col--4">
+  <div className={`col col--4 ${styles.feature}`}>
     <div className="text--center padding-horiz--md">
       <Heading as="h3">{title}</Heading>
       <p className={styles.description}>{description}</p>
