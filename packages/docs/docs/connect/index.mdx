@@ -8,9 +8,28 @@ import DocCardList from '@theme/DocCardList'
 
 Chronocat 支持多种应用和框架。你可以从这里开始接入。
 
+## 聊天机器人框架（推荐）
+
+聊天机器人框架专用于构建聊天机器人。将 Chronocat 接入聊天机器人后，你将立即可以使用机器人提供的各种功能。
+一些框架还提供了插件市场，你可以直接在插件市场内安装喜欢的插件并进行使用，而无需自己编写功能。
+这是我们最推荐的接入方式。
+
 <DocCardList />
 
-如果你不想使用上面列举的应用和框架，你还可以基于 Chronocat 开发自己的框架或适配器。
+## Satori SDK
+
+如果你不想使用上面的聊天机器人框架，或你本身有聊天机器人以外的其他需求，你可以基于 Satori SDK
+实现你的需求。
+
+| 项目                                                                  | 官方               | 语言       | 介绍                          |
+| --------------------------------------------------------------------- | ------------------ | ---------- | ----------------------------- |
+| [Satori](https://github.com/satorijs/satori)                          | :white_check_mark: | TypeScript | Satori 的官方 TypeScript 实现 |
+| [satori-rs](https://github.com/satorijs/satori-rs)                    | :white_check_mark: | Rust       | Satori 官方管理的 Rust 实现   |
+| [YurnSatoriFramework](https://github.com/Nyayurn/YurnSatoriFramework) |                    | Java       | Java 17+/SpringBoot 3+ SDK    |
+
+---
+
+不想使用现有的框架，而是想要自己开发？你可以基于 Chronocat 开发自己的框架或适配器。
 
 <Link
   className="button button--secondary button--lg button--develop"
