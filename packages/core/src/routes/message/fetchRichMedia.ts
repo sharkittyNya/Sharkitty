@@ -5,15 +5,16 @@ import { richMediaDownloadMap } from '../../ipc/globalVars'
 import type { Media } from '../../red'
 import { router } from '../../router'
 import { uixCache } from '../../uixCache'
+import { sleep } from '../../utils/time'
 
 router.message.fetchRichMedia.$body('json').$httpOnly(true)(
   async ({ body, http }) => {
     let { msgId, elementId, chatType, peerUid } = body as Media
 
     const downloadId = msgId + '::' + elementId
-    console.log('DownloadId:', downloadId)
-    const downloadCompletePromise = new Promise<string>((rs) => {
-      richMediaDownloadMap[downloadId] = rs
+    const downloadCompletePromise = new Promise<string>((res, rej) => {
+      richMediaDownloadMap[downloadId] = res
+      void sleep(1000).then(rej)
     })
 
     if (chatType === 1 && !peerUid.startsWith('u_'))
@@ -30,7 +31,15 @@ router.message.fetchRichMedia.$body('json').$httpOnly(true)(
       },
     })
 
-    const path = await downloadCompletePromise
+    let path: string | undefined = undefined
+
+    try {
+      path = await downloadCompletePromise
+    } catch (e) {
+      http.res.writeHead(404)
+      http.res.end('404 asset not found')
+      return
+    }
 
     http.res.statusCode = 200
     http.res.setHeader('Content-Type', getType(path)!)
