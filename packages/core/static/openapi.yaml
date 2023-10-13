@@ -2,7 +2,13 @@ openapi: 3.1.0
 info:
   title: Chronocat Satori
   version: 0.0.50
-  description: Chronocat Satori OpenAPI 定义
+  description: |
+    # Chronocat Satori OpenAPI 定义
+
+    这是一份 Chronocat Satori OpenAPI 的完整定义文件。
+
+    任何时候，你都可以从 <https://chronocat.vercel.app/openapi.yaml> 获取到此文件。
+
   contact:
     name: Team Chrononeko
     url: https://github.com/chrononeko
