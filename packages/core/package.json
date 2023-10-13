@@ -14,12 +14,14 @@
     "lib"
   ],
   "scripts": {
-    "build": "yarn build:tjs && yarn build:ajv && concurrently -n cjs,dts yarn:build:cjs yarn:build:dts",
+    "build": "concurrently -n oapi,core yarn:oapi yarn:build:core",
+    "build:core": "yarn build:tjs && yarn build:ajv && concurrently -n cjs,dts yarn:build:cjs yarn:build:dts",
     "build:dev": "yarn build:tjs && yarn build:ajv && yarn build:cjs",
     "build:tjs": "ts-node -T scripts/tjs.cts",
     "build:ajv": "ts-node -T scripts/ajv.cts",
     "build:cjs": "ts-node -T ../../scripts/build.cts build",
-    "build:dts": "tsc -b tsconfig.json"
+    "build:dts": "tsc -b tsconfig.json",
+    "oapi": "ts-node -T scripts/oapi.cts"
   },
   "devDependencies": {
     "@chronocat/module-native": "0.0.40",
