@@ -3,6 +3,7 @@
     "target": "es5",
   },
   "include": [
-    "satori.ts"
+    "satori.ts",
+    "satoriPlain.ts",
   ]
 }
