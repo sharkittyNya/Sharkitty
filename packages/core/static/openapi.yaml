@@ -131,6 +131,31 @@ paths:
         '500':
           $ref: '#/components/responses/500'
 
+  /message.create:
+    post:
+      operationId: messageCreate
+      tags:
+        - Message
+      summary: 发送消息
+      description: 发送一条消息。
+      requestBody:
+        description: 发送的目标和消息内容
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageCreatePayload'
+      responses:
+        '200':
+          description: 成功发送消息
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
+        '500':
+          $ref: '#/components/responses/500'
+
 components:
   securitySchemes:
     satori:
