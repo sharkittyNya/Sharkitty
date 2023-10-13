@@ -147,6 +147,13 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
   wsServer.on('connection', async (ws) => {
     let authorized = !config.token
 
+    const addToAuthorizedClients = () => {
+      authorizedClients.push(ws)
+      ws.on('close', () =>
+        authorizedClients.splice(authorizedClients.indexOf(ws), 1),
+      )
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     ws.on('message', async (raw) => {
       const message = JSON.parse(
@@ -187,10 +194,7 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
           }
 
           authorized = true
-          authorizedClients.push(ws)
-          ws.on('close', () =>
-            authorizedClients.splice(authorizedClients.indexOf(ws), 1),
-          )
+          addToAuthorizedClients()
 
           const login: Login = {
             user: {
@@ -237,6 +241,7 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
       setTimeout(() => {
         if (!authorized) ws.close(3000, 'Unauthorized')
       }, timeout)
+    else addToAuthorizedClients()
   })
 
   const dispatcher = (message: DispatchMessage) =>
