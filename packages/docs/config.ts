@@ -1,6 +1,7 @@
 import type { Options, ThemeConfig } from '@docusaurus/preset-classic'
 import type { Config } from '@docusaurus/types'
 import { join } from 'node:path'
+import type { PresetOptions } from 'redocusaurus'
 
 const title = 'Chronocat'
 const tagline = '小巧轻便的 Red 实现'
@@ -27,6 +28,16 @@ const presetConfig: Options = {
   theme: {
     customCss: join(__dirname, 'src/css/custom.scss'),
   },
+}
+
+const redocusaurusConfig: PresetOptions = {
+  specs: [
+    {
+      spec: 'static/openapi.yaml',
+      url: 'https://chronocat.vercel.app/openapi.yaml',
+      route: '/develop/satori/reference/api',
+    },
+  ],
 }
 
 const themeConfig: ThemeConfig = {
@@ -222,7 +233,10 @@ export const config: Config = {
     locales: ['zh-Hans'],
   },
 
-  presets: [['classic', presetConfig]],
+  presets: [
+    ['classic', presetConfig],
+    ['redocusaurus', redocusaurusConfig],
+  ],
 
   plugins: ['docusaurus-plugin-sass'],
 
