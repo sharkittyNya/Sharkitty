@@ -1,29 +1,3 @@
-import type Element from '@satorijs/element'
-
-export type WebSocketIncomingMessage =
-  | WebSocketIncomingHeartbeatMessage
-  | WebSocketIncomingVerifyMessage
-
-export enum Op {
-  Event = 0,
-  Ping = 1,
-  Pong = 2,
-  Identify = 3,
-  Ready = 4,
-}
-
-export interface WebSocketIncomingHeartbeatMessage {
-  op: Op.Ping
-  body: never
-}
-
-export interface WebSocketIncomingVerifyMessage {
-  op: Op.Identify
-  body?: {
-    token?: string
-  }
-}
-
 export interface Event {
   /**
    * 事件 ID
@@ -68,7 +42,7 @@ export interface Event {
   /**
    * 事件的目标成员
    */
-  member?: Member
+  member?: GuildMember
 
   /**
    * 事件的消息
@@ -83,7 +57,7 @@ export interface Event {
   /**
    * 事件的目标角色
    */
-  role?: Role
+  role?: GuildRole
 
   /**
    * 事件的目标用户
@@ -206,7 +180,7 @@ export enum LoginStatus {
   RECONNECT = 4,
 }
 
-export interface Member {
+export interface GuildMember {
   /**
    * 用户对象
    */
@@ -247,7 +221,7 @@ export interface Message {
   /**
    * 成员对象
    */
-  member?: Member
+  member?: GuildMember
 
   /**
    * 用户对象
@@ -284,7 +258,7 @@ export interface User {
   is_bot?: boolean
 }
 
-export interface Role {
+export interface GuildRole {
   /**
    * 角色 ID
    */
@@ -294,9 +268,4 @@ export interface Role {
    * 角色名称
    */
   name: string
-}
-
-export interface MessageCreatePayload {
-  channel_id: string
-  content: Element.Fragment
 }

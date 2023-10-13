@@ -4,7 +4,7 @@ import type { ChronocatSatoriServerConfig } from '../../config/types'
 import { selfProfile } from '../../ipc/globalVars'
 import type { Message as RedMessage } from '../../red'
 import { ChatType, MsgType, SendType } from '../../red'
-import type { Channel, Event, Guild, Member } from '../types'
+import type { Channel, Event, Guild, GuildMember } from '../types'
 import { ChannelType } from '../types'
 import { parseMsgTypes } from './msgt'
 
@@ -122,7 +122,7 @@ export const parseMessage = async (
     case ChatType.Group:
       // Guild 和 Member 只有群聊有
       event.guild = {} as Guild
-      event.member = {} as Member
+      event.member = {} as GuildMember
 
       if (message.sendMemberName) event.member.name = message.sendMemberName
 
