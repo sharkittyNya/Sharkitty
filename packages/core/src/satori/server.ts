@@ -145,7 +145,7 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   wsServer.on('connection', async (ws) => {
-    let authorized = false
+    let authorized = !config.token
 
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     ws.on('message', async (raw) => {
@@ -233,9 +233,10 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
       }
     })
 
-    setTimeout(() => {
-      if (!authorized) ws.close(3000, 'Unauthorized')
-    }, timeout)
+    if (config.token)
+      setTimeout(() => {
+        if (!authorized) ws.close(3000, 'Unauthorized')
+      }, timeout)
   })
 
   const dispatcher = (message: DispatchMessage) =>
