@@ -26,7 +26,7 @@ export const parseMessageRecv = async (
     if (!event.message?.id && !event.user?.id) {
       result.push({
         id: undefined as unknown as number,
-        platform: 'chronocat',
+        platform: config.platform!,
         self_id: selfProfile.value!.uin,
         timestamp: Number(message.msgTime) * 1000,
 
@@ -36,7 +36,7 @@ export const parseMessageRecv = async (
     } else if (!event.message?.id)
       result.push({
         id: undefined as unknown as number,
-        platform: 'chronocat',
+        platform: config.platform!,
         self_id: selfProfile.value!.uin,
         timestamp: Number(message.msgTime) * 1000,
 
@@ -49,7 +49,7 @@ export const parseMessageRecv = async (
     else if (!event.user?.id)
       result.push({
         id: undefined as unknown as number,
-        platform: 'chronocat',
+        platform: config.platform!,
         self_id: selfProfile.value!.uin,
         timestamp: Number(message.msgTime) * 1000,
 
@@ -66,7 +66,7 @@ export const parseMessageRecv = async (
     else if (!event.user?.name && !event.member?.name)
       result.push({
         id: undefined as unknown as number,
-        platform: 'chronocat',
+        platform: config.platform!,
         self_id: selfProfile.value!.uin,
         timestamp: Number(message.msgTime) * 1000,
 
@@ -95,7 +95,7 @@ export const parseMessage = async (
     id: undefined as unknown as number,
     type: undefined as unknown as string,
 
-    platform: 'chronocat',
+    platform: config.platform!,
     self_id: selfProfile.value!.uin,
     timestamp: Number(message.msgTime) * 1000,
   }
@@ -391,7 +391,7 @@ async function parseElements(
             if (!id) {
               extraEvents.push({
                 id: undefined as unknown as number,
-                platform: 'chronocat',
+                platform: config.platform!,
                 self_id: selfProfile.value!.uin,
                 timestamp: Number(message.msgTime) * 1000,
 

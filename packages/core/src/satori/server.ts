@@ -178,7 +178,7 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
                 op: Op.Event,
                 body: {
                   id: getId(),
-                  platform: 'chronocat',
+                  platform: config.platform!,
                   self_id: selfProfile.value!.uin,
                   timestamp: new Date().getTime(),
                   type: 'chrono-unsafe-warning-2132',
@@ -203,7 +203,7 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
               is_bot: true,
             },
             self_id: selfProfile.value!.uin,
-            platform: 'chronocat',
+            platform: config.platform!,
             status: LoginStatus.ONLINE,
           }
 
@@ -225,7 +225,7 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
               op: Op.Event,
               body: {
                 id: getId(),
-                platform: 'chronocat',
+                platform: config.platform!,
                 self_id: selfProfile.value!.uin,
                 timestamp: new Date().getTime(),
                 type: 'chrono-unsafe-warning-2133',

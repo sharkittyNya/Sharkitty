@@ -145,4 +145,15 @@ export interface ChronocatSatoriServerConfig
    * @default "https://chronocat.vercel.app"
    */
   self_url?: string
+
+  /**
+   * @title Satori 服务声明的自己所使用的平台。
+   *
+   * @description Satori 对外宣称的自己所处的平台。
+   *
+   * 大多数情况下均无需填写此配置。
+   *
+   * @default "chronocat"
+   */
+  platform?: string
 }
