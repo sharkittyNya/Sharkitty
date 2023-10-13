@@ -38,6 +38,10 @@ const redocusaurusConfig: PresetOptions = {
       route: '/develop/satori/reference/api',
     },
   ],
+  theme: {
+    primaryColor: '#2e8555',
+    primaryColorDark: '#25c2a0',
+  },
 }
 
 const themeConfig: ThemeConfig = {

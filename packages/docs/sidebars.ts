@@ -77,6 +77,21 @@ const sidebars: SidebarsConfig = {
     'develop/satori/index',
     'develop/satori/quickstart',
     'develop/satori/fundamentals',
+    {
+      type: 'category',
+      label: '参考',
+      link: {
+        type: 'doc',
+        id: 'develop/satori/reference/index',
+      },
+      items: [
+        {
+          type: 'link',
+          label: 'API',
+          href: '/develop/satori/reference/api',
+        },
+      ],
+    },
   ],
   developRed: [
     {
