@@ -45,6 +45,7 @@ const sidebars: SidebarsConfig = {
             'install/docker/community',
           ],
         },
+        'install/phone/index',
         'install/trusted-installation',
       ],
     },
