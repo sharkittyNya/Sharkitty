@@ -57,18 +57,6 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
       res.end(index)
     }
 
-    if (
-      config.token &&
-      !(
-        req.headers.authorization?.slice(0, 7) === 'Bearer ' &&
-        req.headers.authorization.slice(7) === config.token
-      )
-    ) {
-      res.writeHead(401)
-      res.end('401 unauthorized')
-      return
-    }
-
     if (!url.pathname.startsWith(prefix)) {
       res.writeHead(404)
       res.end('404 not found')
@@ -101,6 +89,18 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
 
         return
       }
+    }
+
+    if (
+      config.token &&
+      !(
+        req.headers.authorization?.slice(0, 7) === 'Bearer ' &&
+        req.headers.authorization.slice(7) === config.token
+      )
+    ) {
+      res.writeHead(401)
+      res.end('401 unauthorized')
+      return
     }
 
     const method = routes[path as Routes]

@@ -113,6 +113,8 @@ paths:
           description: 成功获取资源
           content:
             '*/*': {}
+      security:
+        - {}
 
   /login.get:
     post:
