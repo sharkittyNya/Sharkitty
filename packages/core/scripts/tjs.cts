@@ -1,7 +1,7 @@
 import { writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import type { PartialArgs } from 'typescript-json-schema'
-import { generateSchema, getProgramFromFiles } from 'typescript-json-schema'
+import { buildGenerator, programFromConfig } from 'typescript-json-schema'
 
 const settings: PartialArgs = {
   aliasRef: true,
@@ -14,11 +14,12 @@ const settings: PartialArgs = {
   skipLibCheck: true,
 }
 
-const program = getProgramFromFiles([
-  resolve(__dirname, '../src/config/types.ts'),
-])
+const generator = buildGenerator(
+  programFromConfig(resolve(__dirname, '../src/config/tsconfig.tjs.json')),
+  settings,
+)!
 
-const schema = generateSchema(program, 'ChronocatConfig', settings)!
+const schema = generator.getSchemaForSymbol('ChronocatConfig')
 
 schema.$id = 'https://chronocat.vercel.app/config-v0.schema.json'
 schema.title = 'Chronocat 配置'
