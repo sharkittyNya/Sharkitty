@@ -37,6 +37,9 @@ const redocusaurusConfig: PresetOptions = {
       spec: 'static/openapi.yaml',
       url: 'https://chronocat.vercel.app/openapi.yaml',
       route: '/develop/satori/reference/api',
+      layout: {
+        title: 'API 参考',
+      },
     },
     {
       id: 'config',
