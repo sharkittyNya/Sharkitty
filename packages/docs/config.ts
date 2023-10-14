@@ -259,7 +259,6 @@ export const config: Config = {
         docsRouteBasePath: '/',
       },
     ],
-    [require.resolve('docusaurus-json-schema-plugin'), {}],
   ],
 
   themeConfig,
