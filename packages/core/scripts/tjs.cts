@@ -38,3 +38,10 @@ void writeFile(
   resolve(__dirname, '../../docs/static/config-v0.schema.json'),
   schemaString,
 )
+void writeFile(
+  resolve(__dirname, '../../docs/static/openapi-config.json'),
+  `{"openapi":"3.1.0","info":{},"components":{"schemas":{"Config":${schemaString.replaceAll(
+    '#/definitions/',
+    '#/components/schemas/Config/definitions/',
+  )}}}}`,
+)

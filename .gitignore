@@ -143,6 +143,7 @@ packages/docs/docs/more/changelog.mdx
 packages/core/src/config/schema.ts
 packages/core/src/config/validate.ts
 packages/docs/static/config-v0.schema.json
+packages/docs/static/openapi-config.json
 packages/docs/static/openapi.yaml
 
 # Temp files
