@@ -115,7 +115,7 @@ export const parseMessage = async (
   switch (ntMsgTypes.chatType) {
     case ChatType.Private:
       event.channel.type = ChannelType.DIRECT
-      event.channel.id = event.user.id
+      event.channel.id = `private:${event.user.id}`
       event.channel.name = event.user.name
       break
 
