@@ -30,3 +30,7 @@ export interface MessageCreatePayload {
   channel_id: string
   content: Element.Fragment
 }
+
+export interface UserChannelCreatePayload {
+  user_id: string
+}
