@@ -76,6 +76,8 @@ router.upload.$httpOnly('POST')(
               mime: 'application/octet-stream',
             }
 
+          // TODO: fileInfo 里也有个 mimeType，也拿出来那个看看呗
+
           const category = fileType.mime.split('/')[0]
 
           const [md5, imageInfo, fileSize] = await Promise.all([
@@ -109,7 +111,7 @@ router.upload.$httpOnly('POST')(
                   fileType: 1,
                 })
 
-          await copyFile(filePath, richMediaPath as string)
+          await copyFile(filePath, richMediaPath)
 
           resolve({
             md5,

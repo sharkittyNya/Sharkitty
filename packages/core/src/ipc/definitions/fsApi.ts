@@ -11,6 +11,10 @@ export const getImageSizeFromPath = defineIpcApi<
   {
     width: number
     height: number
+    type: string // png
+    mime: string // image/png
+    wUnits: string // px
+    hUnits: string // px
   },
   [PathLike]
 >('IPC_UP_2', 'ns-fsApi-2', 'getImageSizeFromPath')

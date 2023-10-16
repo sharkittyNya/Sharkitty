@@ -35,10 +35,11 @@ export const messageCreate = async (ctx: RouteContext) => {
 
 async function messageCreateUsingForm({ req, res }: RouteContext) {
   res.writeHead(500)
-  res.end('500 not implemented')
+  res.end('500 not')
 
   return
 
+  // @ts-expect-error TODO
   return new Promise((resolve, reject) => {
     const bb = busboy({ headers: req.headers })
 
@@ -94,7 +95,7 @@ async function messageCreateUsingForm({ req, res }: RouteContext) {
             mime: 'application/octet-stream',
           }
 
-        // TODO: fileInfo 里也有个 mimeType
+        // TODO: fileInfo 里也有个 mimeType，也拿出来那个看看呗
 
         const category = fileType.mime.split('/')[0]
 
@@ -129,7 +130,7 @@ async function messageCreateUsingForm({ req, res }: RouteContext) {
                 fileType: 1,
               })
 
-        await copyFile(filePath, richMediaPath as string)
+        await copyFile(filePath, richMediaPath)
 
         resolve({
           md5,
