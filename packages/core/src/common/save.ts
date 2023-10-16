@@ -1,6 +1,6 @@
 import mime from 'mime/lite'
 import { createReadStream, createWriteStream } from 'node:fs'
-import { mkdir, writeFile, copyFile, rm } from 'node:fs/promises'
+import { copyFile, mkdir, rm, writeFile } from 'node:fs/promises'
 import { basename, join } from 'node:path'
 import { Readable } from 'node:stream'
 import { finished } from 'node:stream/promises'
@@ -18,10 +18,13 @@ import {
 import { baseDir } from '../utils/baseDir'
 import { qqVersion } from '../utils/qqVersion'
 import { generateToken16 } from '../utils/token'
+import type { CommonSaveResult } from './types'
 
 const dispositionRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
 
-export const commonSave = async (urlString: string) => {
+export const commonSave = async (
+  urlString: string,
+): Promise<CommonSaveResult> => {
   const url = new URL(urlString)
 
   let fileName: string
@@ -133,7 +136,7 @@ export const commonSave = async (urlString: string) => {
           fileType: 1,
         })
 
-  await copyFile(filePath, richMediaPath as string)
+  await copyFile(filePath, richMediaPath)
 
   void rm(filePath)
 

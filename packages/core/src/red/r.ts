@@ -1,5 +1,6 @@
 import path from 'node:path'
 import type { Object as ToolBeltObject } from 'ts-toolbelt'
+import { CommonSaveResult } from '../common/types'
 import type { Element, Peer, UploadResponse } from './types'
 
 const b = () => {
@@ -101,24 +102,24 @@ const b = () => {
     }),
 
     remoteImage: (
-      uploadResponse: UploadResponse,
+      saveResult: CommonSaveResult,
       picType: number,
     ): ToolBeltObject.Partial<Element, 'deep'> => ({
       elementId: '',
       elementType: 2,
       extBufForUI: '',
       picElement: {
-        fileName: path.basename(uploadResponse.ntFilePath),
-        fileSize: String(uploadResponse.fileSize),
+        fileName: path.basename(saveResult.filePath),
+        fileSize: String(saveResult.fileSize),
         fileSubId: '',
         fileUuid: '',
-        md5HexStr: uploadResponse.md5,
+        md5HexStr: saveResult.md5,
         original: true,
-        picHeight: uploadResponse.imageInfo!.height,
-        picWidth: uploadResponse.imageInfo!.width,
+        picHeight: saveResult.imageInfo!.height,
+        picWidth: saveResult.imageInfo!.width,
         picType,
         picSubType: 0,
-        sourcePath: uploadResponse.ntFilePath,
+        sourcePath: saveResult.filePath,
         summary: '',
         thumbFileSize: 0,
         // thumbPath: undefined,
@@ -126,7 +127,7 @@ const b = () => {
     }),
 
     remoteAudio: (
-      uploadResponse: UploadResponse,
+      saveResult: CommonSaveResult,
       duration: number,
       waveAmplitudes?: number[],
     ): ToolBeltObject.Partial<Element, 'deep'> => ({
@@ -134,12 +135,12 @@ const b = () => {
       elementType: 4,
       pttElement: {
         canConvert2Text: true,
-        fileName: path.basename(uploadResponse.ntFilePath),
-        filePath: uploadResponse.ntFilePath,
-        md5HexStr: uploadResponse.md5,
+        fileName: path.basename(saveResult.filePath),
+        filePath: saveResult.filePath,
+        md5HexStr: saveResult.md5,
         fileId: 0,
         fileSubId: '',
-        fileSize: String(uploadResponse.fileSize),
+        fileSize: String(saveResult.fileSize),
         duration,
         formatType: 1,
         voiceType: 1,
@@ -152,15 +153,15 @@ const b = () => {
     }),
 
     remoteFile: (
-      uploadResponse: UploadResponse,
+      saveResult: CommonSaveResult,
     ): ToolBeltObject.Partial<Element, 'deep'> => ({
       elementId: '',
       elementType: 3,
       fileElement: {
         fileMd5: '',
-        fileName: path.basename(uploadResponse.filePath),
-        filePath: uploadResponse.filePath,
-        fileSize: String(uploadResponse.fileSize),
+        fileName: path.basename(saveResult.filePath),
+        filePath: saveResult.filePath,
+        fileSize: String(saveResult.fileSize),
         picHeight: 0,
         picWidth: 0,
         picThumbPath: {},

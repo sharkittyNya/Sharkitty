@@ -41,7 +41,7 @@ export const getMsgsIncludeSelf = defineIpcApi<
 >('IPC_UP_2', 'ns-ntApi-2', 'nodeIKernelMsgService/getMsgsIncludeSelf')
 
 export const getRichMediaFilePath = defineIpcApi<
-  unknown,
+  string,
   [
     {
       md5HexStr: string
@@ -56,7 +56,7 @@ export const getRichMediaFilePath = defineIpcApi<
 >('IPC_UP_2', 'ns-ntApi-2', 'nodeIKernelMsgService/getRichMediaFilePath')
 
 export const getRichMediaFilePathForGuild = defineIpcApi<
-  unknown,
+  string,
   [
     {
       path_info: {

@@ -7,11 +7,13 @@ export const getFileMd5 = defineIpcApi<string, [PathLike]>(
   'getFileMd5',
 )
 
-export const getImageSizeFromPath = defineIpcApi<unknown, [PathLike]>(
-  'IPC_UP_2',
-  'ns-fsApi-2',
-  'getImageSizeFromPath',
-)
+export const getImageSizeFromPath = defineIpcApi<
+  {
+    width: number
+    height: number
+  },
+  [PathLike]
+>('IPC_UP_2', 'ns-fsApi-2', 'getImageSizeFromPath')
 
 export const getFileSize = defineIpcApi<number, [PathLike]>(
   'IPC_UP_2',
