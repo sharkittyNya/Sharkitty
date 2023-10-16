@@ -1,7 +1,7 @@
 import path from 'node:path'
 import type { Object as ToolBeltObject } from 'ts-toolbelt'
-import { CommonSaveResult } from '../common/types'
-import type { Element, Peer, UploadResponse } from './types'
+import type { CommonSaveResult } from '../common/types'
+import type { Element, Peer } from './types'
 
 const b = () => {
   const reg = {

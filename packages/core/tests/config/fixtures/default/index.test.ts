@@ -26,6 +26,7 @@ test('配置文件解析器应当正确解析 默认配置文件', async () => {
       {
         type: 'satori',
         listen: '0.0.0.0',
+        platform: 'chronocat',
         port: 5500,
         self_url: 'https://chronocat.vercel.app',
         token: 'DEFINE_CHRONO_TOKEN',
@@ -53,6 +54,7 @@ test('配置文件解析器应当正确解析 默认配置文件', async () => {
       {
         type: 'satori',
         listen: '0.0.0.0',
+        platform: 'chronocat',
         port: 5501,
         self_url: 'https://chronocat.vercel.app',
         token: 'DEFINE_CHRONO_TOKEN',
