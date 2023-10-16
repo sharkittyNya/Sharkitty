@@ -76,111 +76,53 @@ export class Messager {
         return
       }
 
-      // case 'image': {
-      //   // 图片消息
-      //   const urlString = attrs['url'] as string
-      //   const url = new URL(urlString)
+      case 'image': {
+        // 图片消息
+        const urlString = attrs['url'] as string
+        const result = await this.common.save(urlString)
 
-      //   let data: ReadStream | Buffer
-      //   let opt: FormData.AppendOptions | undefined = undefined
-      //   if (url.protocol === 'file:') {
-      //     // 本地图片
-      //     data = createReadStream(url)
-      //   } else {
-      //     // 非本地图片
-      //     const {
-      //       filename,
-      //       mime,
-      //       ['data']: buf,
-      //     } = await this.bot.ctx.http.file(attrs['url'] as string, {
-      //       timeout: this.bot.config.timeout ?? 5000,
-      //     })
-      //     data = Buffer.from(buf)
-      //     opt = { filename, contentType: mime ?? 'image/png' }
-      //   }
+        let picType: number
+        switch (result.imageInfo?.type) {
+          case 'png': {
+            picType = 1001
+            return
+          }
 
-      //   const form = new FormData()
-      //   form.append('file', data, opt)
+          case 'gif': {
+            picType = 2000
+            return
+          }
 
-      //   const result: UploadResponse = await this.bot.red.upload(form)
+          default: {
+            picType = 1000
+            break
+          }
+        }
 
-      //   this.children.push(
-      //     r.remoteImage(result, result.imageInfo?.type === 'png' ? 1001 : 1000),
-      //   )
+        this.children.push(r.remoteImage(result, picType))
+        return
+      }
 
-      //   return
-      // }
+      case 'audio': {
+        // 语音消息
+        const urlString = attrs['url'] as string
+        const result = await this.common.save(urlString)
+        this.children.push(
+          r.remoteAudio(
+            result,
+            (attrs['chrono-unsafe-time'] as number | undefined) || 1,
+          ),
+        )
+        return
+      }
 
-      // case 'audio': {
-      //   // 语音消息
-      //   const urlString = attrs['url'] as string
-      //   const url = new URL(urlString)
-
-      //   let data: ReadStream | Buffer
-      //   let opt: FormData.AppendOptions | undefined = undefined
-      //   if (url.protocol === 'file:') {
-      //     // 本地语音
-      //     data = createReadStream(url)
-      //   } else {
-      //     // 非本地语音
-      //     const {
-      //       filename,
-      //       mime,
-      //       ['data']: buf,
-      //     } = await this.bot.ctx.http.file(attrs['url'] as string, {
-      //       timeout: this.bot.config.timeout ?? 5000,
-      //     })
-      //     data = Buffer.from(buf)
-      //     opt = { filename, contentType: mime ?? 'audio/amr' }
-      //   }
-
-      //   const form = new FormData()
-      //   form.append('file', data, opt)
-
-      //   const result: UploadResponse = await this.bot.red.upload(form)
-
-      //   this.children.push(
-      //     r.remoteAudio(
-      //       result,
-      //       (attrs['chrono-unsafe-time'] as number | undefined) || 1,
-      //     ),
-      //   )
-
-      //   return
-      // }
-
-      // case 'file': {
-      //   // 文件消息
-      //   const urlString = attrs['url'] as string
-      //   const url = new URL(urlString)
-
-      //   let data: ReadStream | Buffer
-      //   let opt: FormData.AppendOptions | undefined = undefined
-      //   if (url.protocol === 'file:') {
-      //     // 本地文件
-      //     data = createReadStream(url)
-      //   } else {
-      //     // 非本地文件
-      //     const {
-      //       filename,
-      //       mime,
-      //       ['data']: buf,
-      //     } = await this.bot.ctx.http.file(attrs['url'] as string, {
-      //       timeout: this.bot.config.timeout ?? 5000,
-      //     })
-      //     data = Buffer.from(buf)
-      //     opt = { filename, contentType: mime ?? 'application/octet-stream' }
-      //   }
-
-      //   const form = new FormData()
-      //   form.append('file', data, opt)
-
-      //   const result: UploadResponse = await this.bot.red.upload(form)
-
-      //   this.children.push(r.remoteFile(result))
-
-      //   return
-      // }
+      case 'file': {
+        // 文件消息
+        const urlString = attrs['url'] as string
+        const result = await this.common.save(urlString)
+        this.children.push(r.remoteFile(result))
+        return
+      }
 
       case 'at': {
         // at 消息
