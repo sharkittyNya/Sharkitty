@@ -1,5 +1,22 @@
 # CHANGELOG
 
+## v0.0.53 (2023-10-17)
+
+### core
+
+- 添加了 Chronocat Satori OpenAPI 文档 (5708c069223f36cc07e24d34b4a4d33a1b6b9ae8)
+- Red & Satori：修复了尝试下载不存在的媒体文件时连接无响应的问题 (78558d42b12aec38e1549da042667720178de427)
+- Satori：修复了 `token` 配置项为空时仍然无法连接到事件服务的问题 (c123f0f87a7a0056c2596ad17f823f9749af2c6a)
+- Satori：修复了 `token` 配置项为空时事件服务不推送任何事件的问题 (1a9ae46aecbcdf6ca7933b0d2a010586f8abad23)
+- Satori：支持使用 `platform` 配置项自定义 Satori 事件服务对外显示的平台 (1900ef5ddf875a39b47dc0e358efc6e0cd5ff875)
+- Satori：修复了访问媒体资源报错 `401 unauthorized` 的问题 (3f9206ae550141d5609e4ff152663562b569e2cb)
+- Satori：修复了私聊情况下接收消息频道 ID 不一致的问题 (c55debe5219d94556f0a11bbed9dcf1f7226b7f4)
+- Satori：实现了 API `user.channel.create` (b63a757c337854f0a05e1a158979bfacdc94b9de)
+- Satori：支持发送 `image`/`audio`/`file` 元素 (53ca2e667bb2de607d74bee2711adbb8eab9764b)
+- 更新文档 Satori SDK 部分 @Nyayurn (9238c131d5d7df63111d9a6a5130d31b48870fda)
+- Chronocat 管理服务在登录成功后给出提示 @falconshark (48054114d76e035399c66567a1b605cea1c58613)
+- TDD：添加 Satori 解析器的单元测试 (4b0ea13b50e95a35d8f92e00b94cffcf203d04ad)
+
 ## v0.0.52 (2023-10-11)
 
 ### core
