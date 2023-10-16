@@ -1,7 +1,6 @@
 import Element from '@satorijs/element'
 import { Buffer } from 'node:buffer'
 import type { ChronocatSatoriServerConfig } from '../../config/types'
-import { selfProfile } from '../../ipc/globalVars'
 import type { Message as RedMessage } from '../../red'
 import { ChatType, MsgType, SendType } from '../../red'
 import type { Channel, Event, Guild, GuildMember } from '../types'
@@ -9,14 +8,16 @@ import { ChannelType } from '../types'
 import { parseMsgTypes } from './msgt'
 
 export const buildParser =
-  (config: ChronocatSatoriServerConfig) => (message: RedMessage) =>
-    parseMessageRecv(config, message)
+  (self_id: string, config: ChronocatSatoriServerConfig) =>
+  (message: RedMessage) =>
+    parseMessageRecv(self_id, config, message)
 
 export const parseMessageRecv = async (
+  self_id: string,
   config: ChronocatSatoriServerConfig,
   message: RedMessage,
 ) => {
-  const parsed = await parseMessage(config, message)
+  const parsed = await parseMessage(self_id, config, message)
 
   if (!parsed) return undefined
 
@@ -27,7 +28,7 @@ export const parseMessageRecv = async (
       result.push({
         id: undefined as unknown as number,
         platform: config.platform!,
-        self_id: selfProfile.value!.uin,
+        self_id,
         timestamp: Number(message.msgTime) * 1000,
 
         type: 'chrono-unsafe-warning-2127',
@@ -37,7 +38,7 @@ export const parseMessageRecv = async (
       result.push({
         id: undefined as unknown as number,
         platform: config.platform!,
-        self_id: selfProfile.value!.uin,
+        self_id,
         timestamp: Number(message.msgTime) * 1000,
 
         type: 'chrono-unsafe-warning-2128',
@@ -50,7 +51,7 @@ export const parseMessageRecv = async (
       result.push({
         id: undefined as unknown as number,
         platform: config.platform!,
-        self_id: selfProfile.value!.uin,
+        self_id,
         timestamp: Number(message.msgTime) * 1000,
 
         type: 'chrono-unsafe-warning-2129',
@@ -67,7 +68,7 @@ export const parseMessageRecv = async (
       result.push({
         id: undefined as unknown as number,
         platform: config.platform!,
-        self_id: selfProfile.value!.uin,
+        self_id,
         timestamp: Number(message.msgTime) * 1000,
 
         type: 'chrono-unsafe-warning-2130',
@@ -88,6 +89,7 @@ export const parseMessageRecv = async (
 }
 
 export const parseMessage = async (
+  self_id: string,
   config: ChronocatSatoriServerConfig,
   message: RedMessage,
 ) => {
@@ -96,7 +98,7 @@ export const parseMessage = async (
     type: undefined as unknown as string,
 
     platform: config.platform!,
-    self_id: selfProfile.value!.uin,
+    self_id,
     timestamp: Number(message.msgTime) * 1000,
   }
 
@@ -157,7 +159,10 @@ export const parseMessage = async (
     ntMsgTypes.msgType === MsgType.WithRecords ||
     ntMsgTypes.msgType === MsgType.Vaule17
   )
-    return parseChatMessage(config, event, message).then((x) => [x[0], ...x[1]])
+    return parseChatMessage(self_id, config, event, message).then((x) => [
+      x[0],
+      ...x[1],
+    ])
   // else if (event.__CHRONO_UNSAFE_NTMSGTYPES__.subMsgType.multiForward)
   //   // 合并转发消息
   //   // multiForwardMsgElement（elementType = 16）内并不带有合并转发的全部内容，
@@ -173,7 +178,7 @@ export const parseMessage = async (
     message.elements[0]!.grayTipElement!.groupElement!.type === 1 // 1
   )
     // 新人自行入群
-    return await parseGuildMemberAddedMessage(config, event, message)
+    return await parseGuildMemberAddedMessage(self_id, config, event, message)
   else if (
     ntMsgTypes.msgType === MsgType.System && // 5
     message.subMsgType === 8 && // 8
@@ -183,7 +188,7 @@ export const parseMessage = async (
     message.elements[0]!.grayTipElement!.groupElement!.type === 8 // 8
   )
     // 他人被禁言
-    return await parseGuildMemberMuteMessage(config, event, message)
+    return await parseGuildMemberMuteMessage(self_id, config, event, message)
   else if (
     ntMsgTypes.msgType === MsgType.System && // 5
     message.subMsgType === 8 && // 8
@@ -205,6 +210,7 @@ export const parseMessage = async (
   )
     // 旧版群成员邀请新人入群
     return await parseGuildMemberAddedLegacyInviteMessage(
+      self_id,
       config,
       event,
       message,
@@ -228,11 +234,12 @@ export const parseMessage = async (
  * 在消息没有除了消息元素以外的其他属性需要处理的情况下，直接使用此方法。
  */
 async function parseChatMessage(
+  self_id: string,
   config: ChronocatSatoriServerConfig,
   event: Event,
   message: RedMessage,
 ) {
-  const [elements, extraEvents] = await parseElements(config, message)
+  const [elements, extraEvents] = await parseElements(self_id, config, message)
   event.type = 'message-created'
   event.message = {
     id: message.msgId,
@@ -249,11 +256,17 @@ async function parseChatMessage(
  * `groupElement`（subElementType = 4）即可直接提取 QQ 号。
  */
 async function parseGuildMemberAddedMessage(
+  self_id: string,
   config: ChronocatSatoriServerConfig,
   event: Event,
   message: RedMessage,
 ) {
-  const [event2, extraEvents] = await parseChatMessage(config, event, message)
+  const [event2, extraEvents] = await parseChatMessage(
+    self_id,
+    config,
+    event,
+    message,
+  )
   event2.type = 'guild-member-added'
 
   event2.operator = {
@@ -278,11 +291,17 @@ async function parseGuildMemberAddedMessage(
  * 解析他人被禁言消息。
  */
 async function parseGuildMemberMuteMessage(
+  self_id: string,
   config: ChronocatSatoriServerConfig,
   event: Event,
   message: RedMessage,
 ) {
-  const [event2, extraEvents] = await parseChatMessage(config, event, message)
+  const [event2, extraEvents] = await parseChatMessage(
+    self_id,
+    config,
+    event,
+    message,
+  )
   if (
     Number(message.elements[0]!.grayTipElement!.groupElement!.shutUp!.duration)
   )
@@ -334,11 +353,17 @@ const regexGuildMemberAddedLegacyInviteMessage = /jp="(\d+)".*jp="(\d+)"/gim
  * 进行提取。
  */
 async function parseGuildMemberAddedLegacyInviteMessage(
+  self_id: string,
   config: ChronocatSatoriServerConfig,
   event: Event,
   message: RedMessage,
 ) {
-  const [event2, extraEvents] = await parseChatMessage(config, event, message)
+  const [event2, extraEvents] = await parseChatMessage(
+    self_id,
+    config,
+    event,
+    message,
+  )
   event2.type = 'guild-member-added'
 
   const execArr = regexGuildMemberAddedLegacyInviteMessage.exec(
@@ -367,6 +392,7 @@ async function parseGuildMemberAddedLegacyInviteMessage(
  * 解析消息元素。
  */
 async function parseElements(
+  self_id: string,
   config: ChronocatSatoriServerConfig,
   message: RedMessage,
 ) {
@@ -392,7 +418,7 @@ async function parseElements(
               extraEvents.push({
                 id: undefined as unknown as number,
                 platform: config.platform!,
-                self_id: selfProfile.value!.uin,
+                self_id,
                 timestamp: Number(message.msgTime) * 1000,
 
                 type: 'chrono-unsafe-warning-2131',
