@@ -3,7 +3,7 @@
   "id": "chronocat",
   "name": "Chronocat",
   "description": "小巧轻便的 Red 实现",
-  "version": "0.0.52",
+  "version": "0.0.53",
   "author": "Team Chrononeko",
   "injections": [
     {
