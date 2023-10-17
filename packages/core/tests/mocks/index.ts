@@ -12,7 +12,7 @@ export const satoriConfig = {
   enable: true,
 } as const
 
-export const commonSave = jest.fn(async () => ({
+export const saveResult = {
   filePath: '',
   fileSize: 0,
   fileName: '',
@@ -26,7 +26,9 @@ export const commonSave = jest.fn(async () => ({
     wUnits: '1',
     hUnits: '1',
   },
-}))
+}
+
+export const commonSave = jest.fn(async () => saveResult)
 
 export const getMockMessage = async () =>
   (
