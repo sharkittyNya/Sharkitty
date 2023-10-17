@@ -10,6 +10,7 @@ import { httpRouterServer } from './server/httpIncomeRouterServer'
 import { getAuthData } from './utils/authData'
 import { sleep } from './utils/time'
 import { generateToken } from './utils/token'
+import { isChronocatMode } from './config/mode'
 
 interface QuickLoginAccount {
   name: string
@@ -95,6 +96,13 @@ export const initLoginService = () => {
               switch (type) {
                 case 'quickloginList': {
                   loginState.quickLoginAccounts = data
+                  if (
+                    loginState.quickLoginAccounts?.length &&
+                    isChronocatMode('autologin')
+                  )
+                    runScriptInAllRenderers(
+                      `quickLogin('${loginState.quickLoginAccounts[0].id}')`,
+                    )
                   loginState.qrcode = null
                   break
                 }
