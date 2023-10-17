@@ -1,14 +1,22 @@
 import {
   createMemberListScene,
   destroyMemberListScene,
+  getGroupDetailInfo,
   getNextMemberList,
 } from '../../ipc/definitions/groupService'
 import type { GroupGetMemeberListPayload } from '../../red'
 import { router } from '../../router'
 import { detachPromise } from '../../utils/detachPromise'
 
+// TODO: 首次拉取群员列表需要监听 ns-ntApi-2/nodeIKernelGroupListener/onMemberListChange
+
 router.group.getMemberList.$body('json')(async ({ body }) => {
   const { group: groupCode, size: num } = body as GroupGetMemeberListPayload
+
+  await getGroupDetailInfo({
+    groupCode: String(groupCode),
+    source: 4,
+  })
 
   const scene = await createMemberListScene({
     groupCode,

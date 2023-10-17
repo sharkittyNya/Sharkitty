@@ -1,4 +1,5 @@
 import { defineIpcApi } from '../define'
+import type { ApiResult } from '../types'
 
 export type SceneId = unknown
 
@@ -12,6 +13,16 @@ export const getMemberInfo = defineIpcApi<
     },
   ]
 >('IPC_UP_2', 'ns-ntApi-2', 'nodeIKernelGroupService/getMemberInfo')
+
+export const getGroupDetailInfo = defineIpcApi<
+  ApiResult,
+  [
+    {
+      groupCode: string
+      source: 4
+    },
+  ]
+>('IPC_UP_2', 'ns-ntApi-2', 'nodeIKernelGroupService/getGroupDetailInfo')
 
 export const createMemberListScene = defineIpcApi<
   SceneId,
