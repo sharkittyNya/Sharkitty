@@ -1,3 +1,4 @@
+import fetch from 'node-fetch'
 import type { ChronocatSatoriWebHookConfig } from '../config/types'
 import type { DispatchMessage } from '../dispatch'
 import { getAuthData } from '../utils/authData'

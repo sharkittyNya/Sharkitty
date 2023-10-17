@@ -1,4 +1,5 @@
 import mime from 'mime/lite'
+import fetch from 'node-fetch'
 import { createReadStream, createWriteStream } from 'node:fs'
 import { copyFile, mkdir, rm, writeFile } from 'node:fs/promises'
 import { basename, join } from 'node:path'
