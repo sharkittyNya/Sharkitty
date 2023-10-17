@@ -1,4 +1,5 @@
 import type Element from '@satorijs/element'
+import type { GuildMember } from './satori'
 
 export * from './satori'
 
@@ -26,6 +27,10 @@ export interface WebSocketIncomingVerifyMessage {
   }
 }
 
+export interface Next {
+  next?: string
+}
+
 export interface MessageCreatePayload {
   channel_id: string
   content: Element.Fragment
@@ -33,4 +38,12 @@ export interface MessageCreatePayload {
 
 export interface UserChannelCreatePayload {
   user_id: string
+}
+
+export interface GuildMemberListPayload extends Next {
+  guild_id: string
+}
+
+export interface GuildMemberListResponse extends Next {
+  data: GuildMember[]
 }

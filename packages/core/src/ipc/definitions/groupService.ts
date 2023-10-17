@@ -60,7 +60,22 @@ export interface MemberListResult {
       index: string
     }[]
     infos: {
-      get: (uid: string) => unknown
+      get: (uid: string) =>
+        | {
+            uid: string
+            qid: ''
+            uin: string
+            nick: string
+            remark: string
+            cardType: 0
+            cardName: string
+            role: number
+            avatarPath: string
+            shutUpTime: number
+            isDelete: boolean
+            isSpecialConcerned: boolean
+          }
+        | undefined
     }
   }
 }
