@@ -38,8 +38,6 @@ export interface ChronocatCurrentConfig {
    * @title 启用
    *
    * @description 是否启用这个功能。
-   *
-   * @default true
    */
   enable?: boolean
 
