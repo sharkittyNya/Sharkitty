@@ -3,9 +3,7 @@ import fetch from 'node-fetch'
 import { createReadStream, createWriteStream } from 'node:fs'
 import { copyFile, mkdir, rm, writeFile } from 'node:fs/promises'
 import { basename, join } from 'node:path'
-import { Readable } from 'node:stream'
 import { finished } from 'node:stream/promises'
-import type { ReadableStream } from 'node:stream/web'
 import {
   getFileMd5,
   getFileSize,
@@ -66,7 +64,8 @@ export const commonSave = async (
       }
 
       filePath = await saveFile(
-        Readable.fromWeb(response.body as ReadableStream),
+        // Readable.fromWeb(response.body as ReadableStream),
+        response.body!,
         fileName,
       )
 
@@ -153,7 +152,10 @@ export const commonSave = async (
 
 async function saveFile(
   file: {
-    pipe: (destination: NodeJS.WritableStream) => NodeJS.WritableStream
+    pipe: <T extends NodeJS.WritableStream>(
+      destination: T,
+      options?: { end?: boolean | undefined },
+    ) => T
   },
   fileName: string,
 ) {
