@@ -76,9 +76,9 @@ export class Messager {
         return
       }
 
-      case 'image': {
+      case 'img': {
         // 图片消息
-        const urlString = attrs['url'] as string
+        const urlString = attrs['src'] as string
         const result = await this.common.save(urlString)
 
         let picType: number
@@ -105,7 +105,7 @@ export class Messager {
 
       case 'audio': {
         // 语音消息
-        const urlString = attrs['url'] as string
+        const urlString = attrs['src'] as string
         const result = await this.common.save(urlString)
         this.children.push(
           r.remoteAudio(
@@ -118,7 +118,7 @@ export class Messager {
 
       case 'file': {
         // 文件消息
-        const urlString = attrs['url'] as string
+        const urlString = attrs['src'] as string
         const result = await this.common.save(urlString)
         this.children.push(r.remoteFile(result))
         return
