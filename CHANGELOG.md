@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## v0.0.54 (2023-10-17)
+
+### core
+
+- Satori：更换到标准元素 (7dfd01387f72070905bdad314f19f18a97953f9b)
+- Satori：实现了 API `guild.member.list` (9e8a9dac7286983398ee8d1a93ce15bb7316c88a)
+- Satori：支持了 WebHook (1960b4c76a1c6e9d8c404081cc2d0a143b11618e)
+- 支持使用 `autologin` 开关自动登录 (da79fd4fbf79273a17916e799a0982ccc117c941)
+- Red：优化了 API `group/getMemberList` 的实现 (4bb28608b16ffbcb0b56b9bc04249832d678e12c)
+- TDD：添加 Satori 消息编码器的单元测试 (f10092fc54961791c545dfe48341adfeb40904ea)
+- Red：修复了事件中用户身份不正确的问题 @boxie123 (9fa7b0a80a2071a19f4dd298d0682dd1976bd915)
+- 修复了 Satori 无法获取网络图片和 WebHook 无法请求的问题 (3e63ddb1a6c8061d57e764b78f059e8d040a54c7)
+
 ## v0.0.53 (2023-10-17)
 
 ### core
