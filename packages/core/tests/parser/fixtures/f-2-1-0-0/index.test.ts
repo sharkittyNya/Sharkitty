@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import type { Message, WsPackage } from '../../../../src/red'
 import { buildParser } from '../../../../src/satori/parser'
-import { satoriConfig } from '../../../common'
+import { satoriConfig } from '../../../mocks'
 
 test('Satori解析器应当正确解析 纯文本消息', async () => {
   const data = JSON.parse(
