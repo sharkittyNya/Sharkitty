@@ -13,6 +13,7 @@ class State {
 
 export class Messager {
   constructor(
+    public selfId: string,
     public config: ChronocatSatoriServerConfig,
     public common: Common,
     public channelId: string,
@@ -60,7 +61,7 @@ export class Messager {
     const result = await this.common.send(this.peer, this.children)
     const parsedEvents = await new MessageRecvDispatchMessage([
       result,
-    ]).toSatori(this.config)
+    ]).toSatori(this.selfId, this.config)
     for (const parsedEvent of parsedEvents)
       if (parsedEvent.message) this.results.push(parsedEvent.message)
     this.children = []

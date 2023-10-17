@@ -8,9 +8,9 @@ import { ChannelType } from '../types'
 import { parseMsgTypes } from './msgt'
 
 export const buildParser =
-  (self_id: string, config: ChronocatSatoriEventsConfig) =>
+  (selfId: string, config: ChronocatSatoriEventsConfig) =>
   (message: RedMessage) =>
-    parseMessageRecv(self_id, config, message)
+    parseMessageRecv(selfId, config, message)
 
 export const parseMessageRecv = async (
   self_id: string,

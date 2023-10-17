@@ -1,5 +1,6 @@
 import type { ChronocatSatoriWebHookConfig } from '../config/types'
 import type { DispatchMessage } from '../dispatch'
+import { getAuthData } from '../utils/authData'
 import { buildEventIdCounter } from '../utils/token'
 
 export const initSatoriWebHook = async (
@@ -13,8 +14,8 @@ export const initSatoriWebHook = async (
 
   const getId = buildEventIdCounter()
 
-  const dispatcher = (message: DispatchMessage) =>
-    void message.toSatori(config).then((events) =>
+  const dispatcher = async (message: DispatchMessage) => {
+    await message.toSatori((await getAuthData()).uin, config).then((events) =>
       events.forEach((data) => {
         const body = {
           ...data,
@@ -31,6 +32,7 @@ export const initSatoriWebHook = async (
         })
       }),
     )
+  }
 
   return {
     dispatcher,

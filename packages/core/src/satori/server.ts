@@ -6,6 +6,7 @@ import index from '../../static/satori.html'
 import type { ChronocatSatoriServerConfig } from '../config/types'
 import type { DispatchMessage } from '../dispatch'
 import { selfProfile } from '../ipc/globalVars'
+import { getAuthData } from '../utils/authData'
 import { timeout } from '../utils/time'
 import { buildEventIdCounter } from '../utils/token'
 import type { Routes } from './routes'
@@ -241,22 +242,22 @@ export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
   })
 
   const dispatcher = (message: DispatchMessage) =>
-    authorizedClients.forEach(
-      (ws) =>
-        void message.toSatori(config).then((events) =>
-          events.forEach((body) =>
-            ws.send(
-              JSON.stringify({
-                op: Op.Event,
-                body: {
-                  ...body,
-                  id: getId(),
-                },
-              }),
-            ),
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    authorizedClients.forEach(async (ws) => {
+      await message.toSatori((await getAuthData()).uin, config).then((events) =>
+        events.forEach((body) =>
+          ws.send(
+            JSON.stringify({
+              op: Op.Event,
+              body: {
+                ...body,
+                id: getId(),
+              },
+            }),
           ),
         ),
-    )
+      )
+    })
 
   server.listen(config.port, config.listen)
 

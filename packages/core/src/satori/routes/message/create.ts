@@ -14,6 +14,7 @@ import {
   getRichMediaFilePath,
   getRichMediaFilePathForGuild,
 } from '../../../ipc/definitions/msgService'
+import { getAuthData } from '../../../utils/authData'
 import { baseDir } from '../../../utils/baseDir'
 import { qqVersion } from '../../../utils/qqVersion'
 import { Messager } from '../../messager'
@@ -163,5 +164,10 @@ async function messageCreateUsingJson({ config, res, json }: RouteContext) {
     return
   }
 
-  return new Messager(config, common, channel_id).send(content)
+  return new Messager(
+    (await getAuthData()).uin,
+    config,
+    common,
+    channel_id,
+  ).send(content)
 }
