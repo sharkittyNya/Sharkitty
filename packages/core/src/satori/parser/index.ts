@@ -1,6 +1,6 @@
 import Element from '@satorijs/element'
 import { Buffer } from 'node:buffer'
-import type { ChronocatSatoriServerConfig } from '../../config/types'
+import type { ChronocatSatoriEventsConfig } from '../../config/types'
 import type { Message as RedMessage } from '../../red'
 import { ChatType, MsgType, SendType } from '../../red'
 import type { Channel, Event, Guild, GuildMember } from '../types'
@@ -8,13 +8,13 @@ import { ChannelType } from '../types'
 import { parseMsgTypes } from './msgt'
 
 export const buildParser =
-  (self_id: string, config: ChronocatSatoriServerConfig) =>
+  (self_id: string, config: ChronocatSatoriEventsConfig) =>
   (message: RedMessage) =>
     parseMessageRecv(self_id, config, message)
 
 export const parseMessageRecv = async (
   self_id: string,
-  config: ChronocatSatoriServerConfig,
+  config: ChronocatSatoriEventsConfig,
   message: RedMessage,
 ) => {
   const parsed = await parseMessage(self_id, config, message)
@@ -90,7 +90,7 @@ export const parseMessageRecv = async (
 
 export const parseMessage = async (
   self_id: string,
-  config: ChronocatSatoriServerConfig,
+  config: ChronocatSatoriEventsConfig,
   message: RedMessage,
 ) => {
   const event: Event = {
@@ -235,7 +235,7 @@ export const parseMessage = async (
  */
 async function parseChatMessage(
   self_id: string,
-  config: ChronocatSatoriServerConfig,
+  config: ChronocatSatoriEventsConfig,
   event: Event,
   message: RedMessage,
 ) {
@@ -257,7 +257,7 @@ async function parseChatMessage(
  */
 async function parseGuildMemberAddedMessage(
   self_id: string,
-  config: ChronocatSatoriServerConfig,
+  config: ChronocatSatoriEventsConfig,
   event: Event,
   message: RedMessage,
 ) {
@@ -292,7 +292,7 @@ async function parseGuildMemberAddedMessage(
  */
 async function parseGuildMemberMuteMessage(
   self_id: string,
-  config: ChronocatSatoriServerConfig,
+  config: ChronocatSatoriEventsConfig,
   event: Event,
   message: RedMessage,
 ) {
@@ -354,7 +354,7 @@ const regexGuildMemberAddedLegacyInviteMessage = /jp="(\d+)".*jp="(\d+)"/gim
  */
 async function parseGuildMemberAddedLegacyInviteMessage(
   self_id: string,
-  config: ChronocatSatoriServerConfig,
+  config: ChronocatSatoriEventsConfig,
   event: Event,
   message: RedMessage,
 ) {
@@ -393,7 +393,7 @@ async function parseGuildMemberAddedLegacyInviteMessage(
  */
 async function parseElements(
   self_id: string,
-  config: ChronocatSatoriServerConfig,
+  config: ChronocatSatoriEventsConfig,
   message: RedMessage,
 ) {
   const elements: Element[] = []

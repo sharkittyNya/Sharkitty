@@ -7,6 +7,7 @@ import type { ChronocatSatoriServerConfig } from '../config/types'
 import type { DispatchMessage } from '../dispatch'
 import { selfProfile } from '../ipc/globalVars'
 import { timeout } from '../utils/time'
+import { buildEventIdCounter } from '../utils/token'
 import type { Routes } from './routes'
 import { routes } from './routes'
 import { assets } from './routes/assets'
@@ -18,11 +19,6 @@ declare const __DEFINE_CHRONO_VERSION__: string
 
 const prefix = '/v1/'
 const poweredBy = `Chronocat/${__DEFINE_CHRONO_VERSION__}`
-
-const buildEventIdCounter = () => {
-  let i = 0
-  return () => ++i
-}
 
 export const initSatoriServer = async (config: ChronocatSatoriServerConfig) => {
   // 预处理 self_url

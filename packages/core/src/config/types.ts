@@ -15,7 +15,11 @@ export interface ChronocatConfig {
    *
    * @default []
    */
-  servers?: (ChronocatRedServerConfig | ChronocatSatoriServerConfig)[]
+  servers?: (
+    | ChronocatRedServerConfig
+    | ChronocatSatoriServerConfig
+    | ChronocatSatoriWebHookConfig
+  )[]
 
   /**
    * @title 账号配置
@@ -34,6 +38,8 @@ export interface ChronocatCurrentConfig {
    * @title 启用
    *
    * @description 是否启用这个功能。
+   *
+   * @default true
    */
   enable?: boolean
 
@@ -41,8 +47,14 @@ export interface ChronocatCurrentConfig {
    * @title 服务
    *
    * @description Chronocat 需要启动的服务。
+   *
+   * @default []
    */
-  servers?: (ChronocatRedServerConfig | ChronocatSatoriServerConfig)[]
+  servers?: (
+    | ChronocatRedServerConfig
+    | ChronocatSatoriServerConfig
+    | ChronocatSatoriWebHookConfig
+  )[]
 }
 
 export interface ChronocatServerConfig {
@@ -96,27 +108,9 @@ export interface ChronocatRedServerConfig
   port?: number
 }
 
-export interface ChronocatSatoriServerConfig
-  extends ChronocatServerConfig,
-    ChronocatHttpServerConfig {
-  type: 'satori'
-
+export interface ChronocatSatoriEventsConfig {
   /**
-   * @title 监听端口
-   *
-   * @description 服务器监听的端口。
-   *
-   * 默认为 5500。
-   *
-   * @TJS-type integer
-   * @default 5500
-   * @minimum 1
-   * @maximum 65535
-   */
-  port?: number
-
-  /**
-   * @title 客户端访问 Satori 服务时的地址。
+   * @title 客户端访问 Satori 服务时的地址
    *
    * @description 客户端将会使用这个地址访问 Satori。
    *
@@ -147,7 +141,7 @@ export interface ChronocatSatoriServerConfig
   self_url?: string
 
   /**
-   * @title Satori 服务声明的自己所使用的平台。
+   * @title Satori 服务声明的平台
    *
    * @description Satori 对外宣称的自己所处的平台。
    *
@@ -156,4 +150,60 @@ export interface ChronocatSatoriServerConfig
    * @default "chronocat"
    */
   platform?: string
+}
+
+export interface ChronocatSatoriServerConfig
+  extends ChronocatServerConfig,
+    ChronocatHttpServerConfig,
+    ChronocatSatoriEventsConfig {
+  type: 'satori'
+
+  /**
+   * @title 监听端口
+   *
+   * @description 服务器监听的端口。
+   *
+   * 默认为 5500。
+   *
+   * @TJS-type integer
+   * @default 5500
+   * @minimum 1
+   * @maximum 65535
+   */
+  port?: number
+}
+
+export interface ChronocatSatoriWebHookConfig
+  extends ChronocatSatoriEventsConfig {
+  type: 'satori_webhook'
+
+  /**
+   * @title WebHook URL
+   *
+   * @description WebHook 推送事件的目标 URL。
+   */
+  url: string
+
+  /**
+   * @title 启用
+   *
+   * @description 是否启用这个功能。
+   *
+   * @default true
+   */
+  enable?: boolean
+
+  /**
+   * @title WebHook 推送鉴权密码
+   *
+   * @description
+   *
+   * WebHook 推送事件时，会设置 Authorization 头为
+   * Bearer 加上此鉴权密码。
+   *
+   * 强烈建议为 WebHook 服务设置单独的鉴权密码。
+   *
+   * @default ""
+   */
+  token?: string
 }

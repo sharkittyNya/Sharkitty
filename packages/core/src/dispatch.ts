@@ -1,4 +1,4 @@
-import type { ChronocatSatoriServerConfig } from './config/types'
+import type { ChronocatSatoriEventsConfig } from './config/types'
 import type { Message } from './red'
 import { buildParser } from './satori/parser'
 import type { Event } from './satori/types'
@@ -7,7 +7,7 @@ import { getAuthData } from './utils/authData'
 export interface DispatchMessage {
   type: 'message::recv'
   toRed: () => Promise<unknown>
-  toSatori: (config: ChronocatSatoriServerConfig) => Promise<Event[]>
+  toSatori: (config: ChronocatSatoriEventsConfig) => Promise<Event[]>
 }
 
 export class MessageRecvDispatchMessage implements DispatchMessage {
@@ -15,7 +15,7 @@ export class MessageRecvDispatchMessage implements DispatchMessage {
   type = 'message::recv' as const
   toRed = async () => this.messages
 
-  toSatori = async (config: ChronocatSatoriServerConfig) => {
+  toSatori = async (config: ChronocatSatoriEventsConfig) => {
     const authData = await getAuthData()
 
     const events = await Promise.all(
