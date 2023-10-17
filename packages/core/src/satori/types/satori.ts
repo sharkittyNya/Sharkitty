@@ -267,5 +267,5 @@ export interface GuildRole {
   /**
    * 角色名称
    */
-  name: string
+  name?: string
 }

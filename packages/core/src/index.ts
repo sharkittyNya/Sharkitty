@@ -95,7 +95,7 @@ export const chronocat = async () => {
 
         const fillRole = (msg: Message) => {
           if (msg.chatType === ChatType.Group) {
-            msg.roleType = roleMap[msg.peerUid]?.[msg.senderUid]
+            msg.roleType = roleMap[msg.peerUid]?.[msg.senderUin]
           }
         }
 
@@ -160,7 +160,7 @@ export const chronocat = async () => {
         for (const [uid, { uin, role }] of members) {
           uixCache.addToMap(uid, uin)
           if (!(groupCode in roleMap)) roleMap[groupCode] = {}
-          roleMap[groupCode][uid] = role
+          roleMap[groupCode][uin] = role
         }
         break
       }
@@ -188,7 +188,7 @@ export const chronocat = async () => {
         for (const [uid, { uin, role }] of payload.info.infos) {
           uixCache.addToMap(uid, uin)
           if (!(groupCode in roleMap)) roleMap[groupCode] = {}
-          roleMap[groupCode][uid] = role
+          roleMap[groupCode][uin] = role
         }
 
         break
