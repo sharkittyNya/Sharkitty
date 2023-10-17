@@ -41,7 +41,6 @@ router.group.getMemberList.$body('json')(async ({ body }) => {
 
   return memList.result?.ids?.map(({ uid, index }) => {
     return {
-      uid,
       index,
       detail: memList.result.infos.get(uid),
     }
