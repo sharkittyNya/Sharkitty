@@ -1,4 +1,3 @@
-import path from 'node:path'
 import type { Object as ToolBeltObject } from 'ts-toolbelt'
 import type { CommonSaveResult } from '../common/types'
 import type { Element, Peer } from './types'
@@ -109,7 +108,7 @@ const b = () => {
       elementType: 2,
       extBufForUI: '',
       picElement: {
-        fileName: path.basename(saveResult.filePath),
+        fileName: saveResult.fileName,
         fileSize: String(saveResult.fileSize),
         fileSubId: '',
         fileUuid: '',
@@ -135,7 +134,7 @@ const b = () => {
       elementType: 4,
       pttElement: {
         canConvert2Text: true,
-        fileName: path.basename(saveResult.filePath),
+        fileName: saveResult.fileName,
         filePath: saveResult.filePath,
         md5HexStr: saveResult.md5,
         fileId: 0,
@@ -159,7 +158,7 @@ const b = () => {
       elementType: 3,
       fileElement: {
         fileMd5: '',
-        fileName: path.basename(saveResult.filePath),
+        fileName: saveResult.fileName,
         filePath: saveResult.filePath,
         fileSize: String(saveResult.fileSize),
         picHeight: 0,
