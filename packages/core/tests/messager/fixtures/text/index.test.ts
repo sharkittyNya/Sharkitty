@@ -1,5 +1,5 @@
-import { Messager } from '../../../src/satori/messager'
-import { commonSave, getMockMessage, satoriConfig } from '../../mocks'
+import { Messager } from '../../../../src/satori/messager'
+import { commonSave, getMockMessage, satoriConfig } from '../../../mocks'
 
 test('Satori编码器应当正确编码 纯文本消息', async () => {
   const send = jest.fn().mockReturnValueOnce(getMockMessage())

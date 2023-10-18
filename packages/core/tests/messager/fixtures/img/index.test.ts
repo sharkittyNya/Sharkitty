@@ -1,7 +1,7 @@
 import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
-import { Messager } from '../../../src/satori/messager'
-import { getMockMessage, satoriConfig, saveResult } from '../../mocks'
+import { Messager } from '../../../../src/satori/messager'
+import { getMockMessage, satoriConfig, saveResult } from '../../../mocks'
 
 test('Satori编码器应当正确编码 图片消息', async () => {
   const send = jest.fn().mockReturnValueOnce(getMockMessage())
